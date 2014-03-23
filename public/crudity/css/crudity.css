@@ -1,0 +1,307 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 1 nov. 2013, 22:15:53
+    Author     : Alban
+*/
+.cr-form input[type="text"], 
+.cr-form input[type="phone"], 
+.cr-form input[type="email"], 
+.cr-form input[type="number"], 
+.selectly__frame {
+    border : 1px solid #DDD;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    box-shadow: inset 0 2px 3px -2px rgba(0, 0, 0, 0.05), inset 0 2px 10px 0px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(255, 255, 255, 1);
+    background-color: #F9F9F9;
+    padding: 8px;
+    transition: background, box-shadow 0.3s;
+    color: #555;
+    border-radius: 3px;
+    font-size: 13px;
+    font-family: "Open Sans";
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 1);
+}
+
+.cr-form input[type="text"]:hover, 
+.cr-form input[type="phone"]:hover, 
+.cr-form input[type="email"]:hover, 
+.cr-form input[type="number"]:hover {
+    box-shadow: inset 0 2px 8px 1px rgba(0, 0, 0, 0.1);
+    background-color: #F9F9F9;
+}
+
+.cr-form input[type="text"]:focus, 
+.cr-form input[type="phone"]:focus, 
+.cr-form input[type="email"]:focus, 
+.cr-form input[type="number"]:focus {
+    border: 1px solid #DDD;
+    outline: none;
+}
+
+/*
+.cr-form [type="submit"] {
+    border : 1px solid #DDD;
+    box-shadow: 0 2px 3 px 0 rgba(0, 0, 0, 0.08);
+    
+    
+    background: #abd0ef; 
+    background: -moz-linear-gradient(top,  #abd0ef 0%, #65a7d9 100%); 
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#abd0ef), color-stop(100%,#65a7d9)); 
+    background: -webkit-linear-gradient(top,  #abd0ef 0%,#65a7d9 100%);
+    background: -o-linear-gradient(top,  #abd0ef 0%,#65a7d9 100%); 
+    background: -ms-linear-gradient(top,  #abd0ef 0%,#65a7d9 100%); 
+    background: linear-gradient(to bottom,  #abd0ef 0%,#65a7d9 100%); 
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#abd0ef', endColorstr='#65a7d9',GradientType=0 ); 
+
+    border-top: 1px solid #E7EFF5;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    
+    border-radius: 3px;
+    padding: 8px 15px;
+    transition: background, box-shadow, padding 0.3s;
+    color: white;
+    font-size: 15px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    font-family: "Open Sans";
+    font-weight: 400;
+    position: relative;
+    
+}
+*/
+
+.cr-form [type="submit"]:hover {
+    box-shadow: inset 0 2px 8px 1px rgba(0, 0, 0, 0.1);
+    background-color: #F9F9F9;
+}
+
+.cr-form [type="submit"]:focus {
+    border: 1px solid #DDD;
+    outline: none;
+}
+
+.cr-form input[type="text"].cr-guilt--highlight,
+.cr-form input[type="phone"].cr-guilt--highlight,
+.cr-form input[type="email"].cr-guilt--highlight,
+.cr-form input[type="number"].cr-guilt--highlight {
+    border-color: rgba(255, 0, 0, 0.1);
+    background-color: rgba(255, 0, 0, 0.05);
+}
+
+.cr-form [type='submit']:disabled {
+    background-image: none;
+    background: #abd0ef; /* Old browsers */
+    border: none;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.cr-form [type='submit']:before {
+    transition: background .3s;
+}
+
+.cr-form [type='submit'].cr-submit--loading:before {
+    content: "";
+    background-image: url("../images/submit-loader.gif");
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    top: 2px;
+    left: 0;
+}
+
+.cr-form [type='submit'].cr-submit--loading {
+    padding-left: 36px;
+}
+
+.selectly {
+    width: 300px;
+    position: relative;
+    z-index: 10;
+}
+
+.selectly__wrapper {
+    width: 275px;
+}
+
+.selectly__frame {
+    height: 12px;
+    cursor: pointer;
+    line-height: 15px;
+}
+
+.selectly__frame:after {
+    content: '\f0d7';
+    font-family: "FontAwesome";
+    float: right;
+    margin-right: 5px;
+    font-size: 17px;
+    position: relative;
+    top: -2px;
+    color: rgba(0, 0, 0, 0.1);
+    transition: color 0.3s;
+}
+
+.selectly__frame:hover:after {
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.selectly__add {
+    float: right;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    z-index: 2;
+    text-decoration: none;
+    color: white;
+    
+    background: #abd0ef; /* Old browsers */
+    background: -moz-linear-gradient(top,  #abd0ef 0%, #65a7d9 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#abd0ef), color-stop(100%,#65a7d9)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #abd0ef 0%,#65a7d9 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #abd0ef 0%,#65a7d9 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #abd0ef 0%,#65a7d9 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #abd0ef 0%,#65a7d9 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#abd0ef', endColorstr='#65a7d9',GradientType=0 ); /* IE6-9 */
+    
+    border-radius: 0 4px 4px 0;
+    box-shadow: -3px 0 5px -2px rgba(0, 0, 0, 0.1);
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.2), -1px -1px 1px rgba(0, 0, 0, 0.1);
+    
+    
+    color: rgba(0, 0, 0, 0.2);
+    border-left: 1px solid rgba(0, 0, 0, 0.06);
+    border-right: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.selectly__add:before {
+    content: "\f067";
+    font-family: "FontAwesome";
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: block;
+    vertical-align: middle;
+    line-height: 33px;
+    text-decoration: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    text-indent: -2px;
+}
+
+.selectly__form {
+    display: none;
+}
+
+.selectly__form fieldset {
+    border: none;
+}
+
+.selectly__list {    
+    border : 1px solid #EEE;
+    position: absolute;
+    width: 100%;
+    box-sizing: border-box;
+    width: 265px;
+    margin-left: 5px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.06);
+}
+
+.selectly__option {
+    box-shadow: inset 0 2px 3px -2px rgba(0, 0, 0, 0.02);
+    background-color: #F9F9F9;
+    padding: 5px;
+    transition: background, box-shadow 0.3s;
+    color: #555;
+    font-size: 13px;
+    font-family: "Open Sans";
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 1);
+    width: 100%;
+    position: relative;    
+    box-sizing: border-box;
+    border-top: 1px solid #FEFEFE;
+    border-bottom: 1px solid #EEE;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.selectly__option:hover {
+    text-shadow: 2px 2px 1px rgba(255, 255, 255, 1);
+    background-color: #F4F4F4;
+    color: #000;
+}
+
+.selectly__edit, .selectly__remove {
+    float: right;
+    margin: 0 5px;
+}
+
+main {
+    width: 300px;
+    position: relative;
+    margin: auto;
+    margin-top: 100px;
+}
+
+.selectly__edit {
+    text-decoration: none;
+}
+
+.selectly__edit:before {
+    content: "\f040";
+    font-family: "FontAwesome";
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: block;
+    vertical-align: middle;
+    text-decoration: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    text-indent: -2px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.2);    
+    color: rgba(0, 0, 0, 0.2);
+    transition: color 0.2s;
+    font-size: 15px;
+}
+
+.selectly__edit:hover:before { 
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.selectly__remove {
+    text-decoration: none;
+}
+
+.selectly__remove:before {
+    content: "\f00d";
+    font-family: "FontAwesome";
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: block;
+    vertical-align: middle;
+    text-decoration: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    text-indent: -2px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.2);    
+    color: rgba(0, 0, 0, 0.2);
+    transition: color 0.2s;
+    font-size: 15px;
+}
+
+.selectly__remove:hover:before { 
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.selectly__edit.selectly__inactive, .selectly__remove.selectly__inactive {
+    cursor: not-allowed;
+}
+
+.selectly__edit.selectly__inactive:before, .selectly__remove.selectly__inactive:before {
+    opacity: 0.2;
+}
+
+.selectly__edit.selectly__inactive:hover:before, .selectly__remove.selectly__inactive:hover:before { 
+    color: rgba(0, 0, 0, 0.2);
+}
