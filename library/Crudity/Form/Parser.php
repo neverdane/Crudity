@@ -1,6 +1,7 @@
 <?php
 
-class Crudity_Form_Parser {
+class Crudity_Form_Parser
+{
 
     /**
      * All the Form elements that Crudity can handle
@@ -20,46 +21,76 @@ class Crudity_Form_Parser {
      *  The form to parse
      * @return array
      */
-    public static function parse($formElem) {
+    public static function parse($formElem)
+    {
         return array(
-            "id"        => $formElem->attr("id"),
-            "fields"    => self::_identifyFields($formElem)
+            "id" => $formElem->attr("id"),
+            "fields" => self::_identifyFields($formElem)
         );
     }
 
     /**
-     * Identify fields
-     * @param $formElem
+     * Identify all fields managed by Crudity and return Crudity_Form_Field instances in an indexed array
+     * @param phpQueryObject $formElem
+     *  The form to parse
      * @return array
+     *  Indexed array
      */
-    protected static function _identifyFields($formElem) {
+    protected static function _identifyFields($formElem)
+    {
         $fields = array();
         // We get all the Form Elements managed by Crudity
-        foreach(self::$_managedElemTypes as $elemType) {
+        foreach (self::$_managedElemTypes as $elemType) {
             // We store all fields in a flatten array (That's why we use array_merge and not [])
             $fields = array_merge($fields, self::_getFields($elemType, $formElem));
         }
         return $fields;
     }
 
-    protected static function _getFields($type, $html) {
-        $inputs = $html->find($type);
+    /**
+     * Return all Crudity_Form_Field instances of a specific type from $formElem
+     * @param string $type
+     *  The selector of the element (input, select, ...)
+     * @param phpQueryObject $formElem
+     *  The form to parse
+     * @return array
+     *  Indexed array
+     */
+    protected static function _getFields($type, $formElem)
+    {
+        // We get all elements from the DOM with selector $type
+        $inputs = $formElem->find($type);
         $fields = array();
+        // Foreach element, we create an Crudity_Form_Field instance of its type
         foreach ($inputs as $input) {
+            // We transform the element as a phpQuery object
             $pqInput = pq($input);
+            // We test if the current field analyzed is a Crudity functional field in the aim to not manage them
             if ($pqInput->attr("name") === Crudity_Application::$prefix . "_partial"
                 || $pqInput->attr("type") === "submit"
                 || $pqInput->attr("cr-name") === ""
-                || is_null($pqInput->attr("cr-name"))) {
+                || is_null($pqInput->attr("cr-name"))
+            ) {
                 continue;
             }
+            // We factory the Crudity_Form_Field class name
             $fieldType = "Crudity_Form_Field_" . ucfirst(self::_identifyField($pqInput, $type));
+            // We add the instance to the returned array
             $fields[] = new $fieldType($type, $pqInput);
         }
         return $fields;
     }
-    
-    public static function _identifyField($pqInput, $elemType = null) {
+
+    /**
+     * Identifies the Crudity_Form_Field type of the given $pqInput element
+     * @param phpQueryObject $pqInput
+     *  The element to analyze
+     * @param null|string $elemType
+     *  The selector of the element
+     * @return null|string
+     */
+    public static function _identifyField($pqInput, $elemType = null)
+    {
         if (in_array($elemType, self::$_managedElemTypes)) {
             if ($elemType === "input") {
                 $type = $pqInput->attr("type");

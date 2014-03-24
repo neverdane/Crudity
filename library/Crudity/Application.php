@@ -3,7 +3,7 @@
 /**
  * This library is used in order to parse and interact easily with the DOM
  */
-require_once "libs/phpQuery/phpQuery.php";
+require_once __DIR__ . "/../../libs/phpQuery/phpQuery.php";
 
 class Crudity_Application {
 
@@ -243,7 +243,7 @@ class Crudity_Application {
 
         // We import the settings of Crudity
         // We assume that the Crudity default config file path is self::PARAMS_FILE
-        self::$params = json_decode(file_get_contents(realpath(dirname(__FILE__) . "/" . self::PARAMS_FILE)), true);
+        self::$params = json_decode(file_get_contents(realpath(dirname(__FILE__) . "/../../" . self::PARAMS_FILE)), true);
         if (!is_null($customParamsFile)) {
             if(file_exists($customParamsFile)) {
                 $customParamsJson = json_decode(file_get_contents($customParamsFile), true);
