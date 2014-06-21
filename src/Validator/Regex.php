@@ -1,6 +1,7 @@
 <?php
+namespace Neverdane\Crudity\Validator;
 
-class Crudity_Validator_Regex extends Crudity_Validator_Abstract {
+class ValidatorRegex extends ValidatorAbstract {
     
     protected static function _validate($input, $regex) {
         if(self::_testRegex($regex, $input) === true){ 

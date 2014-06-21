@@ -1,6 +1,9 @@
 <?php
+namespace Neverdane\Crudity\Form;
 
-class Crudity_Form_Parser
+use Neverdane\Crudity\Crudity;
+
+class FormParser
 {
 
     /**
@@ -66,7 +69,7 @@ class Crudity_Form_Parser
             // We transform the element as a phpQuery object
             $pqInput = pq($input);
             // We test if the current field analyzed is a Crudity functional field in the aim to not manage them
-            if ($pqInput->attr("name") === Crudity_Application::$prefix . "_partial"
+            if ($pqInput->attr("name") === Crudity::$prefix . "_partial"
                 || $pqInput->attr("type") === "submit"
                 || $pqInput->attr("cr-name") === ""
                 || is_null($pqInput->attr("cr-name"))
@@ -74,7 +77,7 @@ class Crudity_Form_Parser
                 continue;
             }
             // We factory the Crudity_Form_Field class name
-            $fieldType = "Crudity_Form_Field_" . ucfirst(self::_identifyField($pqInput, $type));
+            $fieldType = "Neverdane\\Crudity\\Form\\Field\\" . ucfirst(self::_identifyField($pqInput, $type)) . "Field";
             // We add the instance to the returned array
             $fields[] = new $fieldType($type, $pqInput);
         }
@@ -95,7 +98,7 @@ class Crudity_Form_Parser
             if ($elemType === "input") {
                 $type = $pqInput->attr("type");
                 if (is_null($type)) {
-                    $type = $pqInput->attr(Crudity_Application::$prefix . "-type");
+                    $type = $pqInput->attr(Crudity::$prefix . "-type");
                 }
                 switch ($type) {
                     case "email":

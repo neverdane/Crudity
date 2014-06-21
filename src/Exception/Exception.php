@@ -1,8 +1,11 @@
 <?php
-class Crudity_Exception extends Exception
+namespace Neverdane\Crudity\Exception;
+
+
+class Exception extends \Exception
 {
     /**
-     * @var null|Exception
+     * @var null|\Exception
      */
     private $_previous = null;
 
@@ -11,9 +14,9 @@ class Crudity_Exception extends Exception
      *
      * @param  string $msg
      * @param  int $code
-     * @param  Exception $previous
+     * @param  \Exception $previous
      */
-    public function __construct($msg = '', $code = 0, Exception $previous = null)
+    public function __construct($msg = '', $code = 0, \Exception $previous = null)
     {
         if (version_compare(PHP_VERSION, '5.3.0', '<')) {
             parent::__construct($msg, (int) $code);

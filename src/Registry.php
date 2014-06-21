@@ -1,6 +1,7 @@
 <?php
+namespace Neverdane\Crudity;
 
-class Crudity_Registry {
+class Registry {
 
     public static function store($id, $form) { 
         if(!isset($_SESSION["Crudity"])) {

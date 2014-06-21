@@ -1,9 +1,14 @@
 <?php
+namespace Neverdane\Crudity\Form;
+use Neverdane\Crudity\Crudity;
+use Neverdane\Crudity\Error;
+use Neverdane\Crudity\Exception\Exception;
+use phpQuery;
 
 /**
- * Crudity_Form class stores the params of the form
+ * Form class stores the params of the form
  */
-class Crudity_Form
+class Form
 {
 
     /**
@@ -60,7 +65,21 @@ class Crudity_Form
     public $crudityParams = array();
 
     /**
-     * Creates an instance of Crudity_Form
+     * All errors get during after the treatment of user input
+     * @var array
+     */
+    protected $_errors = array();
+
+    /**
+     * The status of the user input treatment and the CRUD action. Can be :
+     * - self::STATUS_SUCCESS
+     * - self::STATUS_FAILURE
+     * @var int
+     */
+    protected $_status = self::STATUS_SUCCESS;
+
+    /**
+     * Creates an instance of Form
      * Gets the script's HTML view to the form
      * @param string $partial
      */
@@ -71,7 +90,7 @@ class Crudity_Form
         $this->_initDoc();
         // We set the Crudity params for this specific Form instance
         $this->setCrudityParams();
-        $this->populate(Crudity_Form_Parser::parse($this->_form));
+        $this->populate(FormParser::parse($this->_form));
     }
 
     /**
@@ -81,7 +100,7 @@ class Crudity_Form
     {
         // We store the HTML content to a variable
         ob_start();
-        Crudity_Application::$adapter->render($this->_partial);
+        Crudity::$adapter->render($this->_partial);
         $html = ob_get_contents();
         ob_end_clean();
         // To simplify the DOM interaction, we convert the HTML to phpQueryObject (jQuery's PHP version)
@@ -120,7 +139,7 @@ class Crudity_Form
     {
         // We prevent the browser to block the Crudity validation (HTML5 specific)
         $this->_form->attr("novalidate", true)
-            ->addClass(Crudity_Application::$prefix . "-form");
+            ->addClass(Crudity::$prefix . "-form");
     }
 
     /**
@@ -158,7 +177,14 @@ class Crudity_Form
         $return["extra"] = array();
         if ($return["status"] === self::STATUS_SUCCESS) {
             $this->_cleanParams = $this->filter($params);
-            $return["extra"] = $this->_succeed($action, $rowId);
+            $formParams = Crudity::$params["Forms"][$this->_id];
+
+            if (isset($formParams["noDuplicates"])) {
+                /*$model = new $formParams["model"]();
+                $*/
+            }
+
+            $return["extra"] = $this->_succeed($action, $rowId, $return);
         }
         return $return;
     }
@@ -170,7 +196,7 @@ class Crudity_Form
      *  "errors"   => (array) Messages returned by the validation
      * @param array $params
      * @return array
-     * @throws Crudity_Exception
+     * @throws Exception
      */
     public function validate($params = null)
     {
@@ -179,8 +205,7 @@ class Crudity_Form
             $params = $this->_dirtyParams;
         }
         $result = array(
-            "status" => self::STATUS_SUCCESS,
-            "errors" => array()
+            "status" => self::STATUS_SUCCESS
         );
 
         // We iterate on each field declared on this Form
@@ -192,26 +217,28 @@ class Crudity_Form
             $userInput = (isset($params[$field->name])) ? $params[$field->name] : null;
             // If this expected field was not submitted by the user (probably hack attempt), an exception is thrown
             if (is_null($userInput)) {
-                throw new Crudity_Exception("The field " . $field->name . " was expected but not submitted");
+                throw new Exception("The field " . $field->name . " was expected but not submitted");
             }
             // If this expected field is required
             if ($field->required) {
                 // If empty, an error is added to the error stack
                 if ($userInput === "" || is_null($userInput)) {
                     $status = self::STATUS_FAILURE;
-                    $code = Crudity_Error::REQUIRED;
+                    $code = Error::REQUIRED;
                 }
             }
             // If no error was detected for this field previously and a validation is needed
-            if ($status !== self::STATUS_FAILURE && !is_null($field->validator)) {
-                // We get the validator class suffix
-                $validatorName = ucfirst($field->validator);
-                // We get the validator class name
-                $validator = "Crudity_Validator_" . $validatorName;
-                $validation = $validator::validate($userInput);
-                if ($validation["success"] !== true) {
-                    $status = self::STATUS_FAILURE;
-                    $code = $validation["code"];
+            if ($status !== self::STATUS_FAILURE && !is_null($field->validators)) {
+                foreach($field->validators as $validator) {
+                    // We get the validator class suffix
+                    $validatorName = ucfirst($validator);
+                    // We get the validator class name
+                    $validator = "Crudity_Validator_" . $validatorName;
+                    $validation = $validator::validate($userInput, $this);
+                    if ($validation["success"] !== true) {
+                        $status = self::STATUS_FAILURE;
+                        $code = $validation["code"];
+                    }
                 }
             }
             if ($status === self::STATUS_FAILURE) {
@@ -220,11 +247,7 @@ class Crudity_Form
                     "validatorName" => $validatorName
                 );
                 $result["status"] = self::STATUS_FAILURE;
-                $result["errors"][] = array(
-                    "code" => $code,
-                    "message" => Crudity_Error::getMessage($messagesParams, $code, $this, $field),
-                    "guilt" => $field->name
-                );
+                $this->addError($code, $messagesParams, $field);
             }
             if ($this->params["errors"]["showAll"] !== true && $status === self::STATUS_FAILURE) {
                 break;
@@ -280,14 +303,19 @@ class Crudity_Form
      * TODO Creates the crud function
      * Currently just tests it directly in JSON without db adapter
      */
-    protected function _succeed($action, $rowId = null)
+    protected function _succeed($action, $rowId = null, &$result = null)
     {
-        $formParams = Crudity_Application::$params["Forms"][$this->_id];
+        $formParams = Crudity::$params["Forms"][$this->_id];
         if (isset($formParams["model"])) {
             if ($action === self::ACTION_UPDATE) {
-                $id = Crudity_Application::$adapter->update($formParams["model"], $rowId, $this->_cleanParams);
+                $id = Crudity::$adapter->update($formParams["model"], $rowId, $this->_cleanParams);
             } elseif ($action === self::ACTION_CREATE) {
-                $id = Crudity_Application::$adapter->create($formParams["model"], $this->_cleanParams);
+                $result = Crudity::$adapter->create($formParams["model"], $this->_cleanParams);
+                $id = $result["rowId"];
+                if($result["status"] === false) {
+                    $this->addError(Error::DUPLICATE_ENTRY);
+                    return false;
+                }
                 if (isset($formParams["onSuccess"])) {
                     $model = new $formParams["model"]();
                     $model->$formParams["onSuccess"]["method"]($id);
@@ -298,12 +326,12 @@ class Crudity_Form
 
     /**
      * We parse and store the Crudity Params and override them by the Form specific params if any into $this->params
-     * @return Crudity_Form
+     * @return Form
      */
     public function setCrudityParams()
     {
-        // We get the previously stored Crudity_Application::$params containing our wanted
-        $this->params = Crudity_Application::$params;
+        // We get the previously stored Crudity::$params containing our wanted
+        $this->params = Crudity::$params;
         // If our Form is customized in these params, we override the params by the customized one
         if (isset($this->params["Forms"][$this->_id]) && count($this->params) > 0) {
             $formParams = $this->params["Forms"][$this->_id];
@@ -337,10 +365,10 @@ class Crudity_Form
 
     public function read($rowId)
     {
-        $formParams = Crudity_Application::$params["Forms"][$this->_id];
+        $formParams = Crudity::$params["Forms"][$this->_id];
         $fields = array();
         if (isset($formParams["model"])) {
-            $fields = Crudity_Application::$adapter->read($formParams["model"], $this->_fields, $rowId);
+            $fields = Crudity::$adapter->read($formParams["model"], $this->_fields, $rowId);
         }
         return $fields;
     }
@@ -352,10 +380,25 @@ class Crudity_Form
 
     public function delete($rowId)
     {
-        $formParams = Crudity_Application::$params["Forms"][$this->_id];
+        $formParams = Crudity::$params["Forms"][$this->_id];
         if (isset($formParams["model"])) {
-            Crudity_Application::$adapter->delete($formParams["model"], $rowId);
+            Crudity::$adapter->delete($formParams["model"], $rowId);
         }
+    }
+
+    public function addError($code, $params = array(), $guiltField = null) {
+        $error = array(
+            "code" => $code,
+            "message" => Error::getMessage($params, $code, $this, $guiltField)
+        );
+        if(!is_null($guiltField)) {
+            $error["guilt"] = $guiltField->name;
+        }
+        $this->_errors[] = $error;
+    }
+
+    public function getErrors() {
+        return $this->_errors;
     }
 
 }

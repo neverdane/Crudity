@@ -1,6 +1,7 @@
 <?php
+namespace Neverdane\Crudity\Adapter;
 
-abstract class Crudity_Adapter_Abstract {
+abstract class AbstractAdapter {
     
     public function manageAutoload() {  
     }

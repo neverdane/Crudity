@@ -1,6 +1,7 @@
 <?php
+namespace Neverdane\Crudity\Validator;
 
-class Crudity_Validator_Email extends Crudity_Validator_Abstract {
+class ValidatorEmail extends ValidatorAbstract {
     
     protected static function _validate($input) {
         if(filter_var($input, FILTER_VALIDATE_EMAIL)){ 

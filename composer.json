@@ -1,0 +1,17 @@
+{
+    "name": "neverdane/crudity",
+    "authors": [
+        {
+            "name": "Alban Pommeret",
+            "email": "neverdane@hotmail.com"
+        }
+    ],
+    "require": {
+        "electrolinux/phpquery": "0.9.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Neverdane\\Crudity\\": "src"
+        }
+    }
+}

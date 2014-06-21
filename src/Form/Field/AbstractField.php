@@ -1,6 +1,9 @@
 <?php
+namespace Neverdane\Crudity\Form\Field;
 
-abstract class Crudity_Form_Field_Abstract {
+use Neverdane\Crudity\Crudity;
+
+abstract class AbstractField {
     /**
      * Sets if the field is required or not
      * On required, if the submitted value is empty, a message will be sent to the user
@@ -59,13 +62,13 @@ abstract class Crudity_Form_Field_Abstract {
         $this->required = $field->attr("required") === "true";
         $this->name     = $field->attr("name");
         $this->type     = $field->attr("type");
-        $this->column   = $field->attr(Crudity_Application::$prefix . "-column");
-        $crudityName    = $field->attr(Crudity_Application::$prefix . "-name");
-        $crudityType    = $field->attr(Crudity_Application::$prefix . "-type");
+        $this->column   = $field->attr(Crudity::$prefix . "-column");
+        $crudityName    = $field->attr(Crudity::$prefix . "-name");
+        $crudityType    = $field->attr(Crudity::$prefix . "-type");
 
         // We remove the Crudity column param if defined to simplify the DOM and hide some settings to the final user
         if(!is_null($this->column)) {
-            $field->removeAttr(Crudity_Application::$prefix . "-column");
+            $field->removeAttr(Crudity::$prefix . "-column");
         }
 
         // We manage some fallback attributes, known as Crudity shortcuts
@@ -83,7 +86,7 @@ abstract class Crudity_Form_Field_Abstract {
                 $this->column = $crudityName;
             }
             // We remove the Crudity name attribute to simplify the DOM and hide some settings to the final user
-            $field->removeAttr(Crudity_Application::$prefix . "-name");
+            $field->removeAttr(Crudity::$prefix . "-name");
         }
         if(!is_null($crudityType)) {
             // If the name attribute was not defined
@@ -94,7 +97,7 @@ abstract class Crudity_Form_Field_Abstract {
                 $pqField->attr("type", $crudityType);
             }
             // We remove the Crudity type attribute to simplify the DOM and hide some settings to the final user
-            $field->removeAttr(Crudity_Application::$prefix . "-type");
+            $field->removeAttr(Crudity::$prefix . "-type");
         }
     }
 

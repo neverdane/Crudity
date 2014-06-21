@@ -1,6 +1,7 @@
 <?php
+namespace Neverdane\Crudity;
 
-class Crudity_Error {
+class Error {
 
     /**
      *
@@ -50,6 +51,10 @@ class Crudity_Error {
      * Error thrown when the submitted value contains too many characters
      */
     const STRING_TOO_LONG   = 111;
+    /**
+     * Error thrown when the submitted value is already stored in the database
+     */
+    const DUPLICATE_ENTRY    = 112;
 
     /**
      * The path to the Crudity error massages file
@@ -66,7 +71,7 @@ class Crudity_Error {
     public static function initMessages($customMessages = array())
     {
         // We include the default error messages
-        $defaultMessages = include(realpath(dirname(__FILE__) . "/" . self::MESSAGES_FILE));
+        $defaultMessages = include(realpath(dirname(__FILE__) . "/../../" . self::MESSAGES_FILE));
         self::$_messages = array_replace_recursive($defaultMessages, $customMessages);
     }
 
@@ -79,9 +84,13 @@ class Crudity_Error {
 
     protected static function _interpretMessage($message, $params)
     {
-        $message = str_replace("{{name}}", $params["field"]->name, $message);
+        if(isset($params["field"]->name)) {
+            $message = str_replace("{{name}}", $params["field"]->name, $message);
+        }
         //CAUTION ! SECURE $params["value"] FROM XSS !!
-        $message = str_replace("{{value}}", $params["value"], $message);
+        if(isset($params["value"])) {
+            $message = str_replace("{{value}}", $params["value"], $message);
+        }
         return $message;
     }
 
@@ -92,16 +101,16 @@ class Crudity_Error {
         return self::_getMessageByOrder($availableParams, $availableCodes);
     }
 
-    protected static function _getAvailableParamsByOrder($params, $formId, $field)
+    protected static function _getAvailableParamsByOrder($params, $formId, $field = null)
     {
         $availableParams = array();
-        if (isset(self::$_messages["Forms"][$formId]["Fields"][$field->name])) {
+        if (!is_null($field) && isset(self::$_messages["Forms"][$formId]["Fields"][$field->name])) {
             $availableParams[] = self::$_messages["Forms"][$formId]["Fields"][$field->name];
         }
         if (isset(self::$_messages["Forms"][$formId]["Validators"])) {
             $availableParams[] = self::$_messages["Forms"][$formId]["Validators"];
         }
-        if (isset(self::$_messages["Validators"][$params["validatorName"]])) {
+        if (isset($params["validatorName"]) && isset(self::$_messages["Validators"][$params["validatorName"]])) {
             $availableParams[] = self::$_messages["Validators"][$params["validatorName"]];
         }
         if (isset(self::$_messages["Default"])) {
@@ -125,10 +134,10 @@ class Crudity_Error {
         return null;
     }
 
-    protected function _getMessageByOrder($availableParams, $availableCodes)
+    protected static function _getMessageByOrder($availableParams, $availableCodes)
     {
         foreach ($availableCodes as $availableCode) {
-            $message = $this->_getMessageByCode($availableParams, $availableCode);
+            $message = self::_getMessageByCode($availableParams, $availableCode);
             if (!is_null($message)) return $message;
         }
         return null;

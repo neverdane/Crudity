@@ -1,6 +1,7 @@
 <?php
+namespace Neverdane\Crudity\Adapter;
 
-class Crudity_Adapter_Zf1 extends Crudity_Adapter_Abstract {
+class Zf1Adapter extends AbstractAdapter {
 
     public function manageAutoload() {
         
@@ -45,12 +46,29 @@ class Crudity_Adapter_Zf1 extends Crudity_Adapter_Abstract {
     }
 
     public function create($modelName, $params) {
+        $status = true;
+        $code   = null;
+        $rowId  = null;
         $model = new $modelName();
         $row = $model->createRow();
         foreach ($params as $param => $value) {
             $row->$param = $value;
         }
-        return $row->save();
+        try {
+            return $row->save();
+        } catch (Zend_Db_Exception $e) {
+            $code = $e->getCode();
+            switch($code) {
+                case 23000 :
+                    $status = false;
+                    $code   = Crudity_Error::DUPLICATE_ENTRY;
+            }
+        }
+        return array(
+            "status"    => $status,
+            "code"      => $code,
+            "rowId"     => $rowId
+        );
     }
 
     public function update($modelName, $rowId, $params) {

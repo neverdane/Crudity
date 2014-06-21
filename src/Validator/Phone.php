@@ -1,6 +1,7 @@
 <?php
+namespace Neverdane\Crudity\Validator;
 
-class Crudity_Validator_Phone extends Crudity_Validator_Abstract {
+class ValidatorPhone extends ValidatorAbstract {
 
     protected static $_regex = "([0-9]+[ .-+()])*[0-9]+";
 

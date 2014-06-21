@@ -1,6 +1,7 @@
 <?php
+namespace Neverdane\Crudity;
 
-class Crudity_Helper
+class Helper
 {
     const CRUDITY_LIB_URI = "http://crudity.lib";
 

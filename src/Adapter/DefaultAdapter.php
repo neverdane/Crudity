@@ -1,7 +1,7 @@
 <?php
-require_once("Crudity/Crudity/Adapter/Abstract.php");
+namespace Neverdane\Crudity\Adapter;
 
-class Crudity_Adapter_Default extends Crudity_Adapter_Abstract {
+class DefaultAdapter extends AbstractAdapter {
 
     public function manageAutoload() {
         parent::manageAutoload();

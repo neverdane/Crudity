@@ -1,11 +1,15 @@
 <?php
+namespace Neverdane\Crudity;
 
 /**
  * This library is used in order to parse and interact easily with the DOM
  */
-require_once __DIR__ . "/../../libs/phpQuery/phpQuery.php";
+use Neverdane\Crudity\Exception\Exception;
+use Neverdane\Crudity\Form\Form;
 
-class Crudity_Application {
+//require_once __DIR__ . "/../../libs/phpQuery/phpQuery.php";
+
+class Crudity {
 
     /**
      * The Default Adapter used by Crudity.
@@ -32,12 +36,12 @@ class Crudity_Application {
      */
     public static $params = array();
     /**
-     * @var Crudity_Adapter_Abstract
+     * @var Adapter_Abstract
      * The adapter used by Crudity
      */
     public static $adapter = null;
     /**
-     * @var Crudity_Form
+     * @var Form
      * The instance of the submitted Form
      */
     protected static $_submittedForm = null;
@@ -55,8 +59,8 @@ class Crudity_Application {
      * @param string $partial
      */
     public static function render($partial) {
-        // We create a Crudity_Form instance from parsing $partial
-        $form = new Crudity_Form($partial);
+        // We create a _Form instance from parsing $partial
+        $form = new Form($partial);
         // We store the Form instance in session so we can retrieve it on submit
         self::$adapter->store($form->_id, $form);
         // We render the cleaned and filtered form HTML
@@ -72,12 +76,8 @@ class Crudity_Application {
      *  - ADAPTER_ZF1
      */
     public static function setAdapter($adapterName = self::ADAPTER_DEFAULT) {
-        // If adapter is ADAPTER_DEFAULT, we include its file the old way
-         if ($adapterName === self::ADAPTER_DEFAULT) {
-             require_once("Crudity/Crudity/Adapter/Default.php");
-         }
         // We construct the Adapter name class
-         $adapterClass = "Crudity_Adapter_" . $adapterName;
+         $adapterClass = "Neverdane\\Crudity\\Adapter\\" . $adapterName . "Adapter";
         // And store its instance in the Application class
          self::$adapter = new $adapterClass();
     }
@@ -91,7 +91,7 @@ class Crudity_Application {
      *  An optional config file that overrides default params
      * @param array $customMessages
      *  Optional custom messages overriding the original messages
-     * @throws Crudity_Exception
+     * @throws Exception
      */
     public static function run($customParamsFile = null, array $customMessages = array()) {
         self::_runInit($customParamsFile, $customMessages);
@@ -104,7 +104,7 @@ class Crudity_Application {
                 // We set the action to be executed (we consider that if none is declared, the action wanted is creation)
                 $action = (!is_null(self::$_requestParams["action"]))
                         ? self::$_requestParams["action"]
-                        : Crudity_Form::ACTION_CREATE;
+                        : Form::ACTION_CREATE;
                 // We launch the action wanted with the params
                 $return =  self::_routeAction($action, self::$_requestParams["row_id"]);
                 // If the Form submission has been done through AJAX
@@ -114,7 +114,7 @@ class Crudity_Application {
                 }
             } else {
                 // If no declared Form has been founded with this id
-               throw new Crudity_Exception("The submitted Form \"" . self::$_requestParams["id"] . "\" has not been declared in the config file : \"" . self::PARAMS_FILE . "\"");
+               throw new Exception("The submitted Form \"" . self::$_requestParams["id"] . "\" has not been declared in the config file : \"" . self::PARAMS_FILE . "\"");
             }
         }
     }
@@ -159,60 +159,59 @@ class Crudity_Application {
      * If action is read, update or delete, performs the action on $rowId
      * @param string $action
      *  The action to perform. Can be :
-     *  - Crudity_Form::ACTION_POPULATE
-     *  - Crudity_Form::ACTION_CREATE
-     *  - Crudity_Form::ACTION_UPDATE
-     *  - Crudity_Form::ACTION_DELETE
+     *  - Form::ACTION_POPULATE
+     *  - Form::ACTION_CREATE
+     *  - Form::ACTION_UPDATE
+     *  - Form::ACTION_DELETE
      * @param string $rowId
      *  The optional rowId on which to perform the action (if read, update or delete)
      * @return array
      *  Returns an array containing the execution of $action status :
      *  ["status"]  => (bool)   If the action has been executed successfully. Can be :
-     *                          - Crudity_Form::STATUS_SUCCESS
-     *                          - Crudity_Form::STATUS_FAILURE
-     *  ["errors"]  => (array)  All errors returned (see in Crudity_Form for format)
-     *  ["fields"]  => (optional array) All fields and values if we want to read (see in Crudity_Form for format)
-     * @throws Crudity_Exception
+     *                          - Form::STATUS_SUCCESS
+     *                          - Form::STATUS_FAILURE
+     *  ["errors"]  => (array)  All errors returned (see in Form for format)
+     *  ["fields"]  => (optional array) All fields and values if we want to read (see in Form for format)
+     * @throws Exception
      */
     protected static function _routeAction($action, $rowId = null)  {
         // We initialize the response
         $return = array(
-            "status" => Crudity_Form::STATUS_SUCCESS,
-            "errors" => array()
+            "status" => Form::STATUS_SUCCESS
         );
         switch($action) {
-            case Crudity_Form::ACTION_CREATE :
+            case Form::ACTION_CREATE :
                 // We initialize error messages and merge them with self::$_customMessages if set
-                Crudity_Error::initMessages(self::$_customMessages);
+                Error::initMessages(self::$_customMessages);
                 // We Create a row with given self::$_requestParams["params"]
                 $return = self::$_submittedForm->create(self::$_requestParams["params"]);
                 break;
-            case Crudity_Form::ACTION_READ :
+            case Form::ACTION_READ :
                 // If we want to get the row id data, we get all fields and their values
                 $fields = self::$_submittedForm->read($rowId);
                 // If the row was not found
                 if(is_null($fields)) {
-                    $return["status"] = Crudity_Form::STATUS_FAILURE;
-                    throw new Crudity_Exception("The row \"" . $rowId . "\" was not founded.");
+                    $return["status"] = Form::STATUS_FAILURE;
+                    throw new Exception("The row \"" . $rowId . "\" was not founded.");
                 }
                 // We store the fields and values in the response
                 $return["fields"] = $fields;
                 break;
-            case Crudity_Form::ACTION_UPDATE :
+            case Form::ACTION_UPDATE :
                 // We initialize error messages and merge them with self::$_customMessages if set
-                Crudity_Error::initMessages(self::$_customMessages);
+                Error::initMessages(self::$_customMessages);
                 // We Update the $rowId with given self::$_requestParams["params"]
                 $return = self::$_submittedForm->update($rowId, self::$_requestParams["params"]);
                 break;
-            case Crudity_Form::ACTION_DELETE :
+            case Form::ACTION_DELETE :
                 // If we want to delete the row id
                 $return = self::$_submittedForm->delete($rowId);
                 break;
             default:
-                throw new Crudity_Exception("The action \"" . $action . "\" is not managed by Crudity");
+                throw new Exception("The action \"" . $action . "\" is not managed by Crudity");
                 break;
-
         }
+        $return["errors"] = self::$_submittedForm->getErrors();
         return $return;
     }
 
@@ -228,7 +227,7 @@ class Crudity_Application {
      *  An optional config file that overrides default params
      * @param array $customMessages
      *  Optional custom messages overriding the original messages
-     * @throws Crudity_Exception
+     * @throws Exception
      */
     protected static function _runInit($customParamsFile = null, array $customMessages = array()) {
         // If no adapter was set, we consider that we're running in a classic environment and not a Framework one
@@ -237,23 +236,23 @@ class Crudity_Application {
         }
 
         // We let the adapter use his proper logic for class inclusion
-        self::$adapter->manageAutoload();
+        //self::$adapter->manageAutoload();
         // We let the adapter use his proper logic for session management
         self::$adapter->manageSession();
 
         // We import the settings of Crudity
         // We assume that the Crudity default config file path is self::PARAMS_FILE
-        self::$params = json_decode(file_get_contents(realpath(dirname(__FILE__) . "/../../" . self::PARAMS_FILE)), true);
+        self::$params = json_decode(file_get_contents(realpath(dirname(__FILE__) . "/" . self::PARAMS_FILE)), true);
         if (!is_null($customParamsFile)) {
             if(file_exists($customParamsFile)) {
                 $customParamsJson = json_decode(file_get_contents($customParamsFile), true);
                 if(is_null($customParamsJson)) {
-                    throw new Crudity_Exception("The config file " . $customParamsFile . " is not a valid JSON format");
+                    throw new Exception("The config file " . $customParamsFile . " is not a valid JSON format");
                 }
                 // We replace each default param by the custom one
                 self::$params = array_replace_recursive(self::$params, $customParamsJson);
             } else {
-                throw new Crudity_Exception("The config file was not found in the specified path : " . $customParamsFile);
+                throw new Exception("The config file was not found in the specified path : " . $customParamsFile);
             }
         }
         // We store the custom messages

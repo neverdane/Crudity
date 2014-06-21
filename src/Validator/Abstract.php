@@ -1,8 +1,12 @@
 <?php
+namespace Neverdane\Crudity\Validator;
 
-abstract class Crudity_Validator_Abstract {
 
-    protected static function _reject($code = Crudity_Error::WRONG_FORMAT) {
+use Neverdane\Crudity\Error;
+
+abstract class ValidatorAbstract {
+
+    protected static function _reject($code = Error::WRONG_FORMAT) {
         return array(
             "success"   => false,
             "code"      => $code
@@ -20,7 +24,7 @@ abstract class Crudity_Validator_Abstract {
         $result = static::_validate($input);
         if(isset($result["success"])) {
             return $result;
-        } 
+        }
         return static::_reject();
     }
     
