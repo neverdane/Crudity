@@ -12,5 +12,14 @@ require '../../vendor/autoload.php';
 
 use Neverdane\Crudity\Crudity;
 
-Crudity::run();
+//Crudity::setObservers(array(new TestFormObserver()));
+Crudity::run("config.json");
+?>
+    <script src="/assets/jquery/dist/jquery.min.js"></script>
+    <script src="/public/crudity/js/crudity.js"></script>
+    <script src="/public/crudity/js/getHiddenDimensions.js"></script>
+    <script src="/public/crudity/js/riplace.js"></script>
+    <script src="/public/crudity/js/selectly.js"></script>
+    <link rel="stylesheet" href="/public/crudity/css/crudity.css">
+<?php
 Crudity::render("form.php");

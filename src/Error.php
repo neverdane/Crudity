@@ -64,14 +64,13 @@ class Error {
     protected static $_messages = null;
 
     /**
-     * Initiates error messages and merges them with $customMessages if set
-     * @param array $customMessages
-     *  Custom messages that override default ones
+     * Initiates error messages and merges them with customMessages if set
      */
-    public static function initMessages($customMessages = array())
+    public static function initialize()
     {
+        $customMessages = Crudity::getCustomMessages();
         // We include the default error messages
-        $defaultMessages = include(realpath(dirname(__FILE__) . "/../../" . self::MESSAGES_FILE));
+        $defaultMessages = include(realpath(dirname(__FILE__) . "/" . self::MESSAGES_FILE));
         self::$_messages = array_replace_recursive($defaultMessages, $customMessages);
     }
 

@@ -61,7 +61,7 @@ class Form
      * @var array
      */
     protected $_cleanParams = array();
-    public $_id = "";
+    public $id = "";
     public $crudityParams = array();
 
     /**
@@ -77,6 +77,9 @@ class Form
      * @var int
      */
     protected $_status = self::STATUS_SUCCESS;
+
+
+    public $params = array();
 
     /**
      * Creates an instance of Form
@@ -115,7 +118,7 @@ class Form
      */
     public function populate($params)
     {
-        $this->_id = $params["id"];
+        $this->id = $params["id"];
         $this->_fields = $params["fields"];
     }
 
@@ -177,7 +180,7 @@ class Form
         $return["extra"] = array();
         if ($return["status"] === self::STATUS_SUCCESS) {
             $this->_cleanParams = $this->filter($params);
-            $formParams = Crudity::$params["Forms"][$this->_id];
+            $formParams = Crudity::$params["Forms"][$this->id];
 
             if (isset($formParams["noDuplicates"])) {
                 /*$model = new $formParams["model"]();
@@ -198,11 +201,11 @@ class Form
      * @return array
      * @throws Exception
      */
-    public function validate($params = null)
+    public function validate($values = null)
     {
         //If no $params set, validates the dirtyParams of the Form
-        if (is_null($params)) {
-            $params = $this->_dirtyParams;
+        if (is_null($values)) {
+            $values = $this->values["request"];
         }
         $result = array(
             "status" => self::STATUS_SUCCESS
@@ -214,7 +217,7 @@ class Form
             $status = self::STATUS_SUCCESS;
             $code = null;
             $validatorName = null;
-            $userInput = (isset($params[$field->name])) ? $params[$field->name] : null;
+            $userInput = (isset($values[$field->name])) ? $values[$field->name] : null;
             // If this expected field was not submitted by the user (probably hack attempt), an exception is thrown
             if (is_null($userInput)) {
                 throw new Exception("The field " . $field->name . " was expected but not submitted");
@@ -258,7 +261,7 @@ class Form
 
     public function getId()
     {
-        return $this->_id;
+        return $this->id;
     }
 
     /**
@@ -280,23 +283,23 @@ class Form
         return $cleanParams;
     }
 
-    public function transform($params = null)
+    public function transform($values = null)
     {
         //If no $params set, filters the dirtyParams of the Form
-        if (is_null($params)) {
-            $params = $this->_dirtyParams;
+        if (is_null($values)) {
+            $values = $this->values["request"];
         }
-        $cleanParams = array();
+        $cleanValues = array();
 
         foreach ($this->_fields as $field) {
             if (isset($params[$field->name])) {
-                $cleanParams[$field->name] = $field->transform($params[$field->name]);
+                $cleanValues[$field->name] = $field->transform($values[$field->name]);
             } else {
-                $cleanParams[$field->name] = $field->transform(null);
+                $cleanValues[$field->name] = $field->transform(null);
             }
         }
 
-        return $cleanParams;
+        return $cleanValues;
     }
 
     /**
@@ -305,7 +308,7 @@ class Form
      */
     protected function _succeed($action, $rowId = null, &$result = null)
     {
-        $formParams = Crudity::$params["Forms"][$this->_id];
+        $formParams = Crudity::$params["Forms"][$this->id];
         if (isset($formParams["model"])) {
             if ($action === self::ACTION_UPDATE) {
                 $id = Crudity::$adapter->update($formParams["model"], $rowId, $this->_cleanParams);
@@ -333,8 +336,8 @@ class Form
         // We get the previously stored Crudity::$params containing our wanted
         $this->params = Crudity::$params;
         // If our Form is customized in these params, we override the params by the customized one
-        if (isset($this->params["Forms"][$this->_id]) && count($this->params) > 0) {
-            $formParams = $this->params["Forms"][$this->_id];
+        if (isset($this->params["Forms"][$this->id]) && count($this->params) > 0) {
+            $formParams = $this->params["Forms"][$this->id];
             // The loop overriding the default params
             foreach ($this->params as $param => $value) {
                 // Foreach default params except "Forms" (pretty logical)
@@ -365,7 +368,7 @@ class Form
 
     public function read($rowId)
     {
-        $formParams = Crudity::$params["Forms"][$this->_id];
+        $formParams = Crudity::$params["Forms"][$this->id];
         $fields = array();
         if (isset($formParams["model"])) {
             $fields = Crudity::$adapter->read($formParams["model"], $this->_fields, $rowId);
@@ -380,7 +383,7 @@ class Form
 
     public function delete($rowId)
     {
-        $formParams = Crudity::$params["Forms"][$this->_id];
+        $formParams = Crudity::$params["Forms"][$this->id];
         if (isset($formParams["model"])) {
             Crudity::$adapter->delete($formParams["model"], $rowId);
         }
@@ -399,6 +402,11 @@ class Form
 
     public function getErrors() {
         return $this->_errors;
+    }
+
+    public function setRequest($params, $rowId) {
+        $this->values["request"] = $params;
+        $this->rowId = $rowId;
     }
 
 }

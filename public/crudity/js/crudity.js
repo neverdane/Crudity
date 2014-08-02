@@ -27,7 +27,7 @@ $.fn.extend({
                 $.ajax($(this).attr("action"), {
                     data: sData,
                     dataType: "json",
-                    type: $form.attr("method"),
+                    type: $form.attr("method") || "post",
                     success: function(response) {
                         $form.find("[type='submit']").removeAttr("disabled").removeClass("cr-submit--loading");
                         $.each(response.errors, function(idx, error) {
@@ -154,5 +154,5 @@ $.fn.extend({
 });
 
 $().ready(function() {
-   $("form").crudity();
+   $(".cr-form").crudity();
 });
