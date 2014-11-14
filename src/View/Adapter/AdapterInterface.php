@@ -19,9 +19,9 @@ interface AdapterInterface
 {
     public function setHtml($html);
     public function getFormId();
-    public function getFieldsOccurences($tagNames = array());
-    public function isTargetField($occurence);
-    public function getTagName($occurence);
-    public function getAttribute($occurence, $attributeKey);
+    public function getFieldsOccurrences($tagNames = array());
+    public function isTargetField($occurrence);
+    public function getTagName($occurrence);
+    public function getAttribute($occurrence, $attributeKey);
 
 }

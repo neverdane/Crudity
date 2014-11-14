@@ -39,28 +39,28 @@ class PhpQueryAdapter extends AbstractAdapter
         return $this->formEl->attr("id");
     }
 
-    public function getFieldsOccurences($tagNames = array())
+    public function getFieldsOccurrences($tagNames = array())
     {
-        $totalOccurences = array();
+        $totalOccurrences = array();
         foreach ($tagNames as $tagName) {
             // We store all fields in a flatten array (That's why we use array_merge and not [])
             $tagNameElements = $this->formEl->find($tagName);
-            $tagNameOccurences = array();
+            $tagNameOccurrences = array();
             foreach ($tagNameElements as $tagNameElement) {
-                $tagNameOccurences[] = $tagNameElement;
+                $tagNameOccurrences[] = $tagNameElement;
             }
-            $totalOccurences = array_merge(
-                $totalOccurences,
-                $tagNameOccurences
+            $totalOccurrences = array_merge(
+                $totalOccurrences,
+                $tagNameOccurrences
             );
         }
-        return $totalOccurences;
+        return $totalOccurrences;
     }
 
-    public function isTargetField($occurence)
+    public function isTargetField($occurrence)
     {
         // We transform the element as a phpQuery object
-        $pqInput = pq($occurence);
+        $pqInput = pq($occurrence);
         // We test if the current field analyzed is a Crudity functional field in the aim to not manage them
         if ($pqInput->attr("name") === FormView::$prefix . "_partial"
             || $pqInput->attr("type") === "submit"
@@ -72,14 +72,14 @@ class PhpQueryAdapter extends AbstractAdapter
         return true;
     }
 
-    public function getTagName($occurence)
+    public function getTagName($occurrence)
     {
-        return $occurence->nodeName;
+        return $occurrence->nodeName;
     }
 
-    public function getAttribute($occurence, $attributeKey)
+    public function getAttribute($occurrence, $attributeKey)
     {
-        return pq($occurence)->attr($attributeKey);
+        return pq($occurrence)->attr($attributeKey);
     }
 
 }

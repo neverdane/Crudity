@@ -31,27 +31,27 @@ class AbstractAdapter implements AdapterInterface
         return null;
     }
 
-    public function getFieldsOccurences($tagNames = array())
+    public function getFieldsOccurrences($tagNames = array())
     {
         return array();
     }
 
-    public function isTargetField($occurence)
+    public function isTargetField($occurrence)
     {
         return true;
     }
 
-    public function createFieldInstance($occurence)
+    public function createFieldInstance($occurrence)
     {
         return null;
     }
 
-    public function getTagName($occurence)
+    public function getTagName($occurrence)
     {
         return null;
     }
 
-    public function getAttribute($occurence, $attributeKey)
+    public function getAttribute($occurrence, $attributeKey)
     {
         return null;
     }

@@ -122,12 +122,12 @@ abstract class AbstractField
         return array();
     }
 
-    public static function identify($view, $occurence)
+    public static function identify($view, $occurrence)
     {
-        if (self::checkTagName($view, $occurence)) {
+        if (self::checkTagName($view, $occurrence)) {
             if (isset($ids["parameters"]) && is_array($ids["parameters"])) {
                 foreach ($ids["parameters"] as $key => $value) {
-                    if(!self::checkAttribute($view, $occurence, $key, $value)) {
+                    if(!self::checkAttribute($view, $occurrence, $key, $value)) {
                         return false;
                     }
                 }

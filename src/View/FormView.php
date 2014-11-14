@@ -34,6 +34,7 @@ class FormView
 
     /**
      * All the Form elements that Crudity can handle
+     * (Different from the handled fields which are more specific)
      * @var array
      */
     protected static $managedTagNames = array(
@@ -83,8 +84,8 @@ class FormView
     {
         $viewAdapter = $this->getAdapter()->setHtml($this->html);
         $formId = $viewAdapter->getFormId();
-        $fieldsOccurences = $this->getFieldsOccurences();
-        $this->fields = $this->createFieldsInstances($fieldsOccurences);
+        $fieldsOccurrences = $this->getFieldsOccurrences();
+        $this->fields = $this->createFieldsInstances($fieldsOccurrences);
         $this->prepareFields();
         return array(
             "id" => $formId,
@@ -96,77 +97,77 @@ class FormView
     {
         foreach ($this->fields as $field) {
             //TODO Clean up HTML for each field
-            //$fields[] = $this->getAdapter()->createFieldInstance($occurence);
+            //$fields[] = $this->getAdapter()->createFieldInstance($occurrence);
         }
     }
 
-    public function createFieldsInstances($occurences)
+    public function createFieldsInstances($occurrences)
     {
         $fields = array();
-        foreach ($occurences as $occurence) {
-            $fields[] = $this->createFieldInstance($occurence);
+        foreach ($occurrences as $occurrence) {
+            $fields[] = $this->createFieldInstance($occurrence);
         }
         return $fields;
     }
 
-    public function createFieldInstance($occurence)
+    public function createFieldInstance($occurrence)
     {
         $field = null;
-        $fieldType = $this->identifyFieldType($occurence);
+        $fieldType = $this->identifyFieldType($occurrence);
         return $field;
     }
 
-    private function identifyFieldType($occurence)
+    private function identifyFieldType($occurrence)
     {
-        $occurenceTagName = $this->getAdapter()->getTagName($occurence);
+        $occurrenceTagName = $this->getAdapter()->getTagName($occurrence);
         $handledFields = $this->fieldHandler->getHandledFields();
         foreach($handledFields as $handledField) {
-            $isField = $handledField::identify($this->getAdapter(), $occurence);
+            $isField = $handledField::identify($this->getAdapter(), $occurrence);
 
         }
-        /*if (in_array($occurenceTagName, $managedTagNames)) {
-            switch ($occurenceTagName) {
+        /*if (in_array($occurrenceTagName, $managedTagNames)) {
+            switch ($occurrenceTagName) {
                 case self::FIELD_INPUT:
-                    $occurenceType = $this->getAdapter()->getAttribute(
-                        $occurence,
+                    $occurrenceType = $this->getAdapter()->getAttribute(
+                        $occurrence,
                         "type"
                     );
-                    if (is_null($occurenceType)) {
-                        $occurenceType = $this->getAdapter()->getAttribute(
-                            $occurence,
+                    if (is_null($occurrenceType)) {
+                        $occurrenceType = $this->getAdapter()->getAttribute(
+                            $occurrence,
                             self::$prefix . "-type"
                         );
                     }
-                    switch ($occurenceType) {
+                    switch ($occurrenceType) {
                         case self::FIELD_INPUT_CHECKBOX:
                         case self::FIELD_INPUT_EMAIL:
                         case self::FIELD_INPUT_PHONE:
-                            return $occurenceType;
+                            return $occurrenceType;
                         default:
                             return self::FIELD_INPUT_TEXT;
                     }
             }
-            return $occurenceTagName;
+            return $occurrenceTagName;
         }*/
         return null;
     }
 
-    public function getFieldsOccurences()
+    public function getFieldsOccurrences()
     {
-        $occurences = $this->getAdapter()->getFieldsOccurences(
+        $occurrences = $this->getAdapter()->getFieldsOccurrences(
             self::$managedTagNames
         );
-        return $this->filterOccurences($occurences);
+        return $this->filterOccurrences($occurrences);
     }
 
-    private function filterOccurences($occurences)
+    private function filterOccurrences($occurrences)
     {
-        $filteredOccurences = array();
-        foreach ($occurences as $occurence) {
-            if ($this->getAdapter()->isTargetField($occurence)) {
-                $filteredOccurences[] = $occurence;
+        $filteredOccurrences = array();
+        foreach ($occurrences as $occurrence) {
+            if ($this->getAdapter()->isTargetField($occurrence)) {
+                $filteredOccurrences[] = $occurrence;
             }
         }
-        return $filteredOccurences;
+        return $filteredOccurrences;
     }
 }
