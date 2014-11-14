@@ -46,6 +46,7 @@ class FieldHandler
                 ".",
                 "..",
                 "AbstractField.php",
+                "FieldInterface.php",
                 "FieldManager.php"
             );
             // scandir returns all the files of the folder in an array

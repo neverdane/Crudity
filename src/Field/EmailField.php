@@ -1,7 +1,7 @@
 <?php
 namespace Neverdane\Crudity\Field;
 
-class EmailField extends AbstractField {
+class EmailField extends AbstractField implements FieldInterface {
     
     public $validators   = array("Email");
 

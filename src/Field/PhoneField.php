@@ -1,7 +1,7 @@
 <?php
 namespace Neverdane\Crudity\Field;
 
-class PhoneField extends AbstractField {
+class PhoneField extends AbstractField implements FieldInterface {
     
     public $validator   = array("Phone");
 

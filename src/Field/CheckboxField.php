@@ -1,7 +1,7 @@
 <?php
 namespace Neverdane\Crudity\Field;
 
-class CheckboxField extends AbstractField {
+class CheckboxField extends AbstractField implements FieldInterface {
 
 	public function transform($value) {
         //jQuery returns "on" on submitted checkbox, we want to convert it to 1 for database injection

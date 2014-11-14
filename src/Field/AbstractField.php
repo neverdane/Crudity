@@ -4,7 +4,7 @@ namespace Neverdane\Crudity\Field;
 use Neverdane\Crudity\Crudity;
 use Neverdane\Crudity\View;
 
-abstract class AbstractField
+abstract class AbstractField implements FieldInterface
 {
     /**
      * Sets if the field is required or not
