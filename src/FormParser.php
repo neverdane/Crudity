@@ -1,20 +1,43 @@
 <?php
-namespace Neverdane\Crudity\Formold;
+namespace Neverdane\Crudity;
 
-use Neverdane\Crudity\Crudity;
+use phpQuery;
 
 class FormParser
 {
+    const FIELD_INPUT = "input";
+    const FIELD_SELECT = "select";
+    const FIELD_TEXTAREA = "textarea";
+
+    private static $instance = null;
 
     /**
      * All the Form elements that Crudity can handle
      * @var array
      */
-    protected static $_managedElemTypes = array(
-        "input",
-        "select",
-        "textarea"
+    private static $managedElemTypes = array(
+        self::FIELD_INPUT,
+        self::FIELD_SELECT,
+        self::FIELD_TEXTAREA,
     );
+
+    private function __construct()
+    {
+    }
+
+    public static function getInstance()
+    {
+
+        if (is_null(self::$instance)) {
+            self::$instance = new self;
+        }
+
+        return self::$instance;
+    }
+
+    public function initDoc($html)
+    {
+    }
 
     /**
      * We parse the form phpQuery Element and return an array containing :
@@ -24,8 +47,13 @@ class FormParser
      *  The form to parse
      * @return array
      */
-    public static function parse($formElem)
+    public static function parseHtml($html)
     {
+        $formElem = phpQuery::newDocument($html)->find("form");
+        return array(
+            "id" => "id",
+            "fields" => array()
+        );
         return array(
             "id" => $formElem->attr("id"),
             "fields" => self::_identifyFields($formElem)

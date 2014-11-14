@@ -5,6 +5,15 @@ class Helper
 {
     const CRUDITY_LIB_URI = "http://crudity.lib";
 
+    public static function getFileAsVariable($file)
+    {
+        ob_start();
+        include($file);
+        $variable = ob_get_contents();
+        ob_end_clean();
+        return $variable;
+    }
+
     public static function includeResources($applicationEnv)
     {
         if ($applicationEnv === "dev") {

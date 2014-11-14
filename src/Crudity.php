@@ -1,84 +1,95 @@
 <?php
+
+/*
+ * This file is part of the Crudity package.
+ *
+ * (c) Alban Pommeret <alban@aocreation.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Neverdane\Crudity;
 
-/**
- * This library is used in order to parse and interact easily with the DOM
- */
-use Neverdane\Crudity\Exception\Exception;
+use Neverdane\Crudity\Field\FieldManager;
 use Neverdane\Crudity\Form\Form;
-use Neverdane\Crudity\Adapter\AbstractAdapter;
+use Neverdane\Crudity\View\FormView;
 
-//require_once __DIR__ . "/../../libs/phpQuery/phpQuery.php";
-
+/**
+ * @package Neverdane\Crudity
+ * @author Alban Pommeret <alban@aocreation.com>
+ */
 class Crudity
 {
+    const INPUT_TYPE_FILE = 1;
+    const INPUT_TYPE_HTML = 2;
 
-    /**
-     * The Default Adapter used by Crudity.
-     * This adapter assumes that no PHP Framework is used
-     */
-    const ADAPTER_DEFAULT = "Default";
-    /**
-     * The Zend Framework 1 Adapter used by Crudity
-     * This adapter assumes that Zend Framework is used
-     */
-    const ADAPTER_ZF1 = "Zf1";
+    private static $configFile = null;
 
-    /**
-     * @var AbstractAdapter
-     * The adapter used by Crudity
-     */
-    public static $adapter = null;
-
-    /**
-     * Calls the Form render function and echoes it
-     * @param string $partial
-     */
-    public static function render($partial = null)
+    public static function setConfig($configFile)
     {
-        // We create a _Form instance from parsing $partial
-        $form = new Form();
-        if(!is_null($partial)) {
-            $form->setHtmlInAndOut($partial);
+        self::$configFile = $configFile;
+    }
+
+    public static function listen()
+    {
+
+    }
+
+    /**
+     * Creates an instance of Form
+     * By parsing the file given and returns it
+     *
+     * @param string $file
+     *  The path to the file
+     * @return Form
+     */
+    public static function createFromFile($file = null)
+    {
+        return self::createForm($file, self::INPUT_TYPE_FILE);
+    }
+
+    /**
+     * Creates an instance of Form
+     * By parsing the HTML given and returns it
+     *
+     * @param string $html
+     * @return Form
+     */
+    public static function createFromHtml($html = null)
+    {
+        return self::createForm($html, self::INPUT_TYPE_HTML);
+    }
+
+    /**
+     * Creates an instance of Form
+     * By parsing the input given and returns it
+     *
+     * @param $input
+     *  The input to parse. Could be a file or raw HTML
+     * @param $inputType
+     *  The type of input to parse
+     * @return Form
+     */
+    private static function createForm($input, $inputType)
+    {
+        if ($inputType === self::INPUT_TYPE_FILE) {
+            // If the input type is a file, we store its content into a variable
+            $input = Helper::getFileAsVariable($input);
         }
-        // We store the Form instance in session so we can retrieve it on submit
-        self::$adapter->store($form->id, $form);
-        // We render the cleaned and filtered form HTML
-        echo $form->render();
-    }
-
-    /**
-     * Sets the Adapter used by Crudity
-     * The adapter to choose depends on the Framework used for the project
-     * @param string $adapterName
-     *  The Adapter name to be used. Can be :
-     *  - ADAPTER_DEFAULT
-     *  - ADAPTER_ZF1
-     */
-    public static function setAdapter($adapterName = self::ADAPTER_DEFAULT)
-    {
-        // We construct the Adapter name class
-        $adapterClass = __NAMESPACE__ . "\\Adapter\\" . $adapterName . "Adapter";
-        // And store its instance in the Application class
-        self::$adapter = new $adapterClass();
-    }
-
-    /**
-     * Launches Crudity, all forms submitted will be analyzed.
-     * If they are from Crudity, everything will be managed by Crudity
-     * You have to specify before calling this method the adapter to be used, however
-     * If a plugin is used, this function is already called by the plugin so no need to call it twice
-     * @param string $customParamsFile
-     *  An optional config file that overrides default params
-     * @param array $customMessages
-     *  Optional custom messages overriding the original messages
-     * @throws Exception
-     */
-    public static function run($customParamsFile = null, array $customMessages = array())
-    {
-        // We initialize the Crudity environment (config files, session...)
-        Config::initialize($customParamsFile, $customMessages);
-        Listener::listen();
+        $form = new Form();
+        // We set all parsed params to the Form instance
+        // And we store it into session
+        $formView = new FormView($input);
+        $parseStatus = $formView->parse();
+        $fieldManager = new FieldManager();
+        $fieldManager->setFields($parseStatus["fields"]);
+        $form->setFieldManager($fieldManager)
+            ->setView($formView)
+            ->setId($parseStatus["id"])
+            ->setRender($input, Form::RENDER_TYPE_HTML)
+            ->persist();
+        return $form;
     }
 
 }

@@ -10,7 +10,7 @@ use Neverdane\Crudity\Adapter\AbstractAdapter;
 
 //require_once __DIR__ . "/../../libs/phpQuery/phpQuery.php";
 
-class Crudity
+class Crudityold
 {
 
     /**

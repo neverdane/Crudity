@@ -1,5 +1,5 @@
 <?php
-namespace Neverdane\Crudity\Formold;
+namespace Neverdane\Crudity\Form;
 
 use Neverdane\Crudity\Crudity;
 
