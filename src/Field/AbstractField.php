@@ -122,30 +122,63 @@ abstract class AbstractField implements FieldInterface
         return array();
     }
 
+    /**
+     * Identifies if a field occurrence is eligible to be this type of class
+     * In order to identify it, we should send the view
+     * which is highly coupled to the field occurrence
+     * @param View\FormView $view
+     * @param mixed $occurrence
+     * @return bool
+     */
     public static function identify($view, $occurrence)
     {
+        // We firstly check the occurrence tag name
         if (self::checkTagName($view, $occurrence)) {
+            $ids = self::getIdentifiers();
+            // Then we check each parameter
             if (isset($ids["parameters"]) && is_array($ids["parameters"])) {
                 foreach ($ids["parameters"] as $key => $value) {
+                    // If a parameter doesn't match, the occurrence is not this type of field class
                     if(!self::checkAttribute($view, $occurrence, $key, $value)) {
                         return false;
                     }
                 }
             }
+            // If the tag name and the potential parameters are matching,
+            // the occurrence is detected as this type of field class
             return true;
         }
+        // If the tag name doesn't match, the occurrence is not this type of field class
         return false;
     }
 
+    /**
+     * Checks if the given field occurrence has the class tag name
+     * @param View\FormView $view
+     * @param mixed $o
+     * @return bool
+     */
     private static function checkTagName($view, $o)
     {
+        // We get the identifiers of the class
         $ids = self::getIdentifiers();
+        // We then compare the class tag name with the occurrence tag name
         return (isset($ids["tagName"])
             && $view->getAdapter()->getTagName($o) === $ids["tagName"]);
     }
 
+    /**
+     * Checks if the given field occurrence has the given attribute
+     * @param View\FormView $view
+     * @param mixed $o
+     * @param string $key
+     * @param string $value
+     * @return bool
+     */
     private static function checkAttribute($view, $o, $key, $value)
     {
+        // The type attribute could be prefixed by the Crudity prefix so we firstly check that one
+        // We then compare the given attribute with the occurrence one
         if($key === "type") {
             if($view->getAdapter()->getAttribute($o, $view::$prefix . "-" . $key) === $value) {
                 return true;
