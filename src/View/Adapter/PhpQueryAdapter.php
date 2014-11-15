@@ -18,7 +18,7 @@ use Neverdane\Crudity\View\FormView;
  * @package Neverdane\Crudity
  * @author Alban Pommeret <alban@aocreation.com>
  */
-class PhpQueryAdapter extends AbstractAdapter
+class PhpQueryAdapter implements AdapterInterface
 {
 
     /**
