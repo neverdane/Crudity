@@ -36,7 +36,7 @@ class AbstractAdapter implements AdapterInterface
         return array();
     }
 
-    public function isTargetField($occurrence)
+    public function isFieldRelevant($occurrence)
     {
         return true;
     }

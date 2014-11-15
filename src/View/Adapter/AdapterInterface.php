@@ -42,7 +42,7 @@ interface AdapterInterface
      * @param mixed $occurrence
      * @return bool
      */
-    public function isTargetField($occurrence);
+    public function isFieldRelevant($occurrence);
 
     /**
      * Returns the tag name of the given occurrence

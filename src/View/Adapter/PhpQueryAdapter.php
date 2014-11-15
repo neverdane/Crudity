@@ -82,29 +82,70 @@ class PhpQueryAdapter extends AbstractAdapter
         return $totalOccurrences;
     }
 
-    public function isTargetField($occurrence)
+    /**
+     * Returns if the given field occurrence can be handled by Crudity
+     * @param mixed $occurrence
+     * @return bool
+     */
+    public function isFieldRelevant($occurrence)
     {
         // We transform the element as a phpQuery object
-        $pqInput = pq($occurrence);
+        $pqo = pq($occurrence);
         // We test if the current field analyzed is a Crudity functional field in the aim to not manage them
-        if ($pqInput->attr("name") === FormView::$prefix . "_partial"
-            || $pqInput->attr("type") === "submit"
-            || $pqInput->attr("cr-name") === ""
-            || is_null($pqInput->attr("cr-name"))
+        // We reject the submit buttons and the inputs that don't have cr-name attribute
+        if ($pqo->attr("type") === "submit"
+            || $pqo->attr(FormView::$prefix . "-name") === ""
+            || is_null($pqo->attr(FormView::$prefix . "-name"))
         ) {
             return false;
         }
         return true;
     }
 
+    /**
+     * Returns the tag name of the given occurrence
+     * @param mixed $occurrence
+     * @return null|string
+     */
     public function getTagName($occurrence)
     {
         return $occurrence->nodeName;
     }
 
+    /**
+     * Returns the given attribute value of the given occurrence
+     * @param mixed $occurrence
+     * @param string $attributeKey
+     * @return null|string
+     */
     public function getAttribute($occurrence, $attributeKey)
     {
         return pq($occurrence)->attr($attributeKey);
     }
 
+    /**
+     * Sets the attribute's value for the given occurrence
+     * Creates the attribute if it does not exist
+     * @param mixed $occurrence
+     * @param string $attributeKey
+     * @param string $attributeValue
+     * @return $this
+     */
+    public function setAttribute($occurrence, $attributeKey, $attributeValue)
+    {
+        pq($occurrence)->attr($attributeKey, $attributeValue);
+        return $this;
+    }
+
+    /**
+     * Removes the attribute from the given occurrence
+     * @param mixed $occurrence
+     * @param string $attributeKey
+     * @return $this
+     */
+    public function removeAttribute($occurrence, $attributeKey)
+    {
+        pq($occurrence)->removeAttr($attributeKey);
+        return $this;
+    }
 }

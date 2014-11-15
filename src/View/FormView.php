@@ -183,7 +183,7 @@ class FormView
     {
         $filteredOccurrences = array();
         foreach ($occurrences as $occurrence) {
-            if ($this->getAdapter()->isTargetField($occurrence)) {
+            if ($this->getAdapter()->isFieldRelevant($occurrence)) {
                 $filteredOccurrences[] = $occurrence;
             }
         }
