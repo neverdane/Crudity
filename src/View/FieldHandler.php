@@ -27,6 +27,8 @@ class FieldHandler
     {
         // We set the Fields classes handled by Crudity by default
         $this->handledFields = $this->getDefaultHandledFields();
+        // In order to identify each field correctly and avoid false positive, we have to sort the handled fields
+        // Then, the "fallback" handled fields (input, select...) will be set at the end
         $this->sortHandledFields();
     }
 
@@ -93,28 +95,41 @@ class FieldHandler
         return $this->handledFields;
     }
 
-    // TODO Document this method which explains why and how we sort handled fields (fields with less identification criteria (only tagName for example) are used as fallback)
-    public function sortHandledFields()
+    /**
+     * In order to identify each field correctly and avoid false positive, we have to sort the handled fields
+     * Then, the "fallback" handled fields (input, select...) will be set at the end
+     * @return $this
+     */
+    private function sortHandledFields()
     {
         $priorityFields = array();
         $handledFields = array();
         /** @var FieldInterface $handledField */
         foreach($this->handledFields as $index => $handledField)
         {
+            // Foreach handled field, we establish a priority
             $priority = 0;
+            // We get the way this field identifies itself
             $identifiers = $handledField::getIdentifiers();
+            // If a field is identified at least by its element name
             if(isset($identifiers["tagName"])) {
                 $priority ++;
             }
+            // If a field has more criteria than tagName, we increment the priority by each one
             if(isset($identifiers["attributes"]) && is_array($identifiers["attributes"])) {
                 $priority += count($identifiers["attributes"]);
             }
+            // In order to keep the indexes, we cast the digital index as string
+            // And we affect the priority of this handled field in a temporary array
             $priorityFields[(string) $index] = $priority;
         }
+        // Now we sort the fields by priority
         arsort($priorityFields, SORT_DESC);
+        // And we register each handled field ats his position
         foreach ($priorityFields as $handledFieldIndex => $priorityField) {
             $handledFields[] = $handledField[(int) $handledFieldIndex];
         }
+        // Now we ca replace the handled fields by the sorted ones
         $this->handledFields = $handledFields;
         return $this;
     }
