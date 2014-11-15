@@ -11,6 +11,7 @@
 
 namespace Neverdane\Crudity\View;
 
+use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\View\FieldHandler;
 
 /**
@@ -55,20 +56,24 @@ class FormView
         $this->html = $html;
     }
 
-    private static function getHandledFields() {
+    private static function getHandledFields()
+    {
 
     }
 
-    public static function setPrefix($prefix = self::PREFIX_DEFAULT) {
+    public static function setPrefix($prefix = self::PREFIX_DEFAULT)
+    {
         self::$prefix = $prefix;
     }
 
     /**
-     * @return Adapter\AbstractAdapter
+     * @return Adapter\AdapterInterface
      */
     public function getAdapter()
     {
+        // If no adapter has been set, we set the default one
         if (is_null($this->adapter)) {
+            // We construct the default adapter namespace from this class namespace
             $defaultAdapterName = __NAMESPACE__ . '\\Adapter\\' . self::ADAPTER_DEFAULT;
             $this->adapter = new $defaultAdapterName();
         }
@@ -80,11 +85,24 @@ class FormView
         $this->adapter = $adapter;
     }
 
+    /**
+     * Parses the view html and extracts its params as an array :
+     *  "id"        => the form id,
+     *  "fields"    => Crudity fields instances from the form
+     * @return array
+     */
     public function parse()
     {
-        $viewAdapter = $this->getAdapter()->setHtml($this->html);
+        // We get the adapter that will parse our html
+        $viewAdapter = $this->getAdapter();
+        $viewAdapter->setHtml($this->html);
+        // We ask our adapter to get back the form id
         $formId = $viewAdapter->getFormId();
+        // We also ask our adapter to get back all the fields in an array
+        // Returned occurrences are highly strongly coupled to the current view adapter
+        // which is the only one that can work with them
         $fieldsOccurrences = $this->getFieldsOccurrences();
+        // It's time to convert this occurrence to Crudity fields instances, let's do it
         $this->fields = $this->createFieldsInstances($fieldsOccurrences);
         $this->prepareFields();
         return array(
@@ -101,6 +119,11 @@ class FormView
         }
     }
 
+    /**
+     * Returns for each fields occurrence its Field instance
+     * @param array $occurrences
+     * @return array
+     */
     public function createFieldsInstances($occurrences)
     {
         $fields = array();
@@ -113,17 +136,22 @@ class FormView
     public function createFieldInstance($occurrence)
     {
         $field = null;
+        // In order to create it, we first need to identify its type
         $fieldType = $this->identifyFieldType($occurrence);
         return $field;
     }
 
     private function identifyFieldType($occurrence)
     {
-        $occurrenceTagName = $this->getAdapter()->getTagName($occurrence);
+        // We get all the fields classes handled by Crudity
         $handledFields = $this->fieldHandler->getHandledFields();
-        foreach($handledFields as $handledField) {
+        /** @var FieldInterface $handledField */
+        foreach ($handledFields as $handledField) {
+            // Foreach field class, we check if the occurrence is this type of field
             $isField = $handledField::identify($this->getAdapter(), $occurrence);
-
+            if ($isField === true) {
+                return $handledField;
+            }
         }
         /*if (in_array($occurrenceTagName, $managedTagNames)) {
             switch ($occurrenceTagName) {
@@ -152,14 +180,23 @@ class FormView
         return null;
     }
 
+    /**
+     * Returns all potential fields occurrences as an array from the form
+     * We consider the fields eligible as they are in the managed elements by Crudity by default
+     * @return array
+     */
     public function getFieldsOccurrences()
     {
-        $occurrences = $this->getAdapter()->getFieldsOccurrences(
-            self::$managedTagNames
-        );
+        $occurrences = $this->getAdapter()->getFieldsOccurrences(self::$managedTagNames);
+        // We remove the non eligible fields occurrences
         return $this->filterOccurrences($occurrences);
     }
 
+    /**
+     * Removes the fields occurrences that could not be handled by Crudity (submit, ...)
+     * @param array $occurrences
+     * @return array
+     */
     private function filterOccurrences($occurrences)
     {
         $filteredOccurrences = array();

@@ -10,6 +10,7 @@
  */
 
 namespace Neverdane\Crudity\View;
+use Neverdane\Crudity\Field\FieldInterface;
 
 /**
  * @package Neverdane\Crudity
@@ -26,6 +27,7 @@ class FieldHandler
     {
         // We set the Fields classes handled by Crudity by default
         $this->handledFields = $this->getDefaultHandledFields();
+        $this->sortHandledFields();
     }
 
     /**
@@ -60,8 +62,11 @@ class FieldHandler
                 $fileParts = explode(".", $fileName);
                 // And we reconstruct the class name (with namespace) of the found field
                 $className = $fieldsNamespace . $fileParts[0];
-                // We add it to the default fields
-                self::$defaultHandledFields[] = $className;
+                // For integrity, we check if it's really a class
+                if(class_exists($className)) {
+                    // We add it to the default fields
+                    self::$defaultHandledFields[] = $className;
+                }
             }
         }
         return self::$defaultHandledFields;
@@ -75,6 +80,7 @@ class FieldHandler
     public function addHandledField($fieldClassName)
     {
         $this->handledFields[] = $fieldClassName;
+        $this->sortHandledFields();
         return $this;
     }
 
@@ -85,6 +91,32 @@ class FieldHandler
     public function getHandledFields()
     {
         return $this->handledFields;
+    }
+
+    // TODO Document this method which explains why and how we sort handled fields (fields with less identification criteria (only tagName for example) are used as fallback)
+    public function sortHandledFields()
+    {
+        $priorityFields = array();
+        $handledFields = array();
+        /** @var FieldInterface $handledField */
+        foreach($this->handledFields as $index => $handledField)
+        {
+            $priority = 0;
+            $identifiers = $handledField::getIdentifiers();
+            if(isset($identifiers["tagName"])) {
+                $priority ++;
+            }
+            if(isset($identifiers["attributes"]) && is_array($identifiers["attributes"])) {
+                $priority += count($identifiers["attributes"]);
+            }
+            $priorityFields[(string) $index] = $priority;
+        }
+        arsort($priorityFields, SORT_DESC);
+        foreach ($priorityFields as $handledFieldIndex => $priorityField) {
+            $handledFields[] = $handledField[(int) $handledFieldIndex];
+        }
+        $this->handledFields = $handledFields;
+        return $this;
     }
 
 }
