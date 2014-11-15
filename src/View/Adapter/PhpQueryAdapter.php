@@ -21,38 +21,63 @@ use Neverdane\Crudity\View\FormView;
 class PhpQueryAdapter extends AbstractAdapter
 {
 
+    /**
+     * @var \phpQueryObject
+     */
     private $doc;
     /**
      * @var \phpQueryObject
      */
     private $formEl;
 
+    /**
+     * Sets the html to work on
+     * @param string $html
+     * @return $this
+     */
     public function setHtml($html)
     {
+        // We store the full html as a phpQueryObject in order to affect it
         $this->doc = phpQuery::newDocument($html);
+        // We isolate the form element as a phpQueryObject
         $this->formEl = $this->doc->find("form");
         return $this;
     }
 
+    /**
+     * Returns the form id attribute value
+     * @return null|string
+     */
     public function getFormId()
     {
         return $this->formEl->attr("id");
     }
 
+    /**
+     * Returns all fields occurrences matching the given tag names
+     * @param array $tagNames
+     * @return array
+     */
     public function getFieldsOccurrences($tagNames = array())
+    {
+        // We unite the query with join and we convert the returned phpQueryObject to array
+        return iterator_to_array($this->formEl->find(join(",", $tagNames)));
+    }
+
+    /**
+     * Returns all fields occurrences matching the given tag names
+     * @param array $tagNames
+     * @return array
+     */
+    public function getFieldsOccurrencesOld($tagNames = array())
     {
         $totalOccurrences = array();
         foreach ($tagNames as $tagName) {
-            // We store all fields in a flatten array (That's why we use array_merge and not [])
             $tagNameElements = $this->formEl->find($tagName);
-            $tagNameOccurrences = array();
-            foreach ($tagNameElements as $tagNameElement) {
-                $tagNameOccurrences[] = $tagNameElement;
-            }
-            $totalOccurrences = array_merge(
-                $totalOccurrences,
-                $tagNameOccurrences
-            );
+            // We convert the object of founded occurrences (which is a phpQueryObject) to an array
+            $tagNameOccurrences = iterator_to_array($tagNameElements);
+            // We then merge these tag name occurrences with all the occurrences already founded
+            $totalOccurrences = array_merge($totalOccurrences, $tagNameOccurrences);
         }
         return $totalOccurrences;
     }
