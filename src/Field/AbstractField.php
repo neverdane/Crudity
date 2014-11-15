@@ -186,4 +186,61 @@ abstract class AbstractField implements FieldInterface
         }
         return ($view->getAdapter()->getAttribute($o, $key) === $value);
     }
+
+    /**
+     * @param View\FormView $view
+     * @param mixed $occurrence
+     * @return static
+     */
+    public static function createFromOccurrence($view, $occurrence)
+    {
+        $params = self::extractParamsFromOccurrence($view, $occurrence);
+        self::cleanUpOccurrence($view, $occurrence);
+        return new static($params);
+    }
+
+    /**
+     * @param View\FormView $view
+     * @param mixed $occurrence
+     * @return array
+     */
+    public static function extractParamsFromOccurrence($view, $occurrence)
+    {
+        $viewAdapter = $view->getAdapter();
+        $required = $viewAdapter->getAttribute($occurrence, "required") === "true";
+        $name = $viewAdapter->getAttribute($occurrence, "name");
+        $crudityName = $viewAdapter->getAttribute($occurrence, View\FormView::$prefix . "-name");
+        $column = $viewAdapter->getAttribute($occurrence, View\FormView::$prefix . "-column");
+
+        if (is_null($name) && !is_null($crudityName)) {
+            // We use the Crudity name attribute
+            $name = $crudityName;
+        }
+        if (is_null($column)) {
+            // We use the Crudity name attribute
+            $column = $name;
+        }
+
+        return array(
+            "name"      => $name,
+            "column"    => $column,
+            "required"  => $required
+        );
+    }
+
+    /**
+     * @param View\FormView $view
+     * @param mixed $occurrence
+     * @return array
+     */
+    public static function cleanUpOccurrence($view, $occurrence, $params = null)
+    {
+        $viewAdapter = $view->getAdapter();
+        $viewAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-name");
+        $viewAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-column");
+        if(!is_null($params)) {
+            $params = self::extractParamsFromOccurrence($view, $occurrence);
+        }
+        $viewAdapter->setAttribute($occurrence, "name", $params["name"]);
+    }
 }

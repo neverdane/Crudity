@@ -104,6 +104,8 @@ class FormView
         $fieldsOccurrences = $this->getFieldsOccurrences();
         // It's time to convert this occurrence to Crudity fields instances, let's do it
         $this->fields = $this->createFieldsInstances($fieldsOccurrences);
+        // We finally have to clean up the HTML (remove cr-params and data put to config)
+        // in order to keep the cleanest html and display it to the user
         $this->prepareFields();
         return array(
             "id" => $formId,
@@ -138,6 +140,9 @@ class FormView
         $field = null;
         // In order to create it, we first need to identify its type
         $fieldType = $this->identifyFieldType($occurrence);
+        if (!is_null($fieldType)) {
+            $field = $fieldType::createFromOccurrence($this, $occurrence);
+        }
         return $field;
     }
 

@@ -41,11 +41,6 @@ class AbstractAdapter implements AdapterInterface
         return true;
     }
 
-    public function createFieldInstance($occurrence)
-    {
-        return null;
-    }
-
     public function getTagName($occurrence)
     {
         return null;
@@ -54,5 +49,15 @@ class AbstractAdapter implements AdapterInterface
     public function getAttribute($occurrence, $attributeKey)
     {
         return null;
+    }
+
+    public function setAttribute($occurrence, $attributeKey, $attributeValue)
+    {
+        return $this;
+    }
+
+    public function removeAttribute($occurrence, $attributeKey)
+    {
+        return $this;
     }
 }
