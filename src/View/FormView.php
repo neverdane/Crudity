@@ -149,34 +149,11 @@ class FormView
         foreach ($handledFields as $handledField) {
             // Foreach field class, we check if the occurrence is this type of field
             $isField = $handledField::identify($this->getAdapter(), $occurrence);
+            // If the field is identified as one, we return its Field class
             if ($isField === true) {
                 return $handledField;
             }
         }
-        /*if (in_array($occurrenceTagName, $managedTagNames)) {
-            switch ($occurrenceTagName) {
-                case self::FIELD_INPUT:
-                    $occurrenceType = $this->getAdapter()->getAttribute(
-                        $occurrence,
-                        "type"
-                    );
-                    if (is_null($occurrenceType)) {
-                        $occurrenceType = $this->getAdapter()->getAttribute(
-                            $occurrence,
-                            self::$prefix . "-type"
-                        );
-                    }
-                    switch ($occurrenceType) {
-                        case self::FIELD_INPUT_CHECKBOX:
-                        case self::FIELD_INPUT_EMAIL:
-                        case self::FIELD_INPUT_PHONE:
-                            return $occurrenceType;
-                        default:
-                            return self::FIELD_INPUT_TEXT;
-                    }
-            }
-            return $occurrenceTagName;
-        }*/
         return null;
     }
 
