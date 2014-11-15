@@ -131,7 +131,6 @@ abstract class AbstractField implements FieldInterface
                         return false;
                     }
                 }
-                return true;
             }
             return true;
         }
