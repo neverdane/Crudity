@@ -12,7 +12,7 @@
 namespace Neverdane\Crudity\View;
 
 use Neverdane\Crudity\Field\FieldInterface;
-use Neverdane\Crudity\View\FieldHandler;
+use Neverdane\Crudity\Field\FieldHandler;
 
 /**
  * @package Neverdane\Crudity
@@ -104,21 +104,10 @@ class FormView
         $fieldsOccurrences = $this->getFieldsOccurrences();
         // It's time to convert this occurrence to Crudity fields instances, let's do it
         $this->fields = $this->createFieldsInstances($fieldsOccurrences);
-        // We finally have to clean up the HTML (remove cr-params and data put to config)
-        // in order to keep the cleanest html and display it to the user
-        $this->prepareFields();
         return array(
             "id" => $formId,
-            "fields" => array()
+            "fields" => $this->fields
         );
-    }
-
-    public function prepareFields()
-    {
-        foreach ($this->fields as $field) {
-            //TODO Clean up HTML for each field
-            //$fields[] = $this->getAdapter()->createFieldInstance($occurrence);
-        }
     }
 
     /**

@@ -46,61 +46,12 @@ abstract class AbstractField implements FieldInterface
      */
     public $type = null;
 
-    /**
-     * Creates a Crudity_Field instance
-     * Reads each attribute used by Crudity in order to set this instance
-     * Cleans the attributes we want to hide to the final user (Crudity relative attributes)
-     * @param $type
-     *  The HTML element name of the HTML element (input, select...)
-     * @param $field
-     *  The DOM element
-     */
-    public function __construct($type, $field)
+    public function __construct($config)
     {
-        // We create a phpQueryObject instance in order to affect it
-        $pqField = pq($field);
-        $this->elem = $type;
-
-        // We read all the attributes we need to set the Field instance
-        $this->required = $field->attr("required") === "true";
-        $this->name = $field->attr("name");
-        $this->type = $field->attr("type");
-        $this->column = $field->attr(Crudity::$prefix . "-column");
-        $crudityName = $field->attr(Crudity::$prefix . "-name");
-        $crudityType = $field->attr(Crudity::$prefix . "-type");
-
-        // We remove the Crudity column param if defined to simplify the DOM and hide some settings to the final user
-        if (!is_null($this->column)) {
-            $field->removeAttr(Crudity::$prefix . "-column");
-        }
-
-        // We manage some fallback attributes, known as Crudity shortcuts
-        if (!is_null($crudityName)) {
-            // If the name attribute was not defined
-            if (is_null($this->name)) {
-                // We use the Crudity name attribute
-                $this->name = $crudityName;
-                // And we set the name attribute with this value
-                $pqField->attr("name", $crudityName);
-            }
-            // If the Crudity column attribute was not defined
-            if (is_null($this->column)) {
-                // We use the Crudity name attribute
-                $this->column = $crudityName;
-            }
-            // We remove the Crudity name attribute to simplify the DOM and hide some settings to the final user
-            $field->removeAttr(Crudity::$prefix . "-name");
-        }
-        if (!is_null($crudityType)) {
-            // If the name attribute was not defined
-            if (is_null($this->type)) {
-                // We use the Crudity type attribute
-                $this->type = $crudityType;
-                // And we set the type attribute with this value
-                $pqField->attr("type", $crudityType);
-            }
-            // We remove the Crudity type attribute to simplify the DOM and hide some settings to the final user
-            $field->removeAttr(Crudity::$prefix . "-type");
+        $this->name = $config["name"];
+        $this->column = $config["column"];
+        if(isset($config["required"])) {
+            $this->required = $config["required"];
         }
     }
 

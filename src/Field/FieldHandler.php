@@ -9,8 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Neverdane\Crudity\View;
-use Neverdane\Crudity\Field\FieldInterface;
+namespace Neverdane\Crudity\Field;
 
 /**
  * @package Neverdane\Crudity
@@ -51,6 +50,7 @@ class FieldHandler
                 "..",
                 "AbstractField.php",
                 "FieldInterface.php",
+                "FieldHandler.php",
                 "FieldManager.php"
             );
             // scandir returns all the files of the folder in an array

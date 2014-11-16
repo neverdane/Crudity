@@ -11,7 +11,8 @@ ini_set('display_errors', 1);
 require '../../vendor/autoload.php';
 
 use Neverdane\Crudity\Crudity;
-
+echo "jio";
+die;
 Crudity::setConfig("config.json");
 Crudity::listen();
 $form = Crudity::createFromFile("form.php"); //Add observers on form creation !
