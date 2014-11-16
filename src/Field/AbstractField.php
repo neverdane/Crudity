@@ -145,8 +145,11 @@ abstract class AbstractField implements FieldInterface
      */
     public static function createFromOccurrence($view, $occurrence)
     {
+        // We extract the params from the occurrence
         $params = self::extractParamsFromOccurrence($view, $occurrence);
+        // Then we remove all the unneeded params from the occurrence
         self::cleanUpOccurrence($view, $occurrence);
+        // Finally we return an instance of the field
         return new static($params);
     }
 
@@ -187,11 +190,14 @@ abstract class AbstractField implements FieldInterface
     public static function cleanUpOccurrence($view, $occurrence, $params = null)
     {
         $viewAdapter = $view->getAdapter();
+        // We remove the crudity name and column attributes
         $viewAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-name");
         $viewAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-column");
         if(!is_null($params)) {
+            // We need the params extracted from the occurrence to reset some attributes
             $params = self::extractParamsFromOccurrence($view, $occurrence);
         }
+        // We reset the name attribute
         $viewAdapter->setAttribute($occurrence, "name", $params["name"]);
     }
 }
