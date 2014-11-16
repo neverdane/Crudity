@@ -33,6 +33,13 @@ class FormView
     const FIELD_INPUT_PHONE = "phone";
     const FIELD_INPUT_CHECKBOX = "checkbox";
 
+    const RENDER_TYPE_FILE = 1;
+    const RENDER_TYPE_HTML = 2;
+    const RENDER_TYPE_OBJECTS = 3;
+
+    public $renderType = self::RENDER_TYPE_OBJECTS;
+    public $rendering = null;
+
     /**
      * All the Form elements that Crudity can handle
      * (Different from the handled fields which are more specific)
@@ -177,5 +184,18 @@ class FormView
             }
         }
         return $filteredOccurrences;
+    }
+
+    public function setRendering($rendering, $renderType)
+    {
+        $this->renderType = $renderType;
+        $this->rendering = $rendering;
+        return $this;
+    }
+
+    public function render()
+    {
+        $html = $this->rendering;
+        return $html;
     }
 }

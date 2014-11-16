@@ -11,7 +11,7 @@
 
 namespace Neverdane\Crudity\Form;
 
-use Neverdane\Crudity\View\View;
+use Neverdane\Crudity\View\FormView;
 use Neverdane\Crudity\Field\FieldManager;
 use Neverdane\Crudity\Registry;
 
@@ -56,14 +56,6 @@ class Form
         return $this->onChange();
     }
 
-    //TODO move to View
-    public function setRender($render, $renderType)
-    {
-        $this->renderType = $renderType;
-        $this->render = $render;
-        return $this;
-    }
-
     private function onChange()
     {
         if ($this->persisted === true) {
@@ -79,13 +71,6 @@ class Form
         return $this;
     }
 
-    //TODO move to View
-    public function render()
-    {
-        $html = $this->render;
-        return $html;
-    }
-
     public function setView($view)
     {
         $this->view = $view;
@@ -93,7 +78,7 @@ class Form
     }
 
     /**
-     * @return View
+     * @return FormView
      */
     public function getView()
     {
