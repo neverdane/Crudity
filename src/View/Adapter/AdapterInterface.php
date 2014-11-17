@@ -23,6 +23,7 @@ interface AdapterInterface
      * @return $this
      */
     public function setHtml($html);
+    public function getHtml();
 
     /**
      * Returns the form id attribute value
@@ -76,4 +77,5 @@ interface AdapterInterface
      * @return $this
      */
     public function removeAttribute($occurrence, $attributeKey);
+
 }

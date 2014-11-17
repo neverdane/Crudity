@@ -44,6 +44,11 @@ class PhpQueryAdapter implements AdapterInterface
         return $this;
     }
 
+    public function getHtml()
+    {
+        return $this->doc->htmlOuter();
+    }
+
     /**
      * Returns the form id attribute value
      * @return null|string

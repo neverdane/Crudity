@@ -149,7 +149,7 @@ class FormView
         /** @var FieldInterface $handledField */
         foreach ($handledFields as $handledField) {
             // Foreach field class, we check if the occurrence is this type of field
-            $isField = $handledField::identify($this->getAdapter(), $occurrence);
+            $isField = $handledField::identify($this, $occurrence);
             // If the field is identified as one, we return its Field class
             if ($isField === true) {
                 return $handledField;
@@ -197,5 +197,10 @@ class FormView
     {
         $html = $this->rendering;
         return $html;
+    }
+
+    public function getCleanedHtml()
+    {
+        return $this->getAdapter()->getHtml();
     }
 }

@@ -43,7 +43,7 @@ class FieldHandler
             // We get the folder name of the Fields classes
             $fieldsDirectory = dirname(__FILE__) . "/../Field";
             // We get the namespace of this folder from the current class
-            $fieldsNamespace = str_replace("\\View", "",  __NAMESPACE__) . "\\Field\\";
+            $fieldsNamespace = __NAMESPACE__;
             // We set the files that are not fields in this folder
             $excludedFiles = array(
                 ".",
@@ -63,7 +63,7 @@ class FieldHandler
                 // We isolate the class name from the extension
                 $fileParts = explode(".", $fileName);
                 // And we reconstruct the class name (with namespace) of the found field
-                $className = $fieldsNamespace . $fileParts[0];
+                $className = $fieldsNamespace . "\\" . $fileParts[0];
                 // For integrity, we check if it's really a class
                 if(class_exists($className)) {
                     // We add it to the default fields
@@ -127,7 +127,7 @@ class FieldHandler
         arsort($priorityFields, SORT_DESC);
         // And we register each handled field ats his position
         foreach ($priorityFields as $handledFieldIndex => $priorityField) {
-            $handledFields[] = $handledField[(int) $handledFieldIndex];
+            $handledFields[] = $this->handledFields[(int) $handledFieldIndex];
         }
         // Now we ca replace the handled fields by the sorted ones
         $this->handledFields = $handledFields;

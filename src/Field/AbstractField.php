@@ -84,18 +84,18 @@ abstract class AbstractField implements FieldInterface
     public static function identify($view, $occurrence)
     {
         // We firstly check the occurrence tag name
-        if (self::checkTagName($view, $occurrence)) {
-            $ids = self::getIdentifiers();
-            // Then we check each parameter
-            if (isset($ids["parameters"]) && is_array($ids["parameters"])) {
-                foreach ($ids["parameters"] as $key => $value) {
+        if (static::checkTagName($view, $occurrence)) {
+            $ids = static::getIdentifiers();
+            // Then we check each attribute
+            if (isset($ids["attributes"]) && is_array($ids["attributes"])) {
+                foreach ($ids["attributes"] as $key => $value) {
                     // If a parameter doesn't match, the occurrence is not this type of field class
-                    if(!self::checkAttribute($view, $occurrence, $key, $value)) {
+                    if(!static::checkAttribute($view, $occurrence, $key, $value)) {
                         return false;
                     }
                 }
             }
-            // If the tag name and the potential parameters are matching,
+            // If the tag name and the potential attributes are matching,
             // the occurrence is detected as this type of field class
             return true;
         }
@@ -112,7 +112,7 @@ abstract class AbstractField implements FieldInterface
     private static function checkTagName($view, $o)
     {
         // We get the identifiers of the class
-        $ids = self::getIdentifiers();
+        $ids = static::getIdentifiers();
         // We then compare the class tag name with the occurrence tag name
         return (isset($ids["tagName"])
             && $view->getAdapter()->getTagName($o) === $ids["tagName"]);
@@ -146,9 +146,9 @@ abstract class AbstractField implements FieldInterface
     public static function createFromOccurrence($view, $occurrence)
     {
         // We extract the params from the occurrence
-        $params = self::extractParamsFromOccurrence($view, $occurrence);
+        $params = static::extractParamsFromOccurrence($view, $occurrence);
         // Then we remove all the unneeded params from the occurrence
-        self::cleanUpOccurrence($view, $occurrence);
+        static::cleanUpOccurrence($view, $occurrence, $params);
         // Finally we return an instance of the field
         return new static($params);
     }
@@ -193,9 +193,9 @@ abstract class AbstractField implements FieldInterface
         // We remove the crudity name and column attributes
         $viewAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-name");
         $viewAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-column");
-        if(!is_null($params)) {
+        if(is_null($params)) {
             // We need the params extracted from the occurrence to reset some attributes
-            $params = self::extractParamsFromOccurrence($view, $occurrence);
+            $params = static::extractParamsFromOccurrence($view, $occurrence);
         }
         // We reset the name attribute
         $viewAdapter->setAttribute($occurrence, "name", $params["name"]);

@@ -82,12 +82,12 @@ class Crudity
         // And we store it into session
         $formView = new FormView($input);
         $parseStatus = $formView->parse();
+        $formView->setRendering($formView->getCleanedHtml(), Form::RENDER_TYPE_HTML);
         $fieldManager = new FieldManager();
         $fieldManager->setFields($parseStatus["fields"]);
         $form->setFieldManager($fieldManager)
             ->setView($formView)
             ->setId($parseStatus["id"])
-            ->setRender($input, Form::RENDER_TYPE_HTML)
             ->persist();
         return $form;
     }
