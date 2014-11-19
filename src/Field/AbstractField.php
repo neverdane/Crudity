@@ -75,22 +75,22 @@ abstract class AbstractField implements FieldInterface
 
     /**
      * Identifies if a field occurrence is eligible to be this type of class
-     * In order to identify it, we should send the view
+     * In order to identify it, we should send the parser
      * which is highly coupled to the field occurrence
-     * @param View\FormView $view
+     * @param View\FormParser $parser
      * @param mixed $occurrence
      * @return bool
      */
-    public static function identify($view, $occurrence)
+    public static function identify($parser, $occurrence)
     {
         // We firstly check the occurrence tag name
-        if (static::checkTagName($view, $occurrence)) {
+        if (static::checkTagName($parser, $occurrence)) {
             $ids = static::getIdentifiers();
             // Then we check each attribute
             if (isset($ids["attributes"]) && is_array($ids["attributes"])) {
                 foreach ($ids["attributes"] as $key => $value) {
                     // If a parameter doesn't match, the occurrence is not this type of field class
-                    if(!static::checkAttribute($view, $occurrence, $key, $value)) {
+                    if(!static::checkAttribute($parser, $occurrence, $key, $value)) {
                         return false;
                     }
                 }
@@ -105,71 +105,66 @@ abstract class AbstractField implements FieldInterface
 
     /**
      * Checks if the given field occurrence has the class tag name
-     * @param View\FormView $view
+     * @param View\FormParser $parser
      * @param mixed $o
      * @return bool
      */
-    private static function checkTagName($view, $o)
+    private static function checkTagName($parser, $o)
     {
         // We get the identifiers of the class
         $ids = static::getIdentifiers();
         // We then compare the class tag name with the occurrence tag name
         return (isset($ids["tagName"])
-            && $view->getAdapter()->getTagName($o) === $ids["tagName"]);
+            && $parser->getAdapter()->getTagName($o) === $ids["tagName"]);
     }
 
     /**
      * Checks if the given field occurrence has the given attribute
-     * @param View\FormView $view
+     * @param View\FormParser $parser
      * @param mixed $o
      * @param string $key
      * @param string $value
      * @return bool
      */
-    private static function checkAttribute($view, $o, $key, $value)
+    private static function checkAttribute($parser, $o, $key, $value)
     {
         // The type attribute could be prefixed by the Crudity prefix so we firstly check that one
         // We then compare the given attribute with the occurrence one
         if($key === "type") {
-            if($view->getAdapter()->getAttribute($o, $view::$prefix . "-" . $key) === $value) {
+            if($parser->getAdapter()->getAttribute($o, View\FormView::$prefix . "-" . $key) === $value) {
                 return true;
             }
         }
-        return ($view->getAdapter()->getAttribute($o, $key) === $value);
+        return ($parser->getAdapter()->getAttribute($o, $key) === $value);
     }
 
     /**
-     * @param View\FormView $view
+     * @param View\FormParser $parser
      * @param mixed $occurrence
      * @return static
      */
-    public static function createFromOccurrence($view, $occurrence)
+    public static function createFromOccurrence($parser, $occurrence)
     {
         // We extract the params from the occurrence
-        $params = static::extractParamsFromOccurrence($view, $occurrence);
+        $params = static::extractParamsFromOccurrence($parser, $occurrence);
         // Then we remove all the unneeded params from the occurrence
-        static::cleanUpOccurrence($view, $occurrence, $params);
+        static::cleanUpOccurrence($parser, $occurrence, $params);
         // Finally we return an instance of the field
         return new static($params);
     }
 
     /**
-     * @param View\FormView $view
+     * @param View\FormParser $parser
      * @param mixed $occurrence
      * @return array
      */
-    public static function extractParamsFromOccurrence($view, $occurrence)
+    public static function extractParamsFromOccurrence($parser, $occurrence)
     {
-        $viewAdapter = $view->getAdapter();
-        $required = $viewAdapter->getAttribute($occurrence, "required") === "true";
-        $name = $viewAdapter->getAttribute($occurrence, "name");
-        $crudityName = $viewAdapter->getAttribute($occurrence, View\FormView::$prefix . "-name");
-        $column = $viewAdapter->getAttribute($occurrence, View\FormView::$prefix . "-column");
+        $parserAdapter = $parser->getAdapter();
+        $required = $parserAdapter->getAttribute($occurrence, "required") === "true";
+        $name = $parserAdapter->getAttribute($occurrence, "name");
+        $column = $parserAdapter->getAttribute($occurrence, View\FormView::$prefix . "-column");
 
-        if (is_null($name) && !is_null($crudityName)) {
-            // We use the Crudity name attribute
-            $name = $crudityName;
-        }
         if (is_null($column)) {
             // We use the Crudity name attribute
             $column = $name;
@@ -183,21 +178,21 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
-     * @param View\FormView $view
+     * @param View\FormParser $parser
      * @param mixed $occurrence
      * @return array
      */
-    public static function cleanUpOccurrence($view, $occurrence, $params = null)
+    public static function cleanUpOccurrence($parser, $occurrence, $params = null)
     {
-        $viewAdapter = $view->getAdapter();
+        $parserAdapter = $parser->getAdapter();
         // We remove the crudity name and column attributes
-        $viewAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-name");
-        $viewAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-column");
+        $parserAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-name");
+        $parserAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-column");
         if(is_null($params)) {
             // We need the params extracted from the occurrence to reset some attributes
-            $params = static::extractParamsFromOccurrence($view, $occurrence);
+            $params = static::extractParamsFromOccurrence($parser, $occurrence);
         }
         // We reset the name attribute
-        $viewAdapter->setAttribute($occurrence, "name", $params["name"]);
+        $parserAdapter->setAttribute($occurrence, "name", $params["name"]);
     }
 }

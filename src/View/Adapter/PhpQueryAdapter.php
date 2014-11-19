@@ -11,8 +11,9 @@
 
 namespace Neverdane\Crudity\View\Adapter;
 
-use phpQuery;
 use Neverdane\Crudity\View\FormView;
+use phpQuery;
+use Neverdane\Crudity\View\FormParser;
 
 /**
  * @package Neverdane\Crudity
@@ -70,24 +71,6 @@ class PhpQueryAdapter implements AdapterInterface
     }
 
     /**
-     * Returns all fields occurrences matching the given tag names
-     * @param array $tagNames
-     * @return array
-     */
-    public function getFieldsOccurrencesOld($tagNames = array())
-    {
-        $totalOccurrences = array();
-        foreach ($tagNames as $tagName) {
-            $tagNameElements = $this->formEl->find($tagName);
-            // We convert the object of founded occurrences (which is a phpQueryObject) to an array
-            $tagNameOccurrences = iterator_to_array($tagNameElements);
-            // We then merge these tag name occurrences with all the occurrences already founded
-            $totalOccurrences = array_merge($totalOccurrences, $tagNameOccurrences);
-        }
-        return $totalOccurrences;
-    }
-
-    /**
      * Returns if the given field occurrence can be handled by Crudity
      * @param mixed $occurrence
      * @return bool
@@ -97,10 +80,9 @@ class PhpQueryAdapter implements AdapterInterface
         // We transform the element as a phpQuery object
         $pqo = pq($occurrence);
         // We test if the current field analyzed is a Crudity functional field in the aim to not manage them
-        // We reject the submit buttons and the inputs that don't have cr-name attribute
+        // We reject the submit buttons and the inputs that have cr-excluded attribute
         if ($pqo->attr("type") === "submit"
-            || $pqo->attr(FormView::$prefix . "-name") === ""
-            || is_null($pqo->attr(FormView::$prefix . "-name"))
+            || !is_null($pqo->attr(FormView::$prefix . "-excluded"))
         ) {
             return false;
         }

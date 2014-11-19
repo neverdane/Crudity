@@ -19,8 +19,9 @@ class FieldManager
 {
     public $fields = array();
 
-    public function __construct()
+    public function __construct($fields = array())
     {
+        $this->setFields($fields);
     }
 
     public function addField($field)

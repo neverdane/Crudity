@@ -13,6 +13,8 @@ namespace Neverdane\Crudity;
 
 use Neverdane\Crudity\Field\FieldManager;
 use Neverdane\Crudity\Form\Form;
+use Neverdane\Crudity\View\FormFormatter;
+use Neverdane\Crudity\View\FormParser;
 use Neverdane\Crudity\View\FormView;
 
 /**
@@ -77,17 +79,19 @@ class Crudity
             // If the input type is a file, we store its content into a variable
             $input = Helper::getFileAsVariable($input);
         }
+
+        $formParser = new FormParser($input);
+        $formId = $formParser->getId();
+        $formFields = $formParser->getFields();
+        $formattedHtml = $formParser->getFormattedHtml();
+
+        $formView = new FormView($formattedHtml);
+        $fieldManager = new FieldManager($formFields);
+
         $form = new Form();
-        // We set all parsed params to the Form instance
-        // And we store it into session
-        $formView = new FormView($input);
-        $parseStatus = $formView->parse();
-        $formView->setRendering($formView->getCleanedHtml(), Form::RENDER_TYPE_HTML);
-        $fieldManager = new FieldManager();
-        $fieldManager->setFields($parseStatus["fields"]);
         $form->setFieldManager($fieldManager)
             ->setView($formView)
-            ->setId($parseStatus["id"])
+            ->setId($formId)
             ->persist();
         return $form;
     }

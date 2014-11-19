@@ -1,4 +1,4 @@
 <form id="testForm">
-    <input type="text" cr-name="first_name">
+    <input type="text" name="first_name" cr-column="name">
     <button>Submit</button>
 </form>

@@ -23,6 +23,7 @@ interface AdapterInterface
      * @return $this
      */
     public function setHtml($html);
+
     public function getHtml();
 
     /**

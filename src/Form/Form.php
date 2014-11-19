@@ -11,7 +11,7 @@
 
 namespace Neverdane\Crudity\Form;
 
-use Neverdane\Crudity\View\FormView;
+use Neverdane\Crudity\View\FormParser;
 use Neverdane\Crudity\Field\FieldManager;
 use Neverdane\Crudity\Registry;
 
@@ -31,7 +31,7 @@ class Form
     public $render = null;
     public $persisted = false;
 
-    private $view = null;
+    private $parser = null;
 
     public function __construct()
     {
@@ -71,18 +71,18 @@ class Form
         return $this;
     }
 
-    public function setView($view)
+    public function setView($parser)
     {
-        $this->view = $view;
+        $this->parser = $parser;
         return $this;
     }
 
     /**
-     * @return FormView
+     * @return FormParser
      */
     public function getView()
     {
-        return $this->view;
+        return $this->parser;
     }
 
     public function setFieldManager($fieldManager)
