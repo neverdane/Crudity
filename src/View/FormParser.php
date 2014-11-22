@@ -32,14 +32,20 @@ class FormParser
     private $occurrences = null;
     private $formattedHtml = null;
 
+    /**
+     * @param string $html
+     */
     public function __construct($html)
     {
+        // The Field Handler only purpose is to set the fields that will be identified by the Form Parser
         $this->fieldHandler = new FieldHandler();
         $this->html = $html;
     }
 
     /**
-     * @return Adapter\AdapterInterface
+     * Returns the currently set Adapter instance that will parse the HTML
+     * If none has been set, it will return and set the default one
+     * @return AdapterInterface
      */
     public function getAdapter()
     {
@@ -53,18 +59,20 @@ class FormParser
     }
 
     /**
+     * Sets the Adapter instance that will be used to parse the HTML
      * @param AdapterInterface $adapter
      * @return $this
      */
     public function setAdapter($adapter)
     {
+        // We have to set the html on the adapter
         $adapter->setHtml($this->html);
         $this->adapter = $adapter;
         return $this;
     }
 
     /**
-     * Returns for each fields occurrence its Field instance
+     * Returns for each given fields occurrence its Field instance
      * @param array $occurrences
      * @return array
      */
@@ -77,24 +85,38 @@ class FormParser
         return $fields;
     }
 
+    /**
+     * Creates a Field instance according to the given occurrence
+     * If no Field instance has been identified, returns null
+     * @param mixed $occurrence
+     * @return null | FieldInterface
+     */
     private function createFieldInstance($occurrence)
     {
         $field = null;
         // In order to create it, we first need to identify its type
         $fieldType = $this->identifyFieldType($occurrence);
         if (!is_null($fieldType)) {
+            /** @var FieldInterface $fieldType */
             $field = $fieldType::createFromOccurrence($this, $occurrence);
         }
         return $field;
     }
 
+    /**
+     * Identifies the type of the Field according to the given occurrence
+     * Returns the name of the identified class.
+     * If no Field instance has been identified, returns null
+     * @param mixed $occurrence
+     * @return null | string
+     */
     private function identifyFieldType($occurrence)
     {
-        // We get all the fields classes handled by Crudity
+        // We get all the fields classes that we want to handle
         $handledFields = $this->fieldHandler->getHandledFields();
         /** @var FieldInterface $handledField */
         foreach ($handledFields as $handledField) {
-            // Foreach field class, we check if the occurrence is this type of field
+            // Foreach Field class, we check if the occurrence is this type of field
             $isField = $handledField::identify($this, $occurrence);
             // If the field is identified as one, we return its Field class
             if ($isField === true) {
@@ -105,7 +127,7 @@ class FormParser
     }
 
     /**
-     * Returns all potential fields occurrences as an array from the form
+     * Returns all potential fields occurrences from the form as an array
      * We consider the fields eligible as they are in the managed elements by Crudity by default
      * @return array
      */
