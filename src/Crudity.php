@@ -13,7 +13,6 @@ namespace Neverdane\Crudity;
 
 use Neverdane\Crudity\Field\FieldManager;
 use Neverdane\Crudity\Form\Form;
-use Neverdane\Crudity\View\FormFormatter;
 use Neverdane\Crudity\View\FormParser;
 use Neverdane\Crudity\View\FormView;
 
@@ -23,8 +22,6 @@ use Neverdane\Crudity\View\FormView;
  */
 class Crudity
 {
-    const INPUT_TYPE_FILE = 1;
-    const INPUT_TYPE_HTML = 2;
 
     private static $configFile = null;
 
@@ -48,39 +45,22 @@ class Crudity
      */
     public static function createFromFile($file = null)
     {
-        return self::createForm($file, self::INPUT_TYPE_FILE);
+        //  we store the file content into a variable
+        $html = Helper::getFileAsVariable($file);
+        return self::createForm($html);
     }
 
     /**
      * Creates an instance of Form
-     * By parsing the HTML given and returns it
+     * By parsing the given html and returns it
      *
-     * @param string $html
+     * @param $html
+     *  The HTML to parse.
      * @return Form
      */
-    public static function createFromHtml($html = null)
+    public static function createForm($html)
     {
-        return self::createForm($html, self::INPUT_TYPE_HTML);
-    }
-
-    /**
-     * Creates an instance of Form
-     * By parsing the input given and returns it
-     *
-     * @param $input
-     *  The input to parse. Could be a file or raw HTML
-     * @param $inputType
-     *  The type of input to parse
-     * @return Form
-     */
-    private static function createForm($input, $inputType)
-    {
-        if ($inputType === self::INPUT_TYPE_FILE) {
-            // If the input type is a file, we store its content into a variable
-            $input = Helper::getFileAsVariable($input);
-        }
-
-        $formParser = new FormParser($input);
+        $formParser = new FormParser($html);
         $formId = $formParser->getId();
         $formFields = $formParser->getFields();
         $formattedHtml = $formParser->getFormattedHtml();
