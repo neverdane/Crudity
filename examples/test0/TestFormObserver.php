@@ -6,9 +6,11 @@
  * Time: 23:24
  */
 
+use Neverdane\Crudity\Form\Form;
+
 class TestFormObserver extends \Neverdane\Crudity\AbstractObserver {
 
-    public function beforeValidation()
+    public function preValidation(Form $form)
     {
     }
 } 

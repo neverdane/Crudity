@@ -1,14 +1,8 @@
 <?php
 namespace Neverdane\Crudity;
 
-/**
- * This library is used in order to parse and interact easily with the DOM
- */
-use Neverdane\Crudity\Exception\Exception;
 use Neverdane\Crudity\Form\Form;
-use Neverdane\Crudity\Adapter\AbstractAdapter;
-
-//require_once __DIR__ . "/../../libs/phpQuery/phpQuery.php";
+use Neverdane\Crudity\Request\FormRequest;
 
 class Listener
 {
@@ -19,14 +13,16 @@ class Listener
         // If we detect that a Crudity Form has been submitted (a Crudity Form Id has been launched)
         if (self::wasCrudityFormSubmitted($requestParams)) {
             // We let the adapter search for the instance of the declared Form in config with the submitted id if any
-            $submittedForm = Crudity::$adapter->get($requestParams["id"]);
+            $submittedForm = Registry::get($requestParams["id"]);
             // If a Form has been founded
             if (!is_null($submittedForm)) {
+                /** @var Form $submittedForm */
+                $formRequest = new FormRequest($requestParams);
+                $submittedForm->setRequest($formRequest);
                 $workflow = new Workflow($submittedForm);
-                $workflow->start($requestParams);
+                $workflow->start();
             } else {
                 // If no declared Form has been founded with this id
-                throw new Exception("The submitted Form \"" . $requestParams["id"] . "\" has not been declared in the config file : \"" . Crudity::PARAMS_FILE . "\"");
             }
         }
     }
@@ -40,7 +36,7 @@ class Listener
      */
     private static function getRequestParams()
     {
-        $userParams = Crudity::$adapter->getRequestParams();
+        $userParams = $_POST;
         // We initialize the params
         $requestParams = array(
             "id" => null,
@@ -69,6 +65,7 @@ class Listener
 
     /**
      * Detects if a Crudity Form has been submitted (a Crudity Form Id has been sent)
+     * @param array $requestParams
      * @return bool
      */
     private static function wasCrudityFormSubmitted($requestParams)

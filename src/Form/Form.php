@@ -11,6 +11,8 @@
 
 namespace Neverdane\Crudity\Form;
 
+use Neverdane\Crudity\Request\FormRequest;
+use Neverdane\Crudity\Response\FormResponse;
 use Neverdane\Crudity\View\FormParser;
 use Neverdane\Crudity\Field\FieldManager;
 use Neverdane\Crudity\Registry;
@@ -26,12 +28,15 @@ class Form
     const RENDER_TYPE_OBJECTS = 3;
 
     public $id;
-    public $observers = array();
+    private $observers = array();
     public $renderType = self::RENDER_TYPE_OBJECTS;
     public $render = null;
     public $persisted = false;
 
     private $parser = null;
+
+    private $request = null;
+    private $response = null;
 
     public function __construct()
     {
@@ -54,6 +59,11 @@ class Form
     {
         $this->observers = $observers;
         return $this->onChange();
+    }
+
+    public function getObservers()
+    {
+        return $this->observers;
     }
 
     private function onChange()
@@ -97,6 +107,39 @@ class Form
     public function getFieldManager()
     {
         return $this->fieldManager;
+    }
+
+    public function setRequest($request)
+    {
+        $this->request = $request;
+        $this->response = new FormResponse();
+        return $this;
+    }
+
+    /**
+     * @return FormRequest
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * @return FormResponse
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    public function validate()
+    {
+
+    }
+
+    public function filter()
+    {
+
     }
 
 }

@@ -32,7 +32,7 @@ class Crudity
 
     public static function listen()
     {
-
+        Listener::listen();
     }
 
     /**
