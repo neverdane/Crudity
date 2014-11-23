@@ -1,7 +1,6 @@
 <?php
 namespace Neverdane\Crudity;
 
-use Neverdane\Crudity\Exception\Exception;
 use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Request\FormRequest;
 
@@ -58,6 +57,7 @@ class Workflow
 
         switch ($action) {
             default:
+                $this->form->getRequest()->setAction(FormRequest::ACTION_CUSTOM);
             case FormRequest::ACTION_CUSTOM :
                 $this->validate();
                 $this->filter();
