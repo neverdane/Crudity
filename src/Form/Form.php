@@ -37,6 +37,7 @@ class Form
 
     private $request = null;
     private $response = null;
+    private $errorMessages = array();
 
     public function __construct()
     {
@@ -145,6 +146,16 @@ class Form
     public function filter()
     {
 
+    }
+
+    /**
+     * @param array $errorMessages
+     * @return  $this
+     */
+    public function setErrorMessages($errorMessages = array())
+    {
+        $this->errorMessages = $errorMessages;
+        return $this;
     }
 
 }
