@@ -63,10 +63,10 @@ class Error {
         // We add the field to the params to simplify the signature
         $params["field"] = $field;
         // Then we replace its potential placeholders by their values
-        return self::_interpretMessage($message, $params);
+        return self::interpretMessage($message, $params);
     }
 
-    private static function _interpretMessage($message, $params)
+    private static function interpretMessage($message, $params)
     {
         if(isset($params["field"]->name)) {
             $message = str_replace("{{name}}", $params["field"]->name, $message);
@@ -85,11 +85,12 @@ class Error {
      * @param int $code
      * @param Form $form
      * @param null | FieldInterface $field
-     * @return string
+     * @return null | string
      */
     private static function getRawMessage($params, $code, $form, $field = null)
     {
-        $availableParams    = self::getAvailableParamsByOrder($params, $form->getId(), $field);
+        // We get all the messages that can match with our error
+        $availableParams    = self::getAvailableParamsByOrder($params, $form, $field);
         $availableCodes     = self::getCodesByOrder($code);
         return self::getMessageByOrder($availableParams, $availableCodes);
     }
