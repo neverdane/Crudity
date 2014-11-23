@@ -24,6 +24,7 @@ class Workflow
 
     private function validate()
     {
+        Error::initialize();
         $this->notify(self::EVENT_VALIDATION_BEFORE);
         $this->form->validate();
         $this->notify(self::EVENT_VALIDATION_AFTER);

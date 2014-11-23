@@ -17,7 +17,7 @@ namespace Neverdane\Crudity\Field;
  */
 class FieldManager
 {
-    public $fields = array();
+    private $fields = array();
 
     public function __construct($fields = array())
     {
@@ -34,6 +34,11 @@ class FieldManager
     {
         $this->fields = $fields;
         return $this;
+    }
+
+    public function getFields()
+    {
+        return $this->fields;
     }
 
 }

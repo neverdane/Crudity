@@ -11,6 +11,7 @@
 
 namespace Neverdane\Crudity\Form;
 
+use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\Request\FormRequest;
 use Neverdane\Crudity\Response\FormResponse;
 use Neverdane\Crudity\View\FormParser;
@@ -140,7 +141,11 @@ class Form
 
     public function validate()
     {
-
+        $fields = $this->getFieldManager()->getFields();
+        /** @var FieldInterface $field */
+        foreach ($fields as $field) {
+            $field->validate;
+        }
     }
 
     public function filter()

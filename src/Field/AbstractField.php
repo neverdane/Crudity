@@ -2,10 +2,17 @@
 namespace Neverdane\Crudity\Field;
 
 use Neverdane\Crudity\Crudity;
+use Neverdane\Crudity\Error;
 use Neverdane\Crudity\View;
 
 abstract class AbstractField implements FieldInterface
 {
+    const VALUE_REQUEST = "request";
+    const VALUE_FILTERED = "filtered";
+
+    const STATUS_SUCCESS = 1;
+    const STATUS_ERROR = 2;
+
     /**
      * Sets if the field is required or not
      * On required, if the submitted value is empty, a message will be sent to the user
@@ -46,11 +53,19 @@ abstract class AbstractField implements FieldInterface
      */
     public $type = null;
 
+    private $value = array(
+        self::VALUE_REQUEST => null,
+        self::VALUE_FILTERED => null,
+    );
+
+    private $status = null;
+    private $error = null;
+
     public function __construct($config)
     {
         $this->name = $config["name"];
         $this->column = $config["column"];
-        if(isset($config["required"])) {
+        if (isset($config["required"])) {
             $this->required = $config["required"];
         }
     }
@@ -90,7 +105,7 @@ abstract class AbstractField implements FieldInterface
             if (isset($ids["attributes"]) && is_array($ids["attributes"])) {
                 foreach ($ids["attributes"] as $key => $value) {
                     // If a parameter doesn't match, the occurrence is not this type of field class
-                    if(!static::checkAttribute($parser, $occurrence, $key, $value)) {
+                    if (!static::checkAttribute($parser, $occurrence, $key, $value)) {
                         return false;
                     }
                 }
@@ -130,8 +145,8 @@ abstract class AbstractField implements FieldInterface
     {
         // The type attribute could be prefixed by the Crudity prefix so we firstly check that one
         // We then compare the given attribute with the occurrence one
-        if($key === "type") {
-            if($parser->getAdapter()->getAttribute($o, View\FormView::$prefix . "-" . $key) === $value) {
+        if ($key === "type") {
+            if ($parser->getAdapter()->getAttribute($o, View\FormView::$prefix . "-" . $key) === $value) {
                 return true;
             }
         }
@@ -171,9 +186,9 @@ abstract class AbstractField implements FieldInterface
         }
 
         return array(
-            "name"      => $name,
-            "column"    => $column,
-            "required"  => $required
+            "name" => $name,
+            "column" => $column,
+            "required" => $required
         );
     }
 
@@ -188,7 +203,7 @@ abstract class AbstractField implements FieldInterface
         // We remove the crudity name and column attributes
         $parserAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-name");
         $parserAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-column");
-        if(is_null($params)) {
+        if (is_null($params)) {
             // We need the params extracted from the occurrence to reset some attributes
             $params = static::extractParamsFromOccurrence($parser, $occurrence);
         }
@@ -205,5 +220,57 @@ abstract class AbstractField implements FieldInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setValue($value, $type = self::VALUE_REQUEST)
+    {
+        $this->value[$type] = $value;
+    }
+
+    public function getValue($type = null)
+    {
+        if (is_null($type)) {
+            if (!is_null($this->value[self::VALUE_FILTERED])) {
+                $type = self::VALUE_FILTERED;
+            } elseif (!is_null($this->value[self::VALUE_REQUEST])) {
+                $type = self::VALUE_REQUEST;
+            }
+        }
+        return $this->value[$type];
+    }
+
+    public function validate()
+    {
+        $this->setStatus(self::STATUS_SUCCESS);
+        $value = $this->getValue(self::VALUE_REQUEST);
+        if ($this->required === true) {
+            if (is_null($value) || $value === "") {
+                $this->setStatus(self::STATUS_ERROR, Error::REQUIRED);
+            }
+        }
+        return $this;
+    }
+
+    private function setStatus($status, $error = null)
+    {
+        $this->status = $status;
+        $this->setError($error);
+        return $this;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setError($error = null)
+    {
+        $this->error = $error;
+        return $this;
+    }
+
+    public function getError()
+    {
+        return $this->error;
     }
 }
