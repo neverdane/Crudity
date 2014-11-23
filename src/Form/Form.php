@@ -158,4 +158,8 @@ class Form
         return $this;
     }
 
+    public function getErrorMessages()
+    {
+        return $this->errorMessages;
+    }
 }
