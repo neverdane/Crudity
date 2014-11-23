@@ -195,4 +195,15 @@ abstract class AbstractField implements FieldInterface
         // We reset the name attribute
         $parserAdapter->setAttribute($occurrence, "name", $params["name"]);
     }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
 }
