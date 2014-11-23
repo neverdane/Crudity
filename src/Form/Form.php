@@ -11,6 +11,8 @@
 
 namespace Neverdane\Crudity\Form;
 
+use Neverdane\Crudity\Error;
+use Neverdane\Crudity\Field\AbstractField;
 use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\Request\FormRequest;
 use Neverdane\Crudity\Response\FormResponse;
@@ -141,10 +143,25 @@ class Form
 
     public function validate()
     {
+        $this->getResponse()->setStatus(FormResponse::STATUS_SUCCESS);
         $fields = $this->getFieldManager()->getFields();
         /** @var FieldInterface $field */
         foreach ($fields as $field) {
-            $field->validate;
+            $fieldStatus = $field->validate()->getStatus();
+            if ($fieldStatus !== AbstractField::STATUS_SUCCESS) {
+                $this->getResponse()->setStatus(FormResponse::STATUS_ERROR);
+                $message = Error::getMessage(
+                    $field->getErrorCode(),
+                    $this->getErrorMessages(),
+                    $field->getName(),
+                    $field->getErrorValidatorName(),
+                    $placeholders = array(
+                        "value"     => $field->getValue(),
+                        "fieldName" => $field->getName()
+                    )
+                );
+                $this->getResponse()->addError($field->getErrorCode(), $message, $field->getName());
+            }
         }
     }
 

@@ -11,5 +11,16 @@ Interface FieldInterface
 
     public function getName();
 
+    /**
+     * @return $this
+     */
     public function validate();
+
+    public function getStatus();
+
+    public function getErrorCode();
+
+    public function getErrorValidatorName();
+
+    public function getValue();
 }

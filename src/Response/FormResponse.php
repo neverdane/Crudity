@@ -21,6 +21,10 @@ class FormResponse
     const STATUS_ERROR = 2;
 
     private $status = null;
+    private $errors = array(
+        "fields" => array(),
+        "global" => null
+    );
 
     public function __construct()
     {
@@ -37,9 +41,24 @@ class FormResponse
     {
         echo json_encode(
             array(
-                "status" => $this->status
+                "status" => $this->status,
+                "errors" => $this->errors
             )
         );
         exit();
+    }
+
+    public function addError($code, $message, $fieldName = null)
+    {
+        $error = array(
+            "code" => $code,
+            "message" => $message
+        );
+        if (is_null($fieldName)) {
+            $this->errors["fields"][$fieldName] = $error;
+        } else {
+            $this->errors["global"] = $error;
+        }
+        return $this;
     }
 }

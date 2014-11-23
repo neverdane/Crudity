@@ -59,7 +59,8 @@ abstract class AbstractField implements FieldInterface
     );
 
     private $status = null;
-    private $error = null;
+    private $errorCode = null;
+    private $errorValidatorName = null;
 
     public function __construct($config)
     {
@@ -246,7 +247,26 @@ abstract class AbstractField implements FieldInterface
         if ($this->required === true) {
             if (is_null($value) || $value === "") {
                 $this->setStatus(self::STATUS_ERROR, Error::REQUIRED);
+                return $this;
             }
+        }
+        foreach ($this->validators as $validator) {
+            $result = $validator->validate($value);
+            $this->setStatus($result["status"]);
+            if ($this->getStatus() === self::STATUS_ERROR) {
+                $this->setError($result["code"], $validator->getName());
+                return $this;
+            }
+        }
+        return $this;
+    }
+
+    public function filter()
+    {
+        $this->setValue($this->getValue(self::VALUE_REQUEST), self::VALUE_FILTERED);
+        foreach ($this->filters as $filter) {
+            $value = $this->getValue(self::VALUE_FILTERED);
+            $this->setValue($filter->filter($value), self::VALUE_FILTERED);
         }
         return $this;
     }
@@ -263,14 +283,20 @@ abstract class AbstractField implements FieldInterface
         return $this->status;
     }
 
-    public function setError($error = null)
+    public function setError($code = null, $validatorName = null)
     {
-        $this->error = $error;
+        $this->errorCode = $code;
+        $this->errorValidatorName = $validatorName;
         return $this;
     }
 
-    public function getError()
+    public function getErrorCode()
     {
-        return $this->error;
+        return $this->errorCode;
+    }
+
+    public function getErrorValidatorName()
+    {
+        return $this->errorValidatorName;
     }
 }

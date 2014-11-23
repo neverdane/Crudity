@@ -1,24 +1,22 @@
 <?php
 namespace Neverdane\Crudity;
 
-use Neverdane\Crudity\Field\FieldInterface;
-use Neverdane\Crudity\Form\Form;
+class Error
+{
 
-class Error {
-
-    const FORCED_ERROR      = 100;
-    const REQUIRED          = 101;      // Error thrown when a field is required and submitted empty
-    const WRONG_FORMAT      = 102;      // Default error thrown when a submitted input is wrong formatted
-    const MIN_UNREACHED     = 103;      // Error thrown when a number is under required limit
-    const MAX_EXCEEDED      = 104;      // Error thrown when a number is beyond required limit
-    const OUT_OF_RANGE      = 105;      // ?
-    const NOT_A_NUMBER      = 106;      // Error thrown when the submitted value is not a number but a number is expected
-    const NOT_A_STRING      = 107;      // Error thrown when the submitted value is not a string but a string is expected
-    const ABSENT_CHAR       = 108;      // Error thrown when the submitted value does not contain a specific expected character
-    const FORBIDDEN_CHAR    = 109;      // Error thrown when the submitted value contains a forbidden character
-    const STRING_TOO_SHORT  = 110;      // Error thrown when the submitted value contains not enough characters
-    const STRING_TOO_LONG   = 111;      // Error thrown when the submitted value contains too many characters
-    const DUPLICATE_ENTRY   = 112;      // Error thrown when the submitted value is already stored in the database
+    const FORCED_ERROR = 100;
+    const REQUIRED = 101;      // Error thrown when a field is required and submitted empty
+    const WRONG_FORMAT = 102;      // Default error thrown when a submitted input is wrong formatted
+    const MIN_UNREACHED = 103;      // Error thrown when a number is under required limit
+    const MAX_EXCEEDED = 104;      // Error thrown when a number is beyond required limit
+    const OUT_OF_RANGE = 105;      // ?
+    const NOT_A_NUMBER = 106;      // Error thrown when the submitted value is not a number but a number is expected
+    const NOT_A_STRING = 107;      // Error thrown when the submitted value is not a string but a string is expected
+    const ABSENT_CHAR = 108;      // Error thrown when the submitted value does not contain a specific expected character
+    const FORBIDDEN_CHAR = 109;      // Error thrown when the submitted value contains a forbidden character
+    const STRING_TOO_SHORT = 110;      // Error thrown when the submitted value contains not enough characters
+    const STRING_TOO_LONG = 111;      // Error thrown when the submitted value contains too many characters
+    const DUPLICATE_ENTRY = 112;      // Error thrown when the submitted value is already stored in the database
 
     /**
      * The path to the Crudity error massages file
@@ -50,37 +48,34 @@ class Error {
     /**
      * Returns the message matching the most with the given parameters
      * according to the messages of the Error class
-     * @param array $params
      * @param int $code
-     * @param Form $form
-     * @param null | FieldInterface $field
-     * @return string
+     * @param array $formMessages
+     * @param null|string $fieldName
+     * @param null|string $validatorName
+     * @param array $placeholders
+     * @return null|string
      */
-    public static function getMessage($params, $code, $form = null, $field = null)
+    public static function getMessage($code, $formMessages = array(), $fieldName = null, $validatorName = null, $placeholders = array())
     {
         // First we get the raw message
-        $message = self::getRawMessage($params, $code, $form, $field);
-        // We add the field to the params to simplify the signature
-        $params["field"] = $field;
+        $message = self::getRawMessage($code, $formMessages, $fieldName, $validatorName);
         // Then we replace its potential placeholders by their values
-        return self::interpretMessage($message, $params);
+        return self::replacePlaceholders($message, $placeholders);
     }
 
     /**
      * Replaces the potential placeholders of the message and returns it
-     * @param null | string $message
-     * @param array $params
-     * @return null | string
+     * @param string $message
+     * @param array $placeholders
+     * @return null|string
      */
-    private static function interpretMessage($message, $params)
+    private static function replacePlaceholders($message, $placeholders = array())
     {
-        if (isset($params["field"]) && !is_null($params["field"])) {
-            /** @var FieldInterface $field */
-            $field = $params["field"];
-            $message = str_replace("{{name}}", self::escape($field->getName()), $message);
+        if (isset($placeholders["fieldName"]) && !is_null($placeholders["fieldName"])) {
+            $message = str_replace("{{name}}", self::escape($placeholders["fieldName"]), $message);
         }
-        if (isset($params["value"])) {
-            $message = str_replace("{{value}}", self::escape($params["value"]), $message);
+        if (isset($placeholders["value"])) {
+            $message = str_replace("{{value}}", self::escape($placeholders["value"]), $message);
         }
         return $message;
     }
@@ -95,23 +90,21 @@ class Error {
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 
+
     /**
      * Returns the message matching the most with the given parameters
      * according to the messages of the Error class
-     * @param array $params
      * @param int $code
-     * @param Form $form
-     * @param null | FieldInterface $field
-     * @return null | string
+     * @param array $formMessages
+     * @param null|string $fieldName
+     * @param null|string $validatorName
+     * @return null|string
      */
-    private static function getRawMessage($params, $code, $form, $field = null)
+    private static function getRawMessage($code, $formMessages = array(), $fieldName = null, $validatorName = null)
     {
-        // We identify the field and validator names
-        $fieldName = (!is_null($field)) ? $field->getName() : null;
-        $validatorName = (isset($params["validatorName"])) ? $params["validatorName"] : null;
         // We get all the messages that can match with our error
         // according to the fieldName and the validatorName
-        $availableMessages = self::getAvailableMessagesByOrder($form->getErrorMessages(), $fieldName, $validatorName);
+        $availableMessages = self::getAvailableMessagesByOrder($formMessages, $fieldName, $validatorName);
         // We get the priority of error codes
         $availableCodes = self::getCodesByOrder($code);
         // Returns the
@@ -122,8 +115,8 @@ class Error {
      * Returns pools of messages ordered by priority
      * that can match with our error according to the fieldName and the validatorName
      * @param array $formMessages
-     * @param null | string $fieldName
-     * @param null | string $validatorName
+     * @param null|string $fieldName
+     * @param null|string $validatorName
      * @return array
      */
     private static function getAvailableMessagesByOrder($formMessages, $fieldName = null, $validatorName = null)
@@ -164,7 +157,7 @@ class Error {
      * and returns it if founded
      * @param array $availableMessages
      * @param int $code
-     * @return null | string
+     * @return null|string
      */
     private static function getMessageByCode($availableMessages, $code)
     {
@@ -180,7 +173,7 @@ class Error {
      * Returns the most relevant message
      * @param array $availableMessages
      * @param array $availableCodes
-     * @return null | string
+     * @return null|string
      */
     private static function getMostRelevantMessage($availableMessages, $availableCodes)
     {
