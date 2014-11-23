@@ -27,7 +27,7 @@ class Form
     const RENDER_TYPE_HTML = 2;
     const RENDER_TYPE_OBJECTS = 3;
 
-    public $id;
+    private $id;
     private $observers = array();
     public $renderType = self::RENDER_TYPE_OBJECTS;
     public $render = null;
@@ -47,6 +47,11 @@ class Form
     {
         $this->id = $id;
         return $this;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function addObserver($observer)
