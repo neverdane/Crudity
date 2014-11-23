@@ -23,4 +23,6 @@ Interface FieldInterface
     public function getErrorValidatorName();
 
     public function getValue();
+
+    public function setValue($value, $type = null);
 }

@@ -54,7 +54,7 @@ class FormResponse
             "code" => $code,
             "message" => $message
         );
-        if (is_null($fieldName)) {
+        if (!is_null($fieldName)) {
             $this->errors["fields"][$fieldName] = $error;
         } else {
             $this->errors["global"] = $error;

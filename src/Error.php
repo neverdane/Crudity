@@ -24,7 +24,7 @@ class Error
     const MESSAGES_FILE = "config/errors.php";
 
     private static $messages = null;
-    private static $customMessages = null;
+    private static $customMessages = array();
 
     /**
      * Initiates error messages and merges them with customMessages if set

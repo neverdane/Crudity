@@ -1,6 +1,7 @@
 <?php
 namespace Neverdane\Crudity;
 
+use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Request\FormRequest;
 
@@ -43,6 +44,20 @@ class Workflow
         $this->form->getResponse()->send();
     }
 
+    public function affectValues()
+    {
+        $fields = $this->form->getFieldManager()->getFields();
+        $values = $this->form->getRequest()->getParams();
+        /** @var FieldInterface $field */
+        foreach($fields as $field)
+        {
+            if(isset($values[$field->getName()])) {
+                $field->setValue($values[$field->getName()]);
+            }
+        }
+        return $this;
+    }
+
     private function notify($event)
     {
         $observers = $this->form->getObservers();
@@ -60,6 +75,7 @@ class Workflow
             default:
                 $this->form->getRequest()->setAction(FormRequest::ACTION_CUSTOM);
             case FormRequest::ACTION_CUSTOM :
+                $this->affectValues();
                 $this->validate();
                 $this->filter();
                 break;
