@@ -66,16 +66,33 @@ class Error {
         return self::interpretMessage($message, $params);
     }
 
+    /**
+     * Replaces the potential placeholders of the message and returns it
+     * @param null | string $message
+     * @param array $params
+     * @return null | string
+     */
     private static function interpretMessage($message, $params)
     {
-        if(isset($params["field"]->name)) {
-            $message = str_replace("{{name}}", $params["field"]->name, $message);
+        if (isset($params["field"]) && !is_null($params["field"])) {
+            /** @var FieldInterface $field */
+            $field = $params["field"];
+            $message = str_replace("{{name}}", self::escape($field->getName()), $message);
         }
-        //CAUTION ! SECURE $params["value"] FROM XSS !!
-        if(isset($params["value"])) {
-            $message = str_replace("{{value}}", $params["value"], $message);
+        if (isset($params["value"])) {
+            $message = str_replace("{{value}}", self::escape($params["value"]), $message);
         }
         return $message;
+    }
+
+    /**
+     * Adds a security layer to the given value, preventing XSS
+     * @param string $value
+     * @return string
+     */
+    private static function escape($value)
+    {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
     }
 
     /**
@@ -89,38 +106,69 @@ class Error {
      */
     private static function getRawMessage($params, $code, $form, $field = null)
     {
+        // We identify the field and validator names
+        $fieldName = (!is_null($field)) ? $field->getName() : null;
+        $validatorName = (isset($params["validatorName"])) ? $params["validatorName"] : null;
         // We get all the messages that can match with our error
-        $availableParams    = self::getAvailableParamsByOrder($params, $form, $field);
-        $availableCodes     = self::getCodesByOrder($code);
-        return self::getMessageByOrder($availableParams, $availableCodes);
+        // according to the fieldName and the validatorName
+        $availableMessages = self::getAvailableMessagesByOrder($form->getErrorMessages(), $fieldName, $validatorName);
+        // We get the priority of error codes
+        $availableCodes = self::getCodesByOrder($code);
+        // Returns the
+        return self::getMostRelevantMessage($availableMessages, $availableCodes);
     }
 
-    private static function getAvailableParamsByOrder($params, $formId, $field = null)
+    /**
+     * Returns pools of messages ordered by priority
+     * that can match with our error according to the fieldName and the validatorName
+     * @param array $formMessages
+     * @param null | string $fieldName
+     * @param null | string $validatorName
+     * @return array
+     */
+    private static function getAvailableMessagesByOrder($formMessages, $fieldName = null, $validatorName = null)
     {
-        $availableParams = array();
-        if (!is_null($field) && isset(self::$messages["Forms"][$formId]["Fields"][$field->name])) {
-            $availableParams[] = self::$messages["Forms"][$formId]["Fields"][$field->name];
+        $availableMessages = array();
+        // If a message has been customized for this field on the Form, we get its messages first
+        if (!is_null($fieldName) && isset($formMessages["Fields"][$fieldName])) {
+            $availableMessages[] = $formMessages["Fields"][$fieldName];
         }
-        if (isset(self::$messages["Forms"][$formId]["Validators"])) {
-            $availableParams[] = self::$messages["Forms"][$formId]["Validators"];
+        // Then, if a message has been customized for this validator on the Form, we get its messages
+        if (!is_null($validatorName) && isset($formMessages["Validators"][$validatorName])) {
+            $availableMessages[] = $formMessages["Validators"][$validatorName];
         }
-        if (isset($params["validatorName"]) && isset(self::$messages["Validators"][$params["validatorName"]])) {
-            $availableParams[] = self::$messages["Validators"][$params["validatorName"]];
+        // Then, if a message has been set globally for this validator, we get its messages
+        if (!is_null($validatorName) && isset(self::$messages["Validators"][$validatorName])) {
+            $availableMessages[] = self::$messages["Validators"][$validatorName];
         }
+        // Finally, we get all the default messages (wrong format, required...)
         if (isset(self::$messages["Default"])) {
-            $availableParams[] = self::$messages["Default"];
+            $availableMessages[] = self::$messages["Default"];
         }
-        return $availableParams;
+        return $availableMessages;
     }
 
+    /**
+     * Returns codes ordered by their priority
+     * @param int $code
+     * @return array
+     */
     private static function getCodesByOrder($code)
     {
         return array(self::FORCED_ERROR, $code, self::REQUIRED);
     }
 
-    private static function getMessageByCode($availableParams, $code)
+    /**
+     * Traverses the availableMessages
+     * in order to found if a message has been set for the given code
+     * and returns it if founded
+     * @param array $availableMessages
+     * @param int $code
+     * @return null | string
+     */
+    private static function getMessageByCode($availableMessages, $code)
     {
-        foreach ($availableParams as $availableParam) {
+        foreach ($availableMessages as $availableParam) {
             if (isset($availableParam[$code])) {
                 return $availableParam[$code];
             }
@@ -128,11 +176,20 @@ class Error {
         return null;
     }
 
-    private static function getMessageByOrder($availableParams, $availableCodes)
+    /**
+     * Returns the most relevant message
+     * @param array $availableMessages
+     * @param array $availableCodes
+     * @return null | string
+     */
+    private static function getMostRelevantMessage($availableMessages, $availableCodes)
     {
         foreach ($availableCodes as $availableCode) {
-            $message = self::getMessageByCode($availableParams, $availableCode);
+            // First, we check if this code has a message set somewhere
+            $message = self::getMessageByCode($availableMessages, $availableCode);
+            // If this is the case, we return the matching message
             if (!is_null($message)) return $message;
+            // Else, we continue with a lower priority code
         }
         return null;
     }
