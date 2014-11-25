@@ -1,23 +1,59 @@
 (function ($) {
     $.fn.extend({
         crudity: function () {
+
             return this.each(function () {
+
+
+                // On form submission
                 $(this).on("submit", function (e) {
+                    // We prevent the form to be submitted
                     e.preventDefault();
+                    // We store the elem in order to keep it on this scope change
                     var $form = $(this);
+
+                    /***************************************************************************************************
+                     * START Form Display Initialization **/
+
+                        // We hide the potential errors shown in the form
                     $form.find('.cr-error').each(function () {
                         $(this).crHideError();
                     });
-                    var params = $form.data("crudity-params");
+                    // We disable and set the submit button(s) at load state in order to prevent from a new submit
                     $form.find("[type='submit']").attr("disabled", true).addClass("cr-submit--loading");
-                    var sData = $form.serializeArray();
-                    sData.push({name: "crudity_form_id", value: $(this).attr("id")});
-                    sData.push({name: "crudity_form_action", value: $(this).data("crudity-action")});
-                    sData.push({name: "crudity_form_row_id", value: $(this).data("crudity-row-id")});
 
+                    /** END Form Display Initialization
+                     **************************************************************************************************/
+
+                    // We get the potential configuration we set for this form
+                    var params = $form.data("crudity-params");
+
+                    /***************************************************************************************************
+                     * START Form Field Values Collect **/
+
+                    // We get all the data from all the form fields into an array
+                    var sData = $form.serializeArray();
+                    // We add the checkboxes not checked as they're not handled by serializeArray
                     $form.find("input[type='checkbox']:not(:checked)").each(function () {
                         sData.push({name: $(this).attr("name"), value: 0});
                     });
+
+                    /** END Form Field Values Collect
+                     **************************************************************************************************/
+
+                    /***************************************************************************************************
+                     * START Crudity Primary Params Collect **/
+
+                        // We also set the crudity needed params
+                    sData.push({name: "crudity_form_id", value: $form.attr("id")});
+                    sData.push({name: "crudity_form_action", value: $form.data("crudity-action")});
+                    sData.push({name: "crudity_form_row_id", value: $form.data("crudity-row-id")});
+
+                    /** END Crudity Primary Params Collect
+                     **************************************************************************************************/
+
+                    /***************************************************************************************************
+                     * START Crudity Secondary Params Collect **/
 
                     var addedParams = $form.data("crudity-added-params");
                     if (addedParams) {
@@ -25,12 +61,18 @@
                             sData.push({name: key, value: value});
                         });
                     }
+
+                    /** END Crudity Secondary Params Collect
+                     **************************************************************************************************/
+
                     $.ajax($(this).attr("action"), {
                         data: sData,
                         dataType: "json",
                         type: $form.attr("method") || "post",
                         success: function (response) {
+                            // We enable back the submit button
                             $form.find("[type='submit']").removeAttr("disabled").removeClass("cr-submit--loading");
+                            // We handle the potential errors display
                             $.each(response.errors, function (idx, error) {
                                 var $guilt = $form.find("[name='" + error.guilt + "']");
                                 if (params.highlightGuilt) {
@@ -48,7 +90,9 @@
                             }
                         },
                         error: function () {
+                            // We enable back the submit button
                             $form.find("[type='submit']").removeAttr("disabled").removeClass("cr-submit--loading");
+                            // We show a global error message
                             $("<div>" + params.messages.fail + "</div>").appendTo($form).hide().slideDown();
                         }
                     });
