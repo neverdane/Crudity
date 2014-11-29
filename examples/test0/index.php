@@ -17,6 +17,16 @@ Crudity::setConfig("config.json");
 Crudity::listen();
 $form = Crudity::createFromFile("form.php");
 $form->addObserver(new TestFormObserver());
+
+$form->setErrorMessages(array(
+    "Fields" => array(
+        "first_name" => array(
+            \Neverdane\Crudity\Error::REQUIRED => "{{name}} ne semble pas être renseigné."
+        )
+    )
+
+));
+
 ?>
 <html>
 <head>
