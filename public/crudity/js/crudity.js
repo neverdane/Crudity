@@ -66,12 +66,12 @@
                 function handleErrors(errors, params) {
                     // We handle the potential errors display
                     $.each(errors.fields, function (idx, error) {
-                        var $guilt = $form.find("[name='" + error.guilt + "']");
-                        if (params.highlightGuilt) {
+                        var $guilt = $form.find("[name='" + idx + "']");
+                        if (params.errorHighlighted) {
                             $guilt.addClass("cr-guilt--highlight");
                         }
-                        if (params.errors.separate === true) {
-                            $guilt.crDisplayError(error.message, params.errors.class);
+                        if (params.errorGrouped === false) {
+                            $guilt.crDisplayError(error.message, "");
                         } else {
                             showGlobalError(error.message);
                         }
@@ -86,7 +86,7 @@
                     hideAllErrors();
                     disableSubmitButton();
                     // We get the potential configuration we set for this form
-                    var params = $form.data("crudity-params");
+                    var params = $form.data("config");
                     var sData = getDataToSend();
                     var url = $form.attr("action") || window.location.href;
                     var method = $form.attr("method") || "post";

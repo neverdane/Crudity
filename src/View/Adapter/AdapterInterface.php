@@ -39,6 +39,8 @@ interface AdapterInterface
      */
     public function getFieldsOccurrences($tagNames = array());
 
+    public function getFormOccurrence();
+    
     /**
      * Returns if the given field occurrence can be handled by Crudity
      * @param mixed $occurrence

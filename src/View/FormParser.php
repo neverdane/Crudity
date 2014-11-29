@@ -225,4 +225,11 @@ class FormParser
         $parserAdapter->removeAttribute($occurrence, FormView::$prefix . "-excluded");
         return $this;
     }
+
+    public function insertConfig($config)
+    {
+        $parserAdapter = $this->getAdapter();
+        $parserAdapter->setAttribute($parserAdapter->getFormOccurrence(), "data-config", json_encode($config));
+        return $this;
+    }
 }

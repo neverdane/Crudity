@@ -135,4 +135,9 @@ class PhpQueryAdapter implements AdapterInterface
         pq($occurrence)->removeAttr($attributeKey);
         return $this;
     }
+
+    public function getFormOccurrence()
+    {
+        return $this->formEl;
+    }
 }

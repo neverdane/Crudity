@@ -33,6 +33,26 @@ class Config
         $this->params = self::getDefault();
     }
 
+    public static function getDefault($type = null)
+    {
+        if(is_null(self::$defaultConfig)) {
+            self::$defaultConfig = array(
+                self::PARAM_ERROR_GROUPED => false,
+                self::PARAM_ERROR_HIGHLIGHTED => true,
+                self::PARAM_ERROR_STOPPED_AT_FIRST => false
+            );
+        }
+        return self::getConfigByTypeAndContext($type);
+    }
+
+    private static function getViewParams()
+    {
+        return array(
+            self::PARAM_ERROR_GROUPED,
+            self::PARAM_ERROR_HIGHLIGHTED
+        );
+    }
+
     public function setParam($param, $value)
     {
         $this->params[$param] = $value;
@@ -46,26 +66,10 @@ class Config
 
     public function getConfig($type = null)
     {
-        switch($type) {
-            case self::TYPE_VIEW:
-                return self::getConfigFromParams(self::getViewParams(), $this->params);
-        }
-        return $this->params;
+        return self::getConfigByTypeAndContext($type, $this->params);
     }
 
-    public static function getDefault($type = null)
-    {
-        if(is_null(self::$defaultConfig)) {
-            self::$defaultConfig = array(
-                self::PARAM_ERROR_GROUPED => false,
-                self::PARAM_ERROR_HIGHLIGHTED => true,
-                self::PARAM_ERROR_STOPPED_AT_FIRST => false
-            );
-        }
-        return self::getConfigByTypeAndContext($type);
-    }
-
-    private static function getConfigByTypeAndContext($type, $fullConfig = array())
+    private static function getConfigByTypeAndContext($type, $fullConfig = null)
     {
         if(is_null($fullConfig)) {
             $fullConfig = self::$defaultConfig;
@@ -91,16 +95,8 @@ class Config
 
     public static function setDefault($config)
     {
-        self::$defaultConfig = array_merge(self::$defaultConfig, $config);
+        self::$defaultConfig = array_merge(self::getDefault(), $config);
         return self::$defaultConfig;
-    }
-
-    public static function getViewParams()
-    {
-        return array(
-            self::PARAM_ERROR_GROUPED,
-            self::PARAM_ERROR_HIGHLIGHTED
-        );
     }
 
 }

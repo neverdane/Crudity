@@ -51,7 +51,7 @@ class Form
     public function setId($id)
     {
         $this->id = $id;
-        return $this;
+        return $this->onChange();
     }
 
     public function getId()
@@ -91,11 +91,15 @@ class Form
         return $this;
     }
 
+    /**
+     * @param FormView $view
+     * @return $this
+     */
     public function setView($view)
     {
         $this->view = $view;
-        $this->view->setConfig($this->config->getViewConfigs());
-        return $this;
+        $this->view->setConfig($this->config->getConfig(Config::TYPE_VIEW));
+        return $this->onChange();
     }
 
     /**
@@ -109,7 +113,7 @@ class Form
     public function setFieldManager($fieldManager)
     {
         $this->fieldManager = $fieldManager;
-        return $this;
+        return $this->onChange();
     }
 
     /**
@@ -179,7 +183,7 @@ class Form
     public function setErrorMessages($errorMessages = array())
     {
         $this->errorMessages = $errorMessages;
-        return $this;
+        return $this->onChange();
     }
 
     public function getErrorMessages()

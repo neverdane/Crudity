@@ -30,6 +30,7 @@ class FormView
 
     public $renderType = self::RENDER_TYPE_HTML;
     public $rendering = null;
+    public $formattedRendering = null;
     private $config = null;
     private $parser = null;
 
@@ -48,7 +49,7 @@ class FormView
 
     public function __construct($rendering, $renderType = self::RENDER_TYPE_HTML)
     {
-        $this->setConfig(Config::getViewC());
+        $this->setConfig(Config::getDefault(Config::TYPE_VIEW));
         $this->setRendering($rendering, $renderType);
     }
 
@@ -66,10 +67,17 @@ class FormView
 
     public function render()
     {
-        $html = $this->rendering;
-        return $html;
+        if(is_null($this->formattedRendering)) {
+            $parser = $this->getParser();
+            $parser->insertConfig($this->getConfig());
+            $this->formattedRendering = $parser->getAdapter()->getHtml();
+        }
+        return $this->formattedRendering;
     }
 
+    /**
+     * @return FormParser
+     */
     public function getParser()
     {
         if(is_null($this->parser)) {
@@ -92,5 +100,10 @@ class FormView
     {
         $this->config = $config;
         return $this;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
     }
 }
