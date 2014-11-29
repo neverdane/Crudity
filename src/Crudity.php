@@ -11,6 +11,7 @@
 
 namespace Neverdane\Crudity;
 
+use Neverdane\Crudity\Form\Config;
 use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\View\FormParser;
 use Neverdane\Crudity\View\FormView;
@@ -74,9 +75,11 @@ class Crudity
         // The FieldManager handles all that is related to the fields
         $fieldManager = new FieldManager($formFields);
 
+        $config = new Config();
+
         // We finally create the Crudity Form and give to it its id, the FieldManager and the FormView instances
         // Then, we store the Crudity Form into session
-        $form = new Form();
+        $form = new Form($config);
         $form->setId($formId)
             ->setFieldManager($fieldManager)
             ->setView($formView)

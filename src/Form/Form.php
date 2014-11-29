@@ -16,9 +16,9 @@ use Neverdane\Crudity\Field\AbstractField;
 use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\Request\FormRequest;
 use Neverdane\Crudity\Response\FormResponse;
-use Neverdane\Crudity\View\FormParser;
 use Neverdane\Crudity\Field\FieldManager;
 use Neverdane\Crudity\Registry;
+use Neverdane\Crudity\View\FormView;
 
 /**
  * @package Neverdane\Crudity
@@ -36,15 +36,16 @@ class Form
     public $render = null;
     public $persisted = false;
 
-    private $parser = null;
+    private $view = null;
 
     private $request = null;
     private $response = null;
     private $errorMessages = array();
 
-    public function __construct()
+    public function __construct($config = null)
     {
         $this->fieldManager = new FieldManager();
+        $this->config = (!is_null($config)) ? $config : new Config();
     }
 
     public function setId($id)
@@ -90,18 +91,19 @@ class Form
         return $this;
     }
 
-    public function setView($parser)
+    public function setView($view)
     {
-        $this->parser = $parser;
+        $this->view = $view;
+        $this->view->setConfig($this->config->getViewConfigs());
         return $this;
     }
 
     /**
-     * @return FormParser
+     * @return FormView
      */
     public function getView()
     {
-        return $this->parser;
+        return $this->view;
     }
 
     public function setFieldManager($fieldManager)
@@ -183,5 +185,13 @@ class Form
     public function getErrorMessages()
     {
         return $this->errorMessages;
+    }
+
+    /**
+     * @return Config
+     */
+    public function getConfig()
+    {
+        return $this->config;
     }
 }

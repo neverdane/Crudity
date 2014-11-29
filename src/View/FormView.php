@@ -10,6 +10,7 @@
  */
 
 namespace Neverdane\Crudity\View;
+use Neverdane\Crudity\Form\Config;
 
 /**
  * @package Neverdane\Crudity
@@ -29,6 +30,8 @@ class FormView
 
     public $renderType = self::RENDER_TYPE_HTML;
     public $rendering = null;
+    private $config = null;
+    private $parser = null;
 
     /**
      * All the Form elements that Crudity can handle
@@ -45,6 +48,7 @@ class FormView
 
     public function __construct($rendering, $renderType = self::RENDER_TYPE_HTML)
     {
+        $this->setConfig(Config::getViewC());
         $this->setRendering($rendering, $renderType);
     }
 
@@ -64,5 +68,29 @@ class FormView
     {
         $html = $this->rendering;
         return $html;
+    }
+
+    public function getParser()
+    {
+        if(is_null($this->parser)) {
+            $this->setParser(new FormParser($this->rendering));
+        }
+        return $this->parser;
+    }
+
+    public function setParser($parser)
+    {
+        $this->parser = $parser;
+        return $this;
+    }
+
+    /**
+     * @param array $config
+     * @return $this
+     */
+    public function setConfig($config = array())
+    {
+        $this->config = $config;
+        return $this;
     }
 }

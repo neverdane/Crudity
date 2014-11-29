@@ -59,9 +59,13 @@
                     return sData;
                 }
 
+                function showGlobalError(content) {
+                    $("<div>" + content + "</div>").appendTo($form).hide().slideDown();
+                }
+
                 function handleErrors(errors, params) {
                     // We handle the potential errors display
-                    $.each(errors, function (idx, error) {
+                    $.each(errors.fields, function (idx, error) {
                         var $guilt = $form.find("[name='" + error.guilt + "']");
                         if (params.highlightGuilt) {
                             $guilt.addClass("cr-guilt--highlight");
@@ -69,7 +73,7 @@
                         if (params.errors.separate === true) {
                             $guilt.crDisplayError(error.message, params.errors.class);
                         } else {
-                            $("<div>" + error.message + "</div>").appendTo($form).hide().slideDown();
+                            showGlobalError(error.message);
                         }
                     });
                 }
@@ -100,8 +104,7 @@
                         },
                         error: function () {
                             enableSubmitButton();
-                            // We show a global error message
-                            $("<div>" + params.messages.fail + "</div>").appendTo($form).hide().slideDown();
+                            showGlobalError(params.messages.fail);
                         }
                     });
                 });
