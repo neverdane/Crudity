@@ -25,25 +25,8 @@ class PdoAdapter extends AbstractAdapter implements AdapterInterface
 
     public function createRow($table, $data)
     {
-        $columns = join(', ', array_keys($data));
-
-        $valuesTmp = array();
-        foreach ($data as $value) {
-            switch(gettype($value)) {
-                default:
-                    $valuesTmp[] = "'$value'";
-                    break;
-                case 'integer':
-                case 'double':
-                    $valuesTmp[] = $value;
-                    break;
-                case 'NULL':
-                    $valuesTmp[] = 'NULL';
-                    break;
-            }
-        }
-
-        $values = join(', ', $valuesTmp);
+        $columns = $this->getColumnsSlug($data);
+        $values = $this->getValuesSlug($data);
 
         $this->connection->beginTransaction();
         $this->connection->exec("INSERT INTO $table ($columns) VALUES ($values)");
@@ -60,5 +43,30 @@ class PdoAdapter extends AbstractAdapter implements AdapterInterface
     public function deleteRow($table, $id)
     {
 
+    }
+
+    private function getColumnsSlug($data)
+    {
+        return join(', ', array_keys($data));
+    }
+
+    private function getValuesSlug($data)
+    {
+        $values = array();
+        foreach ($data as $value) {
+            switch(gettype($value)) {
+                default:
+                    $values[] = "'$value'";
+                    break;
+                case 'integer':
+                case 'double':
+                    $values[] = $value;
+                    break;
+                case 'NULL':
+                    $values[] = 'NULL';
+                    break;
+            }
+        }
+        return join(', ', $values);
     }
 }
