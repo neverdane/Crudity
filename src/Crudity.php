@@ -23,14 +23,6 @@ use Neverdane\Crudity\Field\FieldManager;
  */
 class Crudity
 {
-
-    private static $configFile = null;
-
-    public static function setConfig($configFile)
-    {
-        self::$configFile = $configFile;
-    }
-
     public static function listen()
     {
         Listener::listen();

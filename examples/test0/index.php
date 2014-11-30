@@ -13,19 +13,17 @@ require "TestFormObserver.php";
 
 use Neverdane\Crudity\Crudity;
 
-Crudity::setConfig("config.json");
 Crudity::listen();
-$form = Crudity::createFromFile("form.php");
-$form->addObserver(new TestFormObserver());
 
+$form = Crudity::createFromFile("form.php");
 $form->setErrorMessages(array(
     "Fields" => array(
         "first_name" => array(
             \Neverdane\Crudity\Error::REQUIRED => "{{name}} ne semble pas être renseigné."
         )
     )
-
 ));
+$form->addObserver(new TestFormObserver());
 
 ?>
 <html>
