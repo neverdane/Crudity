@@ -11,6 +11,7 @@
 
 namespace Neverdane\Crudity\Form;
 
+use Neverdane\Crudity\Db\Db;
 use Neverdane\Crudity\Error;
 use Neverdane\Crudity\Field\AbstractField;
 use Neverdane\Crudity\Field\FieldInterface;
@@ -197,5 +198,18 @@ class Form
     public function getConfig()
     {
         return $this->config;
+    }
+
+    public function setDbAdapter($db)
+    {
+        $this->db = $db;
+    }
+
+    public function getDbAdapter()
+    {
+        if(is_null($this->db)) {
+            $this->db = new Db();
+        }
+        return $this->db;
     }
 }

@@ -11,14 +11,39 @@
 
 namespace Neverdane\Crudity\Db;
 
+use Neverdane\Crudity\Db\Adapter\AdapterInterface;
+
 /**
  * @package Neverdane\Crudity
  * @author Alban Pommeret <alban@aocreation.com>
  */
 class Db
 {
+    private static $defaultAdapter = null;
+    private static $defaultConnection = null;
+
     private $adapter = null;
     private $connection = null;
+
+    public static function setDefaultAdapter($adapter)
+    {
+        self::$defaultAdapter = $adapter;
+    }
+
+    public static function getDefaultAdapter()
+    {
+        return self::$defaultAdapter;
+    }
+
+    public static function setDefaultConnection($connection)
+    {
+        self::$defaultConnection = $connection;
+    }
+
+    public static function getDefaultConnection()
+    {
+        return self::$defaultConnection;
+    }
 
     public function setConnection($connection)
     {
@@ -37,6 +62,9 @@ class Db
         return $this;
     }
 
+    /**
+     * @return null|AdapterInterface
+     */
     public function getAdapter()
     {
         return $this->adapter;
@@ -44,16 +72,16 @@ class Db
 
     public function createRow($table, $data)
     {
-        return $this->adapter->createRow($table, $data);
+        return $this->getAdapter()->createRow($table, $data);
     }
 
     public function updateRow($table, $id, $data)
     {
-        return $this->adapter->updateRow($table, $id, $data);
+        return $this->getAdapter()->updateRow($table, $id, $data);
     }
 
     public function deleteRow($table, $id)
     {
-        return $this->adapter->deleteRow($table, $id);
+        return $this->getAdapter()->deleteRow($table, $id);
     }
 }
