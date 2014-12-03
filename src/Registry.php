@@ -6,7 +6,17 @@ class Registry
 
     const NAMESPACE_CRUDITY = "Crudity";
 
-    public static function store($id, $form)
+    public static function storeForm($id, $form)
+    {
+        self::store("form", $id, $form);
+    }
+
+    public static function storeConnection($id, $form)
+    {
+        self::storeConnection("form", $id, $form);
+    }
+
+    private static function store($id, $form)
     {
         self::initSession();
         if (!isset($_SESSION[self::NAMESPACE_CRUDITY])) {

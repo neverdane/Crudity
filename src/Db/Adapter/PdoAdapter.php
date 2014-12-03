@@ -37,12 +37,21 @@ class PdoAdapter extends AbstractAdapter implements AdapterInterface
 
     public function updateRow($table, $id, $data)
     {
-
+        $this->connection->beginTransaction();
+        $assignments = $this->getAssignments($data);
+        $idColumn = $this->getPrimaryKey($table);
+        $result = $this->connection->exec("UPDATE $table SET $assignments WHERE $idColumn=$id");
+        $this->connection->commit();
+        return $result;
     }
 
     public function deleteRow($table, $id)
     {
-
+        $this->connection->beginTransaction();
+        $idColumn = $this->getPrimaryKey($table);
+        $result = $this->connection->exec("DELETE FROM $table WHERE $idColumn=$id");
+        $this->connection->commit();
+        return $result;
     }
 
     private function getColumnsSlug($data)
@@ -54,19 +63,39 @@ class PdoAdapter extends AbstractAdapter implements AdapterInterface
     {
         $values = array();
         foreach ($data as $value) {
-            switch(gettype($value)) {
-                default:
-                    $values[] = "'$value'";
-                    break;
-                case 'integer':
-                case 'double':
-                    $values[] = $value;
-                    break;
-                case 'NULL':
-                    $values[] = 'NULL';
-                    break;
-            }
+            $values[] = $this->formatValue($value);
         }
         return join(', ', $values);
+    }
+
+    private function getAssignments($data)
+    {
+        $assignments = array();
+        foreach($data as $column => $value) {
+            $value = $this->formatValue($value);
+            $assignments[] = "$column=$value";
+        }
+        return $assignments;
+    }
+
+    private function formatValue($value)
+    {
+        switch(gettype($value)) {
+            default:
+                return "'$value'";
+                break;
+            case 'integer':
+            case 'double':
+                return $value;
+                break;
+            case 'NULL':
+                return 'NULL';
+                break;
+        }
+    }
+
+    private function getPrimaryKey($table)
+    {
+        return 'id';
     }
 }
