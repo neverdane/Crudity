@@ -88,7 +88,7 @@ class Form
     public function persist()
     {
         $this->persisted = true;
-        Registry::store($this->id, $this);
+        Registry::storeForm($this->id, $this);
         return $this;
     }
 

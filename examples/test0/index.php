@@ -15,7 +15,7 @@ use Neverdane\Crudity\Crudity;
 use Neverdane\Crudity\Db;
 use Neverdane\Crudity\Registry;
 
-Registry::store('db', );
+//Registry::store('db', );
 
 Db\Db::setDefaultAdapter(new Db\Adapter\PdoAdapter());
 Db\Db::setDefaultConnection(new PDO('mysql:host=localhost;dbname=crudity', 'root', ''));

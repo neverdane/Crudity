@@ -13,7 +13,7 @@ class Listener
         // If we detect that a Crudity Form has been submitted (a Crudity Form Id has been launched)
         if (self::wasCrudityFormSubmitted($requestParams)) {
             // We let the adapter search for the instance of the declared Form in config with the submitted id if any
-            $submittedForm = Registry::get($requestParams["id"]);
+            $submittedForm = Registry::getForm($requestParams["id"]);
             // If a Form has been founded
             if (!is_null($submittedForm)) {
                 /** @var Form $submittedForm */
