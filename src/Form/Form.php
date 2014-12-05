@@ -42,6 +42,8 @@ class Form
     private $request = null;
     private $response = null;
     private $errorMessages = array();
+    private $dbAdapterKey = null;
+    private $entity;
 
     public function __construct($config = null)
     {
@@ -163,7 +165,7 @@ class Form
                     $field->getName(),
                     $field->getErrorValidatorName(),
                     $placeholders = array(
-                        "value"     => $field->getValue(),
+                        "value" => $field->getValue(),
                         "fieldName" => $field->getName()
                     )
                 );
@@ -174,7 +176,16 @@ class Form
 
     public function filter()
     {
+        $params = $this->getRequest()->getParams();
+        $this->getRequest()->setParams($params, FormRequest::PARAMS_FILTERED);
+    }
 
+    public function create()
+    {
+        $db = new Db();
+        $db->setAdapter($this->getDbAdapter());
+        $lastInsertId = $db->createRow($this->entity, $this->getRequest());
+        $this->getResponse()->addParam('id', $lastInsertId);
     }
 
     /**
@@ -200,16 +211,20 @@ class Form
         return $this->config;
     }
 
-    public function setDbAdapter($db)
+    public function setDbAdapterKey($key)
     {
-        $this->db = $db;
+        $this->dbAdapterKey = $key;
+        return $this->onChange();
     }
 
     public function getDbAdapter()
     {
-        if(is_null($this->db)) {
-            $this->db = new Db();
-        }
-        return $this->db;
+        return Db::retrieveAdapter($this->dbAdapterKey);
+    }
+
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+        return $this->onChange();
     }
 }

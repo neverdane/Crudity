@@ -9,25 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Neverdane\Crudity\Db\Adapter;
+namespace Neverdane\Crudity\Db\Layer;
 
 /**
  * @package Neverdane\Crudity
  * @author Alban Pommeret <alban@aocreation.com>
  */
-abstract class AbstractAdapter
+interface AdapterInterface
 {
 
-    protected $connection = null;
+    public function setConnection($connection);
 
-    public function setConnection($connection)
-    {
-        $this->connection = $connection;
-        return $this;
-    }
+    public function getConnection();
 
-    public function getConnection()
-    {
-        return $this->connection;
-    }
+    public function createRow($table, $data);
+
+    public function updateRow($table, $id, $data);
+
+    public function deleteRow($table, $id);
 }

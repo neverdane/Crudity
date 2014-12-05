@@ -11,7 +11,7 @@
 
 namespace Neverdane\Crudity\Db;
 
-use Neverdane\Crudity\Db\Adapter\AdapterInterface;
+use Neverdane\Crudity\Db\Layer\AdapterInterface;
 
 /**
  * @package Neverdane\Crudity
@@ -19,41 +19,33 @@ use Neverdane\Crudity\Db\Adapter\AdapterInterface;
  */
 class Db
 {
-    private static $defaultAdapter = null;
-    private static $defaultConnection = null;
+
+    private static $adapters = array();
+    private static $defaultAdapterKey = null;
 
     private $adapter = null;
-    private $connection = null;
 
-    public static function setDefaultAdapter($adapter)
+    public static function setDefaultAdapterKey($key)
     {
-        self::$defaultAdapter = $adapter;
+        self::$defaultAdapterKey = $key;
     }
 
-    public static function getDefaultAdapter()
+    public static function registerAdapter($key, $adapter, $default = false)
     {
-        return self::$defaultAdapter;
+        self::$adapters[$key] = $adapter;
+        if(true === $default || 1 === count(self::$adapters)) {
+            self::setDefaultAdapterKey($key);
+        }
     }
 
-    public static function setDefaultConnection($connection)
+    public static function retrieveAdapter($key = null)
     {
-        self::$defaultConnection = $connection;
-    }
-
-    public static function getDefaultConnection()
-    {
-        return self::$defaultConnection;
-    }
-
-    public function setConnection($connection)
-    {
-        $this->connection = $connection;
-        return $this;
-    }
-
-    public function getConnection()
-    {
-        return $this->connection;
+        if(isset(self::$adapters[$key])) {
+            return self::$adapters[$key];
+        } elseif(isset(self::$adapters[self::$defaultAdapterKey])) {
+            return self::$adapters[self::$defaultAdapterKey];
+        }
+        return null;
     }
 
     public function setAdapter($adapter)

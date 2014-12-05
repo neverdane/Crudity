@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Neverdane\Crudity\Db\Adapter;
+namespace Neverdane\Crudity\Db\Layer;
 
 /**
  * @package Neverdane\Crudity
@@ -23,34 +23,52 @@ class PdoAdapter extends AbstractAdapter implements AdapterInterface
      */
     protected $connection;
 
+    public function createConnection()
+    {
+        $this->connection = new \PDO($this->credentials);
+        return $this->connection;
+    }
+
+    /**
+     * @return \PDO
+     */
+    public function getConnection()
+    {
+        return parent::getConnection();
+    }
+
     public function createRow($table, $data)
     {
+        $connection = $this->getConnection();
+
         $columns = $this->getColumnsSlug($data);
         $values = $this->getValuesSlug($data);
 
-        $this->connection->beginTransaction();
-        $this->connection->exec("INSERT INTO $table ($columns) VALUES ($values)");
-        $lastInsertId = $this->connection->lastInsertId();
-        $this->connection->commit();
+        $connection->beginTransaction();
+        $connection->exec("INSERT INTO $table ($columns) VALUES ($values)");
+        $lastInsertId = $connection->lastInsertId();
+        $connection->commit();
         return $lastInsertId;
     }
 
     public function updateRow($table, $id, $data)
     {
-        $this->connection->beginTransaction();
+        $connection = $this->getConnection();
+        $connection->beginTransaction();
         $assignments = $this->getAssignments($data);
         $idColumn = $this->getPrimaryKey($table);
-        $result = $this->connection->exec("UPDATE $table SET $assignments WHERE $idColumn=$id");
-        $this->connection->commit();
+        $result = $connection->exec("UPDATE $table SET $assignments WHERE $idColumn=$id");
+        $connection->commit();
         return $result;
     }
 
     public function deleteRow($table, $id)
     {
-        $this->connection->beginTransaction();
+        $connection = $this->getConnection();
+        $connection->beginTransaction();
         $idColumn = $this->getPrimaryKey($table);
-        $result = $this->connection->exec("DELETE FROM $table WHERE $idColumn=$id");
-        $this->connection->commit();
+        $result = $connection->exec("DELETE FROM $table WHERE $idColumn=$id");
+        $connection->commit();
         return $result;
     }
 

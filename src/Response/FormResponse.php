@@ -22,9 +22,10 @@ class FormResponse
 
     private $status = null;
     private $errors = array(
-        "fields" => array(),
-        "global" => null
+        'fields' => array(),
+        'global' => null
     );
+    private $params = array();
 
     public function __construct()
     {
@@ -41,8 +42,9 @@ class FormResponse
     {
         echo json_encode(
             array(
-                "status" => $this->status,
-                "errors" => $this->errors
+                'status' => $this->status,
+                'errors' => $this->errors,
+                'params' => $this->params
             )
         );
         exit();
@@ -51,14 +53,20 @@ class FormResponse
     public function addError($code, $message, $fieldName = null)
     {
         $error = array(
-            "code" => $code,
-            "message" => $message
+            'code' => $code,
+            'message' => $message
         );
         if (!is_null($fieldName)) {
-            $this->errors["fields"][$fieldName] = $error;
+            $this->errors['fields'][$fieldName] = $error;
         } else {
-            $this->errors["global"] = $error;
+            $this->errors['global'] = $error;
         }
+        return $this;
+    }
+
+    public function addParam($key, $value)
+    {
+        $this->params[$key] = $value;
         return $this;
     }
 }

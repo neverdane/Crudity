@@ -13,12 +13,10 @@ require "TestFormObserver.php";
 
 use Neverdane\Crudity\Crudity;
 use Neverdane\Crudity\Db;
-use Neverdane\Crudity\Registry;
 
-//Registry::store('db', );
-
-Db\Db::setDefaultAdapter(new Db\Adapter\PdoAdapter());
-Db\Db::setDefaultConnection(new PDO('mysql:host=localhost;dbname=crudity', 'root', ''));
+$pdoAdapter = new Db\Layer\PdoAdapter();
+$pdoAdapter->setConnection(new PDO('mysql:host=localhost;dbname=crudity', 'root', ''));
+Db\Db::registerAdapter('pdo', $pdoAdapter);
 Crudity::listen();
 
 $form = Crudity::createFromFile("form.php");
@@ -30,6 +28,7 @@ $form->setErrorMessages(array(
     )
 ));
 $form->addObserver(new TestFormObserver());
+$form->setEntity('user');
 
 ?>
 <html>

@@ -17,6 +17,12 @@ abstract class AbstractObserver
     public function postFilter(Form $form)
     {
     }
+    public function preCreate(Form $form)
+    {
+    }
+    public function postCreate(Form $form)
+    {
+    }
     public function preSend(Form $form)
     {
     }

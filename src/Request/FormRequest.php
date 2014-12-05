@@ -18,10 +18,19 @@ namespace Neverdane\Crudity\Request;
 class FormRequest
 {
     const ACTION_CUSTOM = "custom";
+    const ACTION_CREATE = "create";
+    const ACTION_UPDATE = "update";
+    const ACTION_DELETE = "delete";
+
+    const PARAMS_REQUEST = "request";
+    const PARAMS_FILTERED = "filtered";
 
     private $action = null;
     private $rowId = null;
-    private $params = null;
+    private $params = array(
+        self::PARAMS_REQUEST => null,
+        self::PARAMS_FILTERED => null,
+    );
 
     public function __construct($requestParams = null)
     {
@@ -48,9 +57,9 @@ class FormRequest
         return $this;
     }
 
-    public function setParams($params)
+    public function setParams($params, $type = self::PARAMS_REQUEST)
     {
-        $this->params = $params;
+        $this->params[$type] = $params;
         return $this;
     }
 
@@ -64,9 +73,16 @@ class FormRequest
         return $this->rowId;
     }
 
-    public function getParams()
+    public function getParams($type = null)
     {
-        return $this->params;
+        if (is_null($type)) {
+            if (!is_null($this->params[self::PARAMS_FILTERED])) {
+                $type = self::PARAMS_FILTERED;
+            } elseif (!is_null($this->params[self::PARAMS_REQUEST])) {
+                $type = self::PARAMS_REQUEST;
+            }
+        }
+        return $this->params[$type];
     }
 
 }
