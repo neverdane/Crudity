@@ -96,7 +96,7 @@
                         type: method,
                         success: function (response) {
                             enableSubmitButton();
-                            if(response.status === 1) {
+                            if (response.status === 1) {
                                 $form.trigger("cruditySuccess");
                             } else {
                                 handleErrors(response.errors, params);
@@ -179,6 +179,11 @@
                         }
                     });
                 }, "json");
+            });
+        },
+        crSetCreate: function () {
+            return this.each(function () {
+                $(this).data("crudity-action", "create");
             });
         },
         crSetRowId: function (id) {

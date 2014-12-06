@@ -38,6 +38,11 @@ class FormResponse
         return $this;
     }
 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
     public function send()
     {
         echo json_encode(

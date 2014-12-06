@@ -39,5 +39,10 @@ $form->setEntity('user');
 <?php echo $form->getView()->render(); ?>
 <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
 <script src="/public/crudity/js/crudity.js"></script>
+<script>
+    $().ready(function() {
+        $('form').crSetCreate();
+    });
+</script>
 </body>
 </html>

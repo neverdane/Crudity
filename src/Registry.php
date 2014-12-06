@@ -1,6 +1,8 @@
 <?php
 namespace Neverdane\Crudity;
 
+use Neverdane\Crudity\Form\Form;
+
 class Registry
 {
 
@@ -8,8 +10,13 @@ class Registry
     const NAMESPACE_FORM = "Forms";
     const NAMESPACE_CONNECTION = "Connections";
 
+    /**
+     * @param $id
+     * @param Form $form
+     */
     public static function storeForm($id, $form)
     {
+        $form->closeToPersistence();
         self::store(self::NAMESPACE_FORM, $id, $form);
     }
 
@@ -45,7 +52,7 @@ class Registry
         self::initSession();
         $crudityTypeSession = $_SESSION[self::NAMESPACE_CRUDITY][$type];
         if (isset($crudityTypeSession[$id])) {
-            return $crudityTypeSession[$id];
+            return clone $crudityTypeSession[$id];
         }
         return null;
     }

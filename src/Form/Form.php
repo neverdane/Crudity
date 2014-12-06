@@ -44,6 +44,8 @@ class Form
     private $errorMessages = array();
     private $dbAdapterKey = null;
     private $entity;
+    private $openedToPersistence = true;
+    private $openedWorkflow = true;
 
     public function __construct($config = null)
     {
@@ -81,7 +83,9 @@ class Form
 
     private function onChange()
     {
-        if ($this->persisted === true) {
+        if (true === $this->openedToPersistence
+            && true === $this->persisted
+        ) {
             $this->persist();
         }
         return $this;
@@ -184,8 +188,28 @@ class Form
     {
         $db = new Db();
         $db->setAdapter($this->getDbAdapter());
-        $lastInsertId = $db->createRow($this->entity, $this->getRequest());
-        $this->getResponse()->addParam('id', $lastInsertId);
+        $data = $this->getRequest()->getParams();
+        $lastInsertId = $db->createRow($this->entity, $data);
+        $this->getResponse()->addParam('created_id', $lastInsertId);
+    }
+
+    public function update()
+    {
+        $db = new Db();
+        $db->setAdapter($this->getDbAdapter());
+        $data = $this->getRequest()->getParams();
+        $rowId = $this->getRequest()->getRowId();
+        $affectedCount = $db->updateRow($this->entity, $rowId, $data);
+        $this->getResponse()->addParam('affected_count', $affectedCount);
+    }
+
+    public function delete()
+    {
+        $db = new Db();
+        $db->setAdapter($this->getDbAdapter());
+        $rowId = $this->getRequest()->getRowId();
+        $affectedCount = $db->deleteRow($this->entity, $rowId);
+        $this->getResponse()->addParam('affected_count', $affectedCount);
     }
 
     /**
@@ -226,5 +250,25 @@ class Form
     {
         $this->entity = $entity;
         return $this->onChange();
+    }
+
+    public function closeWorkflow()
+    {
+        $this->openedWorkflow = false;
+    }
+
+    public function isWorkflowOpened()
+    {
+        return $this->openedWorkflow;
+    }
+
+    public function openToPersistence()
+    {
+        $this->openedToPersistence = true;
+    }
+
+    public function closeToPersistence()
+    {
+        $this->openedToPersistence = false;
     }
 }
