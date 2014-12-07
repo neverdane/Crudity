@@ -310,46 +310,86 @@ class Form
         $data = $this->getRequest()->getParams();
         // We ask the Db to create the row and get the result, it should return the inserted id
         $lastInsertId = $db->createRow($this->entity, $data);
-        // We as this inserted id to the as a response param in order to inform the user
+        // We add this inserted id as a response param in order to inform the user
         $this->getResponse()->addParam('created_id', $lastInsertId);
         return $this;
     }
 
+    /**
+     * Update the row depending on the Request set on the Form
+     * @return $this
+     */
     public function update()
     {
+        // We instantiate a new Db that will handle the Db interaction
         $db = new Db\Db();
+        // We set the DbAdapter configured on this Form
         $db->setAdapter($this->getDbAdapter());
+        // We get the requested params (filtered if done, else the raw ones)
         $data = $this->getRequest()->getParams();
+        // We get the requested row id we want to update
         $rowId = $this->getRequest()->getRowId();
+        // We ask the Db to update the row and get the result, it should return the number of affected rows
         $affectedCount = $db->updateRow($this->entity, $rowId, $data);
-        $this->getResponse()->addParam('affected_count', $affectedCount);
-    }
-
-    public function delete()
-    {
-        $db = new Db\Db();
-        $db->setAdapter($this->getDbAdapter());
-        $rowId = $this->getRequest()->getRowId();
-        $affectedCount = $db->deleteRow($this->entity, $rowId);
+        // We add the number of affected rows as a response param in order to inform the user
         $this->getResponse()->addParam('affected_count', $affectedCount);
     }
 
     /**
+     * Update the row depending on the Request set on the Form
+     * @return $this
+     */
+    public function delete()
+    {
+        // We instantiate a new Db that will handle the Db interaction
+        $db = new Db\Db();
+        // We set the DbAdapter configured on this Form
+        $db->setAdapter($this->getDbAdapter());
+        // We get the requested row id we want to update
+        $rowId = $this->getRequest()->getRowId();
+        // We ask the Db to delete the row and get the result, it should return the number of affected rows
+        $affectedCount = $db->deleteRow($this->entity, $rowId);
+        // We add the number of affected rows as a response param in order to inform the user
+        $this->getResponse()->addParam('affected_count', $affectedCount);
+    }
+
+    /**
+     * Sets an array of custom Error Messages overriding the default ones.
+     * The array must be formatted as below :
+     *
+     *      array(
+     *          "Fields" => array(
+     *              "{Field Name}" => array(
+     *                  {ERROR CODE} => "{Your message}"
+     *              )
+     *          ),
+     *          "Validators" => array(
+     *              "{Validator Name}" => array(
+     *                  {ERROR CODE} => "{Your message}"
+     *              )
+     *          )
+     *      );
+     *
      * @param array $errorMessages
      * @return  $this
      */
-    public function setErrorMessages($errorMessages = array())
+    public function setErrorMessages($errorMessages)
     {
         $this->errorMessages = $errorMessages;
         return $this->onChange();
     }
 
+    /**
+     * Returns the customized Error Messages set on the Form
+     * @return array
+     */
     public function getErrorMessages()
     {
         return $this->errorMessages;
     }
 
     /**
+     * Returns the Config Object set on the Form
      * @return Config
      */
     public function getConfig()
@@ -357,36 +397,68 @@ class Form
         return $this->config;
     }
 
+    /**
+     * Sets the adapter key that will be used to retrieve the DbAdapter registered in the Db
+     * @param string $key
+     * @return Form
+     */
     public function setDbAdapterKey($key)
     {
         $this->dbAdapterKey = $key;
         return $this->onChange();
     }
 
+    /**
+     * Returns the DbAdapter registered in the Db in the Db from the dbAdapterKey set on the Form
+     * The adapter is not directly set on the Form because it embeds the connection that must not be stored in session
+     * If no dbAdapterKey was set on the Form, the method will return the default dbAdapter registered on Db if any
+     * @return Db\Layer\AdapterInterface|null
+     */
     public function getDbAdapter()
     {
         return Db\Db::retrieveAdapter($this->dbAdapterKey);
     }
 
+    /**
+     * Sets the entity the Form could work with on Db workflow,
+     * (e.g. When we work with pdo and mysql, the entity will be a table name)
+     * @param mixed $entity
+     * @return Form
+     */
     public function setEntity($entity)
     {
         $this->entity = $entity;
         return $this->onChange();
     }
 
+    /**
+     * Avoids the Workflow to continue
+     * Useful when an error occurs
+     */
     public function closeWorkflow()
     {
         $this->openedWorkflow = false;
     }
 
+    /**
+     * Returns whether the Workflow can continue or not
+     * @return bool
+     */
     public function isWorkflowOpened()
     {
         return $this->openedWorkflow;
     }
 
+    /**
+     * Affects the values from the Request to each matching Field
+     * This method is called before the validation of the filtering
+     * @return $this
+     */
     public function affectValuesToFields()
     {
+        // We get the values we want to affect
         $values = $this->getRequest()->getParams();
+        // We ask the FieldManager to affect these values to their matching Field
         $this->getFieldManager()->affectValues($values);
         return $this;
     }
