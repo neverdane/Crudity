@@ -11,9 +11,8 @@
 
 namespace Neverdane\Crudity;
 
-use Neverdane\Crudity\Form\Config;
 use Neverdane\Crudity\Form\Form;
-use Neverdane\Crudity\View\FormParser;
+use Neverdane\Crudity\Form\Parser\Parser;
 use Neverdane\Crudity\View\FormView;
 use Neverdane\Crudity\Field\FieldManager;
 
@@ -54,7 +53,7 @@ class Crudity
     public static function createForm($html)
     {
         // We instantiate a FormParser in order to extract required data to build the Crudity Form
-        $formParser = new FormParser($html);
+        $formParser = new Parser($html);
         // We get the form attribute id
         $formId = $formParser->getId();
         // We get all the detected fields instances

@@ -9,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Neverdane\Crudity\View;
+namespace Neverdane\Crudity\Form\Parser;
 
-use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\Field\FieldHandler;
-use Neverdane\Crudity\View\Adapter\AdapterInterface;
+use Neverdane\Crudity\Field\FieldInterface;
+use Neverdane\Crudity\View\FormView;
 
 /**
  * @package Neverdane\Crudity
  * @author Alban Pommeret <alban@aocreation.com>
  */
-class FormParser
+class Parser
 {
 
     const ADAPTER_DEFAULT = "PhpQueryAdapter";
@@ -52,7 +52,7 @@ class FormParser
         // If no adapter has been set, we set the default one
         if (is_null($this->adapter)) {
             // We construct the default adapter namespace from this class namespace
-            $defaultAdapterName = __NAMESPACE__ . '\\Adapter\\' . self::ADAPTER_DEFAULT;
+            $defaultAdapterName = __NAMESPACE__ . '\\' . self::ADAPTER_DEFAULT;
             $this->setAdapter(new $defaultAdapterName());
         }
         return $this->adapter;

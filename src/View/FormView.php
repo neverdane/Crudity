@@ -10,7 +10,9 @@
  */
 
 namespace Neverdane\Crudity\View;
+
 use Neverdane\Crudity\Form\Config;
+use Neverdane\Crudity\Form\Parser\Parser;
 
 /**
  * @package Neverdane\Crudity
@@ -76,12 +78,12 @@ class FormView
     }
 
     /**
-     * @return FormParser
+     * @return Parser
      */
     public function getParser()
     {
         if(is_null($this->parser)) {
-            $this->setParser(new FormParser($this->rendering));
+            $this->setParser(new Parser($this->rendering));
         }
         return $this->parser;
     }

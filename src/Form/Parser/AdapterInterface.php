@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Neverdane\Crudity\View\Adapter;
+namespace Neverdane\Crudity\Form\Parser;
 
 /**
  * @package Neverdane\Crudity
