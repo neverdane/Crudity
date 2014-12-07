@@ -67,11 +67,9 @@ class Crudity
         // The FieldManager handles all that is related to the fields
         $fieldManager = new FieldManager($formFields);
 
-        $config = new Config();
-
         // We finally create the Crudity Form and give to it its id, the FieldManager and the FormView instances
         // Then, we store the Crudity Form into session
-        $form = new Form($config);
+        $form = new Form();
         $form->setId($formId)
             ->setFieldManager($fieldManager)
             ->setView($formView)

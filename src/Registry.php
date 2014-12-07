@@ -16,7 +16,6 @@ class Registry
      */
     public static function storeForm($id, $form)
     {
-        $form->closeToPersistence();
         self::store(self::NAMESPACE_FORM, $id, $form);
     }
 
