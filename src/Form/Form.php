@@ -386,4 +386,11 @@ class Form
     {
         return $this->openedWorkflow;
     }
+
+    public function affectValuesToFields()
+    {
+        $values = $this->getRequest()->getParams();
+        $this->getFieldManager()->affectValues($values);
+        return $this;
+    }
 }

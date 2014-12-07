@@ -1,7 +1,6 @@
 <?php
 namespace Neverdane\Crudity;
 
-use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Request\FormRequest;
 use Neverdane\Crudity\Response\FormResponse;
@@ -116,14 +115,7 @@ class Workflow
 
     public function affectValues()
     {
-        $fields = $this->form->getFieldManager()->getFields();
-        $values = $this->form->getRequest()->getParams();
-        /** @var FieldInterface $field */
-        foreach ($fields as $field) {
-            if (isset($values[$field->getName()])) {
-                $field->setValue($values[$field->getName()]);
-            }
-        }
+        $this->form->affectValuesToFields();
         return $this;
     }
 

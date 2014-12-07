@@ -41,4 +41,15 @@ class FieldManager
         return $this->fields;
     }
 
+    public function affectValues($values)
+    {
+        $fields = $this->getFields();
+        /** @var FieldInterface $field */
+        foreach ($fields as $field) {
+            if (isset($values[$field->getName()])) {
+                $field->setValue($values[$field->getName()]);
+            }
+        }
+    }
+
 }
