@@ -14,9 +14,8 @@ require "TestFormObserver.php";
 use Neverdane\Crudity\Crudity;
 use Neverdane\Crudity\Db;
 
-$pdoAdapter = new Db\Layer\PdoAdapter();
-$pdoAdapter->setConnection(new PDO('mysql:host=localhost;dbname=crudity', 'root', ''));
-Db\Db::registerAdapter('pdo', $pdoAdapter);
+$pdo = new PDO('mysql:host=localhost;dbname=crudity', 'root', '');
+Db\Db::registerAdapter('pdo', new Db\Layer\PdoAdapter($pdo));
 Crudity::listen();
 
 $form = Crudity::createFromFile("form.php");

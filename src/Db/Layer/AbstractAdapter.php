@@ -19,6 +19,16 @@ abstract class AbstractAdapter
 {
 
     /**
+     * @param mixed $connection
+     */
+    public function __construct($connection = null)
+    {
+        if (!is_null($connection)) {
+            $this->setConnection($connection);
+        }
+    }
+
+    /**
      * @var null
      */
     protected $connection = null;
@@ -38,7 +48,7 @@ abstract class AbstractAdapter
      */
     public function getConnection()
     {
-        if(is_null($this->connection) && !is_null($this->credentials)) {
+        if (is_null($this->connection) && !is_null($this->credentials)) {
             $this->createConnection();
         }
         return $this->connection;
