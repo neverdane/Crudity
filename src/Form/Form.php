@@ -16,11 +16,8 @@ use Neverdane\Crudity\Db;
 use Neverdane\Crudity\Error;
 use Neverdane\Crudity\Field\AbstractField;
 use Neverdane\Crudity\Field\FieldInterface;
-use Neverdane\Crudity\Form\Request;
-use Neverdane\Crudity\Form\Response;
 use Neverdane\Crudity\Field\FieldManager;
 use Neverdane\Crudity\Registry;
-use Neverdane\Crudity\View\FormView;
 
 /**
  * @package Neverdane\Crudity
@@ -50,7 +47,7 @@ class Form
      */
     private $fieldManager;
     /**
-     * @var FormView
+     * @var View
      * Instance of the view used for the rendering
      */
     private $view = null;
@@ -178,21 +175,21 @@ class Form
     }
 
     /**
-     * Sets a FormView to the Form that will handle the rendering
-     * @param FormView $view
+     * Sets a View to the Form that will handle the rendering
+     * @param View $view
      * @return $this
      */
     public function setView($view)
     {
         $this->view = $view;
-        // The FormView needs some Config that is stored in the global Form Config so we retrieve and affect it
+        // The View needs some Config that is stored in the global Form Config so we retrieve and affect it
         $this->view->setConfig($this->config->getConfig(Config::TYPE_VIEW));
         return $this->onChange();
     }
 
     /**
-     * Returns the FormView set on the Form
-     * @return FormView
+     * Returns the View set on the Form
+     * @return View
      */
     public function getView()
     {

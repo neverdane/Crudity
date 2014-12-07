@@ -9,16 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Neverdane\Crudity\View;
+namespace Neverdane\Crudity\Form;
 
-use Neverdane\Crudity\Form\Config;
 use Neverdane\Crudity\Form\Parser\Parser;
 
 /**
  * @package Neverdane\Crudity
  * @author Alban Pommeret <alban@aocreation.com>
  */
-class FormView
+class View
 {
     const PREFIX_DEFAULT = "cr";
 

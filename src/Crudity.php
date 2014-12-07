@@ -13,7 +13,7 @@ namespace Neverdane\Crudity;
 
 use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Form\Parser\Parser;
-use Neverdane\Crudity\View\FormView;
+use Neverdane\Crudity\Form\View;
 use Neverdane\Crudity\Field\FieldManager;
 
 /**
@@ -62,7 +62,7 @@ class Crudity
         $formattedHtml = $formParser->getFormattedHtml();
 
         // We give the FormView its render
-        $formView = new FormView($formattedHtml);
+        $formView = new View($formattedHtml);
         // The FieldManager handles all that is related to the fields
         $fieldManager = new FieldManager($formFields);
 

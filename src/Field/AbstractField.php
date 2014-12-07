@@ -1,9 +1,9 @@
 <?php
 namespace Neverdane\Crudity\Field;
 
-use Neverdane\Crudity\Crudity;
 use Neverdane\Crudity\Error;
-use Neverdane\Crudity\View;
+use Neverdane\Crudity\Form\Parser\Parser;
+use Neverdane\Crudity\Form\View;
 
 abstract class AbstractField implements FieldInterface
 {
@@ -93,7 +93,7 @@ abstract class AbstractField implements FieldInterface
      * Identifies if a field occurrence is eligible to be this type of class
      * In order to identify it, we should send the parser
      * which is highly coupled to the field occurrence
-     * @param View\FormParser $parser
+     * @param Parser $parser
      * @param mixed $occurrence
      * @return bool
      */
@@ -121,7 +121,7 @@ abstract class AbstractField implements FieldInterface
 
     /**
      * Checks if the given field occurrence has the class tag name
-     * @param View\FormParser $parser
+     * @param Parser $parser
      * @param mixed $o
      * @return bool
      */
@@ -136,7 +136,7 @@ abstract class AbstractField implements FieldInterface
 
     /**
      * Checks if the given field occurrence has the given attribute
-     * @param View\FormParser $parser
+     * @param Parser $parser
      * @param mixed $o
      * @param string $key
      * @param string $value
@@ -147,7 +147,7 @@ abstract class AbstractField implements FieldInterface
         // The type attribute could be prefixed by the Crudity prefix so we firstly check that one
         // We then compare the given attribute with the occurrence one
         if ($key === "type") {
-            if ($parser->getAdapter()->getAttribute($o, View\FormView::$prefix . "-" . $key) === $value) {
+            if ($parser->getAdapter()->getAttribute($o, View::$prefix . "-" . $key) === $value) {
                 return true;
             }
         }
@@ -155,7 +155,7 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
-     * @param View\FormParser $parser
+     * @param Parser $parser
      * @param mixed $occurrence
      * @return static
      */
@@ -170,7 +170,7 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
-     * @param View\FormParser $parser
+     * @param Parser $parser
      * @param mixed $occurrence
      * @return array
      */
@@ -179,7 +179,7 @@ abstract class AbstractField implements FieldInterface
         $parserAdapter = $parser->getAdapter();
         $required = $parserAdapter->getAttribute($occurrence, "required") === "true";
         $name = $parserAdapter->getAttribute($occurrence, "name");
-        $column = $parserAdapter->getAttribute($occurrence, View\FormView::$prefix . "-column");
+        $column = $parserAdapter->getAttribute($occurrence, View::$prefix . "-column");
 
         if (is_null($column)) {
             // We use the Crudity name attribute
@@ -194,7 +194,7 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
-     * @param View\FormParser $parser
+     * @param Parser $parser
      * @param mixed $occurrence
      * @return array
      */
@@ -202,8 +202,8 @@ abstract class AbstractField implements FieldInterface
     {
         $parserAdapter = $parser->getAdapter();
         // We remove the crudity name and column attributes
-        $parserAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-name");
-        $parserAdapter->removeAttribute($occurrence, View\FormView::$prefix . "-column");
+        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-name");
+        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-column");
         if (is_null($params)) {
             // We need the params extracted from the occurrence to reset some attributes
             $params = static::extractParamsFromOccurrence($parser, $occurrence);

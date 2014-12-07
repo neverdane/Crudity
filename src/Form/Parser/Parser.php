@@ -13,7 +13,7 @@ namespace Neverdane\Crudity\Form\Parser;
 
 use Neverdane\Crudity\Field\FieldHandler;
 use Neverdane\Crudity\Field\FieldInterface;
-use Neverdane\Crudity\View\FormView;
+use Neverdane\Crudity\Form\View;
 
 /**
  * @package Neverdane\Crudity
@@ -134,7 +134,7 @@ class Parser
     private function getFieldsOccurrences()
     {
         if (is_null($this->occurrences)) {
-            $occurrences = $this->getAdapter()->getFieldsOccurrences(FormView::$managedTagNames);
+            $occurrences = $this->getAdapter()->getFieldsOccurrences(View::$managedTagNames);
             // We remove the non eligible fields occurrences
             $this->occurrences = $this->filterOccurrences($occurrences);
         }
@@ -221,8 +221,8 @@ class Parser
     {
         $parserAdapter = $this->getAdapter();
         // We remove the crudity  column attribute
-        $parserAdapter->removeAttribute($occurrence, FormView::$prefix . "-column");
-        $parserAdapter->removeAttribute($occurrence, FormView::$prefix . "-excluded");
+        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-column");
+        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-excluded");
         return $this;
     }
 
