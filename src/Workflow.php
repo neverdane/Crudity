@@ -2,8 +2,8 @@
 namespace Neverdane\Crudity;
 
 use Neverdane\Crudity\Form\Form;
-use Neverdane\Crudity\Request\FormRequest;
-use Neverdane\Crudity\Response\FormResponse;
+use Neverdane\Crudity\Form\Request;
+use Neverdane\Crudity\Form\Response;
 
 class Workflow
 {
@@ -39,7 +39,7 @@ class Workflow
             Error::initialize();
             $this->notify(self::EVENT_VALIDATION_BEFORE);
             $this->form->validate();
-            if (FormResponse::STATUS_ERROR === $this->form->getResponse()->getStatus()) {
+            if (Response::STATUS_ERROR === $this->form->getResponse()->getStatus()) {
                 $this->form->closeWorkflow();
             }
             $this->notify(self::EVENT_VALIDATION_AFTER);
@@ -60,10 +60,10 @@ class Workflow
         if ($this->form->isWorkflowOpened()) {
             $this->notify(self::EVENT_PROCESS_BEFORE);
             switch ($type) {
-                case FormRequest::ACTION_CREATE :
+                case Request::ACTION_CREATE :
                     $this->create();
                     break;
-                case FormRequest::ACTION_UPDATE :
+                case Request::ACTION_UPDATE :
                     $this->update();
                     break;
             }
@@ -134,23 +134,23 @@ class Workflow
 
         switch ($action) {
             default:
-                $this->form->getRequest()->setAction(FormRequest::ACTION_CUSTOM);
-            case FormRequest::ACTION_CUSTOM :
+                $this->form->getRequest()->setAction(Request::ACTION_CUSTOM);
+            case Request::ACTION_CUSTOM :
                 $this->affectValues();
                 $this->validate();
                 $this->filter();
                 break;
-            case FormRequest::ACTION_CREATE :
-            case FormRequest::ACTION_UPDATE :
+            case Request::ACTION_CREATE :
+            case Request::ACTION_UPDATE :
                 $this->affectValues();
                 $this->validate();
                 $this->filter();
                 $this->process($action);
                 break;
-            case FormRequest::ACTION_DELETE :
+            case Request::ACTION_DELETE :
                 $this->delete();
                 break;
-            case FormRequest::ACTION_READ :
+            case Request::ACTION_READ :
                 $this->read();
                 break;
         }

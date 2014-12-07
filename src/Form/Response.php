@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Neverdane\Crudity\Response;
+namespace Neverdane\Crudity\Form;
 
 /**
  * @package Neverdane\Crudity
  * @author Alban Pommeret <alban@aocreation.com>
  */
-class FormResponse
+class Response
 {
     const STATUS_SUCCESS = 1;
     const STATUS_ERROR = 2;

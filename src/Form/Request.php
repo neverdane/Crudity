@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Neverdane\Crudity\Request;
+namespace Neverdane\Crudity\Form;
 
 /**
  * @package Neverdane\Crudity
  * @author Alban Pommeret <alban@aocreation.com>
  */
-class FormRequest
+class Request
 {
     const ACTION_CUSTOM = "custom";
     const ACTION_CREATE = "create";

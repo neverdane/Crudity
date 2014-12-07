@@ -16,8 +16,8 @@ use Neverdane\Crudity\Db;
 use Neverdane\Crudity\Error;
 use Neverdane\Crudity\Field\AbstractField;
 use Neverdane\Crudity\Field\FieldInterface;
-use Neverdane\Crudity\Request\FormRequest;
-use Neverdane\Crudity\Response\FormResponse;
+use Neverdane\Crudity\Form\Request;
+use Neverdane\Crudity\Form\Response;
 use Neverdane\Crudity\Field\FieldManager;
 use Neverdane\Crudity\Registry;
 use Neverdane\Crudity\View\FormView;
@@ -55,12 +55,12 @@ class Form
      */
     private $view = null;
     /**
-     * @var FormRequest
+     * @var Request
      * Instance of the request object keeping trace of the parameters given through the request
      */
     private $request = null;
     /**
-     * @var FormResponse
+     * @var Response
      * Instance of the response object that contains everything we want to send to the client after the workflow process
      */
     private $response = null;
@@ -220,23 +220,23 @@ class Form
     }
 
     /**
-     * Sets the FormRequest object that has to be handled by the Form
-     * It also instantiates a FormResponse on the Form
-     * Indeed, the FormRequest and FormResponse are really complementary
-     * @param FormRequest $request
+     * Sets the Request object that has to be handled by the Form
+     * It also instantiates a Response on the Form
+     * Indeed, the Request and Response are really complementary
+     * @param Request $request
      * @return $this
      */
     public function setRequest($request)
     {
         $this->request = $request;
-        // We instantiate the FormResponse that will store the result we want to share to the user
-        $this->response = new FormResponse();
+        // We instantiate the Response that will store the result we want to share to the user
+        $this->response = new Response();
         return $this;
     }
 
     /**
-     * Returns the FormRequest object set on the Form
-     * @return FormRequest
+     * Returns the Request object set on the Form
+     * @return Request
      */
     public function getRequest()
     {
@@ -244,9 +244,9 @@ class Form
     }
 
     /**
-     * Returns the FormResponse object set on the Form
-     * The FormResponse object is instantiated when we set the FormRequest
-     * @return FormResponse
+     * Returns the Response object set on the Form
+     * The Response object is instantiated when we set the Request
+     * @return Response
      */
     public function getResponse()
     {
@@ -260,7 +260,7 @@ class Form
     public function validate()
     {
         // We initialize the response status to success
-        $this->getResponse()->setStatus(FormResponse::STATUS_SUCCESS);
+        $this->getResponse()->setStatus(Response::STATUS_SUCCESS);
         // We get all the fields we have to validate
         $fields = $this->getFieldManager()->getFields();
         /** @var FieldInterface $field */
@@ -269,7 +269,7 @@ class Form
             $fieldStatus = $field->validate()->getStatus();
             if ($fieldStatus !== AbstractField::STATUS_SUCCESS) {
                 // If the validation fail, we set the response status to error
-                $this->getResponse()->setStatus(FormResponse::STATUS_ERROR);
+                $this->getResponse()->setStatus(Response::STATUS_ERROR);
                 // We construct the error message that will be displayed to the user
                 $message = Error::getMessage(
                     $field->getErrorCode(),
@@ -295,12 +295,12 @@ class Form
     public function filter()
     {
         $params = $this->getRequest()->getParams();
-        $this->getRequest()->setParams($params, FormRequest::PARAMS_FILTERED);
+        $this->getRequest()->setParams($params, Request::PARAMS_FILTERED);
         return $this;
     }
 
     /**
-     * Creates a row depending on the FormRequest set on the Form
+     * Creates a row depending on the Request set on the Form
      * @return $this
      */
     public function create()

@@ -2,7 +2,7 @@
 namespace Neverdane\Crudity;
 
 use Neverdane\Crudity\Form\Form;
-use Neverdane\Crudity\Request\FormRequest;
+use Neverdane\Crudity\Form\Request;
 
 class Listener
 {
@@ -17,8 +17,8 @@ class Listener
             // If a Form has been founded
             if (!is_null($submittedForm)) {
                 /** @var Form $submittedForm */
-                $formRequest = new FormRequest($requestParams);
-                $submittedForm->setRequest($formRequest);
+                $request = new Request($requestParams);
+                $submittedForm->setRequest($request);
                 $workflow = new Workflow($submittedForm);
                 $workflow->start();
             } else {
