@@ -8,7 +8,6 @@ class Registry
 
     const NAMESPACE_CRUDITY = "Crudity";
     const NAMESPACE_FORM = "Forms";
-    const NAMESPACE_CONNECTION = "Connections";
 
     /**
      * @param $id
@@ -19,19 +18,9 @@ class Registry
         self::store(self::NAMESPACE_FORM, $id, $form);
     }
 
-    public static function storeConnection($id, $connection)
-    {
-        self::storeConnection(self::NAMESPACE_CONNECTION, $id, $connection);
-    }
-
     public static function getForm($id)
     {
         return self::get(self::NAMESPACE_FORM, $id);
-    }
-
-    public static function getConnection($id)
-    {
-        return self::get(self::NAMESPACE_CONNECTION, $id);
     }
 
     public static function store($type, $id, $value)
