@@ -113,7 +113,7 @@ class Workflow
         $this->form->getResponse()->send();
     }
 
-    public function affectValues()
+    private function affectValues()
     {
         $this->form->affectValuesToFields();
         return $this;

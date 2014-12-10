@@ -35,11 +35,12 @@ class Parser
 
     /**
      * @param string $html
+     * @param FieldHandler $fieldHandler
      */
-    public function __construct($html)
+    public function __construct($html, $fieldHandler = null)
     {
         // The Field Handler only purpose is to set the fields that will be identified by the Form Parser
-        $this->fieldHandler = new FieldHandler();
+        $this->fieldHandler = (!is_null($fieldHandler)) ? $fieldHandler : new FieldHandler();
         $this->html = $html;
     }
 

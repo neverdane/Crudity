@@ -85,14 +85,15 @@ class Form
 
     /**
      * @param null|Config $config
+     * @param null|FieldManager $fieldManager
      * We can pass a Config object in order to customize this Form
      */
-    public function __construct($config = null)
+    public function __construct($config = null, $fieldManager = null)
     {
-        // The Form needs a fieldManager, we instantiate it by default
-        $this->fieldManager = new FieldManager();
         // If no config was given, we instantiate a default one
         $this->config = (!is_null($config)) ? $config : new Config();
+        // The Form needs a fieldManager, we instantiate it by default
+        $this->fieldManager = (!is_null($fieldManager)) ? $fieldManager : new FieldManager();
     }
 
     /**
@@ -221,13 +222,14 @@ class Form
      * It also instantiates a Response on the Form
      * Indeed, the Request and Response are really complementary
      * @param Request $request
+     * @param Response $response
      * @return $this
      */
-    public function setRequest($request)
+    public function setRequest($request, $response = null)
     {
         $this->request = $request;
         // We instantiate the Response that will store the result we want to share to the user
-        $this->response = new Response();
+        $this->response = (!is_null($response)) ? $response : new Response();
         return $this;
     }
 
