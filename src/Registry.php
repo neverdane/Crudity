@@ -13,19 +13,19 @@ class Registry
      * @param $id
      * @param Form $form
      */
-    public static function storeForm($id, $form)
+    public function storeForm($id, $form)
     {
-        self::store(self::NAMESPACE_FORM, $id, $form);
+        $this->store(self::NAMESPACE_FORM, $id, $form);
     }
 
-    public static function getForm($id)
+    public function getForm($id)
     {
-        return self::get(self::NAMESPACE_FORM, $id);
+        return $this->get(self::NAMESPACE_FORM, $id);
     }
 
-    public static function store($type, $id, $value)
+    private function store($type, $id, $value)
     {
-        self::initSession();
+        $this->initSession();
         if (!isset($_SESSION[self::NAMESPACE_CRUDITY][$type])) {
             if (!isset($_SESSION[self::NAMESPACE_CRUDITY])) {
                 $_SESSION[self::NAMESPACE_CRUDITY] = array();
@@ -35,9 +35,9 @@ class Registry
         $_SESSION[self::NAMESPACE_CRUDITY][$type] = array($id => $value);
     }
 
-    public static function get($type, $id)
+    private function get($type, $id)
     {
-        self::initSession();
+        $this->initSession();
         $crudityTypeSession = $_SESSION[self::NAMESPACE_CRUDITY][$type];
         if (isset($crudityTypeSession[$id])) {
             return clone $crudityTypeSession[$id];
@@ -45,12 +45,12 @@ class Registry
         return null;
     }
 
-    private static function initSession()
+    private function initSession()
     {
         if (!isset($_SESSION)) {
             try {
                 session_start();
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
 
             }
         }

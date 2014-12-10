@@ -164,14 +164,16 @@ class Form
 
     /**
      * Persists the Form into the Registry in order to be retrieved when a Request occurs
+     * @param null|Registry $registry
      * @return $this
      */
-    public function persist()
+    public function persist($registry = null)
     {
+        $registry = (!is_null($registry)) ? $registry : new Registry();
         // We set the Form as persisted
         $this->persisted = true;
         // The key used to store the Form is its id
-        Registry::storeForm($this->id, $this);
+        $registry->storeForm($this->id, $this);
         return $this;
     }
 
