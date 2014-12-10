@@ -31,6 +31,7 @@ class Parser
     private $fields = null;
     private $occurrences = null;
     private $formattedHtml = null;
+    private $fieldHandler = null;
 
     /**
      * @param string $html
@@ -231,5 +232,21 @@ class Parser
         $parserAdapter = $this->getAdapter();
         $parserAdapter->setAttribute($parserAdapter->getFormOccurrence(), "data-config", json_encode($config));
         return $this;
+    }
+
+    /**
+     * @return FieldHandler|null
+     */
+    public function getFieldHandler()
+    {
+        return $this->fieldHandler;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHtml()
+    {
+        return $this->html;
     }
 }

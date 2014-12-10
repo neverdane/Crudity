@@ -59,7 +59,11 @@ class Registry
     private static function initSession()
     {
         if (!isset($_SESSION)) {
-            session_start();
+            try {
+                session_start();
+            } catch(\Exception $e) {
+
+            }
         }
     }
 
