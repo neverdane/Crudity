@@ -36,12 +36,6 @@ class Form
      */
     private $observers = array();
     /**
-     * @var bool
-     * Tells if the Form has already been persisted.
-     * Used in case we set additional parameters after we persisted it in order to automatically persist these one too
-     */
-    private $persisted = false;
-    /**
      * @var FieldManager
      * The FieldManager stores the fields of the Form
      */
@@ -105,7 +99,7 @@ class Form
     public function setId($id)
     {
         $this->id = $id;
-        return $this->onChange();
+        return $this;
     }
 
     /**
@@ -125,7 +119,7 @@ class Form
     public function addObserver($observer)
     {
         $this->observers[] = $observer;
-        return $this->onChange();
+        return $this;
     }
 
     /**
@@ -136,7 +130,7 @@ class Form
     public function setObservers($observers)
     {
         $this->observers = $observers;
-        return $this->onChange();
+        return $this;
     }
 
     /**
@@ -149,35 +143,6 @@ class Form
     }
 
     /**
-     * To be triggered when we set something on the Form that have to be persisted
-     * If we already persisted the Form, it will persist it again, overriding the previous persisted Form
-     * @return $this
-     */
-    private function onChange()
-    {
-        // If the Form was already persisted, we have to persist it again
-        if (true === $this->persisted) {
-            $this->persist();
-        }
-        return $this;
-    }
-
-    /**
-     * Persists the Form into the Registry in order to be retrieved when a Request occurs
-     * @param null|Registry $registry
-     * @return $this
-     */
-    public function persist($registry = null)
-    {
-        $registry = (!is_null($registry)) ? $registry : new Registry();
-        // We set the Form as persisted
-        $this->persisted = true;
-        // The key used to store the Form is its id
-        $registry->storeForm($this->id, $this);
-        return $this;
-    }
-
-    /**
      * Sets a View to the Form that will handle the rendering
      * @param View $view
      * @return $this
@@ -187,7 +152,7 @@ class Form
         $this->view = $view;
         // The View needs some Config that is stored in the global Form Config so we retrieve and affect it
         $this->view->setConfig($this->config->getConfig(Config::TYPE_VIEW));
-        return $this->onChange();
+        return $this;
     }
 
     /**
@@ -207,7 +172,7 @@ class Form
     public function setFieldManager($fieldManager)
     {
         $this->fieldManager = $fieldManager;
-        return $this->onChange();
+        return $this;
     }
 
     /**
@@ -380,7 +345,7 @@ class Form
     public function setErrorMessages($errorMessages)
     {
         $this->errorMessages = $errorMessages;
-        return $this->onChange();
+        return $this;
     }
 
     /**
@@ -409,7 +374,7 @@ class Form
     public function setDbAdapterKey($key)
     {
         $this->dbAdapterKey = $key;
-        return $this->onChange();
+        return $this;
     }
 
     /**
@@ -432,7 +397,7 @@ class Form
     public function setEntity($entity)
     {
         $this->entity = $entity;
-        return $this->onChange();
+        return $this;
     }
 
     /**

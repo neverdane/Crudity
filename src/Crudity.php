@@ -71,8 +71,7 @@ class Crudity
         $form = new Form();
         $form->setId($formId)
             ->setFieldManager($fieldManager)
-            ->setView($formView)
-            ->persist();
+            ->setView($formView);
         return $form;
     }
 

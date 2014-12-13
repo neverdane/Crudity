@@ -133,7 +133,7 @@ class Parser
      * We consider the fields eligible as they are in the managed elements by Crudity by default
      * @return array
      */
-    private function getFieldsOccurrences()
+    public function getFieldsOccurrences()
     {
         if (is_null($this->occurrences)) {
             $occurrences = $this->getAdapter()->getFieldsOccurrences(View::$managedTagNames);

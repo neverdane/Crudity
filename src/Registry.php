@@ -13,9 +13,9 @@ class Registry
      * @param $id
      * @param Form $form
      */
-    public function storeForm($id, $form)
+    public function storeForm($form)
     {
-        $this->store(self::NAMESPACE_FORM, $id, $form);
+        $this->store(self::NAMESPACE_FORM, $form->getId(), $form);
     }
 
     public function getForm($id)
