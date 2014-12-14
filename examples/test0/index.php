@@ -28,6 +28,23 @@ $form->setErrorMessages(array(
     )
 ));
 $form->addObserver(new TestFormObserver());
+
+$userEntity = new Db\Entity('user');
+$userEntity->setDependencies(array(
+    'contact_id' => 'contact:id'
+));
+
+$contactEntity = new Db\Entity('contact');
+$contactEntity->specifyFieldNames(array(
+    'phone',
+    'city',
+    'country'
+));
+
+$contactEntity->setDefaultValues(array(
+    'country' => 'France'
+));
+
 $form->setEntity('user');
 
 $registry->storeForm($form);
