@@ -5,11 +5,14 @@ namespace Neverdane\Crudity\Db;
 class Entity
 {
 
+    const DEFAULT_NAME = 'default';
+
     private $name;
     private $entity;
     private $dependencies = null;
     private $fieldNames = null;
     private $defaultValues = array();
+    private $fields = array();
 
     /**
      * @param string $entityName
@@ -102,5 +105,23 @@ class Entity
     {
         $this->defaultValues = $defaultValues;
         return $this;
+    }
+
+    /**
+     * @param array $fields
+     * @return $this
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Neverdane\Crudity\Form\Parser;
 
+use Neverdane\Crudity\Db\Entity;
 use Neverdane\Crudity\Field\FieldHandler;
 use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\Form\View;
@@ -32,16 +33,23 @@ class Parser
     private $occurrences = null;
     private $formattedHtml = null;
     private $fieldHandler = null;
+    private $entities = null;
+    private $defaultEntityName = null;
 
     /**
      * @param string $html
+     * @param null|string $defaultEntityName
      * @param FieldHandler $fieldHandler
      */
-    public function __construct($html, $fieldHandler = null)
+    public function __construct($html, $defaultEntityName = null, $fieldHandler = null)
     {
         // The Field Handler only purpose is to set the fields that will be identified by the Form Parser
         $this->fieldHandler = (!is_null($fieldHandler)) ? $fieldHandler : new FieldHandler();
         $this->html = $html;
+        if (is_null($defaultEntityName)) {
+            $defaultEntityName = Entity::DEFAULT_NAME;
+        }
+        $this->defaultEntityName = $defaultEntityName;
     }
 
     /**
@@ -78,31 +86,39 @@ class Parser
      * @param array $occurrences
      * @return array
      */
-    private function createFieldsInstances($occurrences)
+    private function getEntitiesData($occurrences)
     {
-        $fields = array();
+        $entities = array();
         foreach ($occurrences as $occurrence) {
-            $fields[] = $this->createFieldInstance($occurrence);
+            $fieldParams = $this->getFieldParams($occurrence);
+            $entityName = $fieldParams['params']['entityName'];
+            if (!isset($entities[$entityName])) {
+                $entities[$entityName] = array('fields' => array());
+            }
+            $entities[$entityName]['fields'][] = $fieldParams;
         }
-        return $fields;
+        return $entities;
     }
 
     /**
      * Creates a Field instance according to the given occurrence
      * If no Field instance has been identified, returns null
      * @param mixed $occurrence
-     * @return null | FieldInterface
+     * @return null|array
      */
-    private function createFieldInstance($occurrence)
+    private function getFieldParams($occurrence)
     {
-        $field = null;
+        $fieldParams = null;
         // In order to create it, we first need to identify its type
         $fieldType = $this->identifyFieldType($occurrence);
         if (!is_null($fieldType)) {
             /** @var FieldInterface $fieldType */
-            $field = $fieldType::createFromOccurrence($this, $occurrence);
+            $fieldParams = array(
+                'params' => $fieldType::getParamsFromOccurrence($this, $occurrence),
+                'type' => $fieldType
+            );
         }
-        return $field;
+        return $fieldParams;
     }
 
     /**
@@ -173,18 +189,19 @@ class Parser
      * They are also stored in the instance
      * @return array
      */
-    public function getFields()
+    public function getEntities()
     {
-        if (is_null($this->fields)) {
+        if (is_null($this->entities)) {
             // We ask our adapter to get back all the fields in an array
             // Returned occurrences are highly strongly coupled to the current parser adapter
             // which is the only one that can work with them
             $fieldsOccurrences = $this->getFieldsOccurrences();
             // It's time to convert this occurrence to Crudity fields instances, let's do it
-            $this->fields = $this->createFieldsInstances($fieldsOccurrences);
+            $this->entities = $this->getEntitiesData($fieldsOccurrences);
         }
-        return $this->fields;
+        return $this->entities;
     }
+
     /**
      * Returns the cleaned html based on the set html
      * It is also stored in the instance
@@ -249,5 +266,29 @@ class Parser
     public function getHtml()
     {
         return $this->html;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getDefaultEntityName()
+    {
+        return $this->defaultEntityName;
+    }
+
+    private function distributeOccurrences($occurrences)
+    {
+        $entities = array();
+        foreach ($occurrences as $occurrence) {
+            $entityName = $this->getAdapter()->getAttribute($occurrence, 'cr-entity');
+            if (is_null($entityName)) {
+                $entityName = $this->defaultEntityName;
+            }
+            if (!isset($entities[$entityName])) {
+                $entities[$entityName] = array();
+            }
+            $entities[$entityName][] = $occurrence;
+        }
+
     }
 }

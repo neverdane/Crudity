@@ -77,6 +77,7 @@ class Form
      */
     private $openedWorkflow = true;
     private $supportingEntities = null;
+    private $entities = array();
 
     /**
      * @param null|Config $config
@@ -198,6 +199,19 @@ class Form
         $this->request = $request;
         // We instantiate the Response that will store the result we want to share to the user
         $this->response = (!is_null($response)) ? $response : new Response();
+        $params = $request->getParams();
+        /** @var Db\Entity $entity */
+        foreach ($this->entities as $entity) {
+            $fields = $entity->getFields();
+            foreach ($fields as $fieldName => $field) {
+                foreach ($params as $paramName => $value) {
+                    if($fieldName === $paramName) {
+                        $field->setValue($value);
+                    }
+                }
+            }
+        }
+
         return $this;
     }
 
@@ -441,5 +455,37 @@ class Form
         // We ask the FieldManager to affect these values to their matching Field
         $this->getFieldManager()->affectValues($values);
         return $this;
+    }
+
+    /**
+     * @param array $entities
+     * @return $this
+     */
+    public function setEntities($entities)
+    {
+        /** @var Db\Entity $entity */
+        foreach ($entities as $entity) {
+            $this->entities[$entity->getName()] = $entity;
+        }
+        return $this;
+    }
+
+    /**
+     * @param string $entityName
+     * @return null|Db\Entity
+     */
+    public function getEntity($entityName = 'default')
+    {
+        return isset($this->entities[$entityName])
+            ? $this->entities[$entityName]
+            : null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEntities()
+    {
+        return $this->entities;
     }
 }

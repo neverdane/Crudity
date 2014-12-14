@@ -7,7 +7,7 @@ Interface FieldInterface
 
     public static function getIdentifiers();
 
-    public static function createFromOccurrence($parser, $occurrence);
+    public static function getParamsFromOccurrence($parser, $occurrence);
 
     public function getName();
 

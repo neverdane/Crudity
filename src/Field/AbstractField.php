@@ -159,12 +159,13 @@ abstract class AbstractField implements FieldInterface
      * @param mixed $occurrence
      * @return static
      */
-    public static function createFromOccurrence($parser, $occurrence)
+    public static function getParamsFromOccurrence($parser, $occurrence)
     {
         // We extract the params from the occurrence
         $params = static::extractParamsFromOccurrence($parser, $occurrence);
         // Then we remove all the unneeded params from the occurrence
         static::cleanUpOccurrence($parser, $occurrence, $params);
+        return $params;
         // Finally we return an instance of the field
         return new static($params);
     }
@@ -180,15 +181,21 @@ abstract class AbstractField implements FieldInterface
         $required = $parserAdapter->getAttribute($occurrence, "required") === "true";
         $name = $parserAdapter->getAttribute($occurrence, "name");
         $column = $parserAdapter->getAttribute($occurrence, View::$prefix . "-column");
+        $entityName = $parserAdapter->getAttribute($occurrence, View::$prefix . "-entity");
 
         if (is_null($column)) {
             // We use the Crudity name attribute
             $column = $name;
         }
+        if (is_null($entityName)) {
+            // We use the Crudity name attribute
+            $entityName = $parser->getDefaultEntityName();
+        }
 
         return array(
             "name" => $name,
             "column" => $column,
+            "entityName" => $entityName,
             "required" => $required
         );
     }
@@ -202,14 +209,8 @@ abstract class AbstractField implements FieldInterface
     {
         $parserAdapter = $parser->getAdapter();
         // We remove the crudity name and column attributes
-        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-name");
         $parserAdapter->removeAttribute($occurrence, View::$prefix . "-column");
-        if (is_null($params)) {
-            // We need the params extracted from the occurrence to reset some attributes
-            $params = static::extractParamsFromOccurrence($parser, $occurrence);
-        }
-        // We reset the name attribute
-        $parserAdapter->setAttribute($occurrence, "name", $params["name"]);
+        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-entity");
     }
 
     public function setName($name)
