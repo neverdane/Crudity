@@ -77,6 +77,9 @@ class Form
      */
     private $openedWorkflow = true;
     private $supportingEntities = null;
+    /**
+     * @var Db\Entity[] array
+     */
     private $entities = array();
 
     /**
@@ -203,15 +206,15 @@ class Form
         /** @var Db\Entity $entity */
         foreach ($this->entities as $entity) {
             $fields = $entity->getFields();
+            /** @var FieldInterface $field */
             foreach ($fields as $fieldName => $field) {
                 foreach ($params as $paramName => $value) {
-                    if($fieldName === $paramName) {
+                    if ($fieldName === $paramName) {
                         $field->setValue($value);
                     }
                 }
             }
         }
-
         return $this;
     }
 
@@ -242,29 +245,9 @@ class Form
     {
         // We initialize the response status to success
         $this->getResponse()->setStatus(Response::STATUS_SUCCESS);
-        // We get all the fields we have to validate
-        $fields = $this->getFieldManager()->getFields();
-        /** @var FieldInterface $field */
-        foreach ($fields as $field) {
-            // We validate each field and we get its status
-            $fieldStatus = $field->validate()->getStatus();
-            if ($fieldStatus !== AbstractField::STATUS_SUCCESS) {
-                // If the validation fail, we set the response status to error
-                $this->getResponse()->setStatus(Response::STATUS_ERROR);
-                // We construct the error message that will be displayed to the user
-                $message = Error::getMessage(
-                    $field->getErrorCode(),
-                    $this->getErrorMessages(),
-                    $field->getName(),
-                    $field->getErrorValidatorName(),
-                    $placeholders = array(
-                        "value" => $field->getValue(),
-                        "fieldName" => $field->getName()
-                    )
-                );
-                // Then we add the error message for this field to the response
-                $this->getResponse()->addError($field->getErrorCode(), $message, $field->getName());
-            }
+
+        foreach ($this->entities as $entity) {
+            $entity->validate($this->getResponse(), $this->getErrorMessages());
         }
         return $this;
     }
@@ -275,8 +258,9 @@ class Form
      */
     public function filter()
     {
-        $params = $this->getRequest()->getParams();
-        $this->getRequest()->setParams($params, Request::PARAMS_FILTERED);
+        foreach ($this->entities as $entity) {
+            $entity->filter();
+        }
         return $this;
     }
 
@@ -293,7 +277,7 @@ class Form
         // We get the requested params (filtered if done, else the raw ones)
         $data = $this->getRequest()->getParams();
         // We ask the Db to create the row and get the result, it should return the inserted id
-        $lastInsertId = $db->createRow($this->entity, $data, $this->supportingEntities);
+        $lastInsertId = $db->createRow($this->entities, $data);
         // We add this inserted id as a response param in order to inform the user
         $this->getResponse()->addParam('created_id', $lastInsertId);
         return $this;

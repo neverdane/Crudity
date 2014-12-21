@@ -113,12 +113,6 @@ class Workflow
         $this->form->getResponse()->send();
     }
 
-    private function affectValues()
-    {
-        $this->form->affectValuesToFields();
-        return $this;
-    }
-
     private function notify($event)
     {
         $observers = $this->form->getObservers();
@@ -136,13 +130,11 @@ class Workflow
             default:
                 $this->form->getRequest()->setAction(Request::ACTION_CUSTOM);
             case Request::ACTION_CUSTOM :
-                $this->affectValues();
                 $this->validate();
                 $this->filter();
                 break;
             case Request::ACTION_CREATE :
             case Request::ACTION_UPDATE :
-                $this->affectValues();
                 $this->validate();
                 $this->filter();
                 $this->process($action);

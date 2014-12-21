@@ -25,4 +25,8 @@ Interface FieldInterface
     public function getValue();
 
     public function setValue($value, $type = null);
+
+    public function filter();
+
+    public function getJoin();
 }

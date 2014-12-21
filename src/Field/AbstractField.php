@@ -61,13 +61,21 @@ abstract class AbstractField implements FieldInterface
     private $status = null;
     private $errorCode = null;
     private $errorValidatorName = null;
+    private $join = null;
 
     public function __construct($config)
     {
         $this->name = $config["name"];
-        $this->column = $config["column"];
+        if (!isset($config['column'])) {
+            $this->column = $config["name"];
+        } else {
+            $this->column = $config["column"];
+        }
         if (isset($config["required"])) {
             $this->required = $config["required"];
+        }
+        if (isset($config["join"])) {
+            $this->join = $config["join"];
         }
     }
 
@@ -299,5 +307,13 @@ abstract class AbstractField implements FieldInterface
     public function getErrorValidatorName()
     {
         return $this->errorValidatorName;
+    }
+
+    /**
+     * @return null|mixed
+     */
+    public function getJoin()
+    {
+        return $this->join;
     }
 }

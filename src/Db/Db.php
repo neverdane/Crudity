@@ -62,27 +62,14 @@ class Db
         return $this->adapter;
     }
 
-    public function createRow($entity, $data, array $supportingEntities = array())
+    /**
+     * @param Entity $entity
+     * @param array $data
+     * @return mixed
+     */
+    public function createRow($entity, $data)
     {
-        $entities = array_merge($supportingEntities, array($entity));
-        $prioritizedEntities = $this->prioritizeEntities($entities);
-        $entitiesIds = array();
-        /** @var Entity $entity */
-        foreach ($prioritizedEntities as $entity) {
-            $dependencies = $entity->getDependencies();
-            foreach ($dependencies as $column => $dependency) {
-
-            }
-            $entitiesIds[$entity->getName()][] = $this->getAdapter()->createRow($entity, $data);
-        }
-        foreach ($supportingEntities as $secondaryEntityData) {
-            $supportingEntity = $secondaryEntityData['entity'];
-            $fields = $secondaryEntityData['fields'];
-            foreach ($fields as $field) {
-
-            }
-        }
-        return $entitiesIds;
+        return $this->getAdapter()->createRow($entity->getEntity(), $data);
     }
 
     public function updateRow($table, $id, $data)
@@ -127,7 +114,8 @@ class Db
      * @param Entity $entity
      * @param array $supportingEntities
      */
-    public function distributeDataOverEntities($data, $entity, $supportingEntities = array()) {
+    public function distributeDataOverEntities($data, $entity, $supportingEntities = array())
+    {
         $fieldsDistribution = array();
         /** @var Entity $supportingEntity */
         foreach ($supportingEntities as $supportingEntity) {
@@ -135,11 +123,10 @@ class Db
             $fieldsDistribution[$entityName] = array();
             $fields = $supportingEntity->getFieldNames();
             foreach ($fields as $field => $value) {
-                if(isset($data[$field])) {
+                if (isset($data[$field])) {
                     $fieldsDistribution[$entityName][$field] = $data[$field];
                     unset($data[$field]);
-                }
-                else {
+                } else {
                     $fieldsDistribution[$entityName][$field] = $supportingEntity->getDefaultValue($field);
                 }
             }

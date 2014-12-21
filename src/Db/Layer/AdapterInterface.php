@@ -22,9 +22,9 @@ interface AdapterInterface
 
     public function getConnection();
 
-    public function createRow($table, $data);
+    public function createRow($entity, $data);
 
-    public function updateRow($table, $id, $data);
+    public function updateRow($entity, $id, $data);
 
-    public function deleteRow($table, $id);
+    public function deleteRow($entity, $id);
 }

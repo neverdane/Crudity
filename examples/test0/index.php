@@ -13,6 +13,7 @@ require "TestFormObserver.php";
 
 use Neverdane\Crudity\Crudity;
 use Neverdane\Crudity\Db;
+use Neverdane\Crudity\Field;
 
 $registry = new \Neverdane\Crudity\Registry();
 $pdo = new PDO('mysql:host=localhost;dbname=crudity', 'root', '');
@@ -28,22 +29,17 @@ $form->setErrorMessages(array(
     )
 ));
 $form->addObserver(new TestFormObserver());
-
-$userEntity = new Db\Entity('user');
-$userEntity->setDependencies(array(
-    'contact_id' => 'contact:id'
+$form->getEntity('user')->setDependencies(array(
+    'contact_id' => 'contact'
 ));
 
-$contactEntity = new Db\Entity('contact');
-$contactEntity->specifyFieldNames(array(
-    'phone',
-    'city',
-    'country'
-));
+$contactField = new Field\TextField(array('name' => 'contact_id', 'join' => 'contact'));
+$form->getEntity('user')->setField($contactField);
 
-$contactEntity->setDefaultValues(array(
+
+/*$contactEntity->setDefaultValues(array(
     'country' => 'France'
-));
+))*/;
 
 $form->setEntity('user');
 
