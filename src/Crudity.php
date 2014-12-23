@@ -65,6 +65,7 @@ class Crudity
         $entities = array();
         foreach ($entitiesData as $entityName => $entityData) {
             $entity = new Entity($entityName);
+            $entity->setEntity($entityName);
             $fields = array();
             foreach ($entityData['fields'] as $fieldData) {
                 $fieldType = $fieldData['type'];

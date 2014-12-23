@@ -3,6 +3,7 @@ namespace Neverdane\Crudity;
 
 use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Form\Request;
+use Neverdane\Crudity\Form\RequestManager;
 use Neverdane\Crudity\Form\Response;
 
 class Workflow
@@ -24,6 +25,7 @@ class Workflow
     const EVENT_SEND_BEFORE = "preSend";
 
     private $form = null;
+    private $requestManager;
 
     /**
      * @param Form $form
@@ -38,7 +40,7 @@ class Workflow
         if ($this->form->isWorkflowOpened()) {
             Error::initialize();
             $this->notify(self::EVENT_VALIDATION_BEFORE);
-            $this->form->validate();
+            $this->requestManager->validate();
             if (Response::STATUS_ERROR === $this->form->getResponse()->getStatus()) {
                 $this->form->closeWorkflow();
             }
@@ -50,7 +52,7 @@ class Workflow
     {
         if ($this->form->isWorkflowOpened()) {
             $this->notify(self::EVENT_FILTER_BEFORE);
-            $this->form->filter();
+            $this->requestManager->filter();
             $this->notify(self::EVENT_FILTER_AFTER);
         }
     }
@@ -75,7 +77,7 @@ class Workflow
     {
         if ($this->form->isWorkflowOpened()) {
             $this->notify(self::EVENT_CREATE_BEFORE);
-            $this->form->create();
+            $this->requestManager->create();
             $this->notify(self::EVENT_CREATE_AFTER);
         }
     }
@@ -125,6 +127,7 @@ class Workflow
     public function start()
     {
         $action = $this->form->getRequest()->getAction();
+        $this->requestManager = new RequestManager($this->form->getRequest(), $this->form->getResponse(), $this->form->getEntities(), $this->form->getDbAdapter());
 
         switch ($action) {
             default:

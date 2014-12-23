@@ -114,18 +114,8 @@ class RequestManager
             }
             $entitiesIds[$entity->getName()] = $entity->create($db);
         }
-
-
-        // We instantiate a new Db that will handle the Db interaction
-        $db = new Db\Db();
-        // We set the DbAdapter configured on this Form
-        $db->setAdapter($this->dbAdapter);
-        // We get the requested params (filtered if done, else the raw ones)
-        $data = $this->getRequest()->getParams();
-        // We ask the Db to create the row and get the result, it should return the inserted id
-        $lastInsertId = $db->createRow($this->entities, $data);
         // We add this inserted id as a response param in order to inform the user
-        $this->getResponse()->addParam('created_id', $lastInsertId);
+        $this->response->addParam('created_id', $entitiesIds);
         return $this;
     }
 

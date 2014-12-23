@@ -75,7 +75,17 @@ class Entity
      */
     public function getDependencies()
     {
-        return $this->dependencies;
+        $fields = $this->getFields();
+        $dependencies = array();
+        foreach ($fields as $fieldName => $field) {
+            if (!is_null($field->getJoin())) {
+                $join = $field->getJoin();
+                if (!is_null($join)) {
+                    $dependencies[] = $join;
+                }
+            }
+        }
+        return $dependencies;
     }
 
     /**

@@ -29,9 +29,9 @@ $form->setErrorMessages(array(
     )
 ));
 $form->addObserver(new TestFormObserver());
-$form->getEntity('user')->setDependencies(array(
+/*$form->getEntity('user')->setDependencies(array(
     'contact_id' => 'contact'
-));
+));*/
 
 $contactField = new Field\TextField(array('name' => 'contact_id', 'join' => 'contact'));
 $form->getEntity('user')->setField($contactField);
@@ -41,7 +41,7 @@ $form->getEntity('user')->setField($contactField);
     'country' => 'France'
 ))*/;
 
-$form->setEntity('user');
+//$form->setEntity('user');
 
 $registry->storeForm($form);
 
