@@ -11,7 +11,6 @@
 
 namespace Neverdane\Crudity\Form\Parser;
 
-use Neverdane\Crudity\Form\View;
 use phpQuery;
 
 /**
@@ -81,7 +80,7 @@ class PhpQueryAdapter implements AdapterInterface
         // We test if the current field analyzed is a Crudity functional field in the aim to not manage them
         // We reject the submit buttons and the inputs that have cr-excluded attribute
         if ($pqo->attr("type") === "submit"
-            || !is_null($pqo->attr(View::$prefix . "-excluded"))
+            || !is_null($pqo->attr(Parser::$prefix . "-excluded"))
         ) {
             return false;
         }

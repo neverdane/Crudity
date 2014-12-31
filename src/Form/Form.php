@@ -13,11 +13,7 @@ namespace Neverdane\Crudity\Form;
 
 use Neverdane\Crudity\AbstractObserver;
 use Neverdane\Crudity\Db;
-use Neverdane\Crudity\Error;
-use Neverdane\Crudity\Field\AbstractField;
 use Neverdane\Crudity\Field\FieldInterface;
-use Neverdane\Crudity\Field\FieldManager;
-use Neverdane\Crudity\Registry;
 
 /**
  * @package Neverdane\Crudity
@@ -35,11 +31,6 @@ class Form
      * The observers added to the Form in order to affect it during the workflow
      */
     private $observers = array();
-    /**
-     * @var FieldManager
-     * The FieldManager stores the fields of the Form
-     */
-    private $fieldManager;
     /**
      * @var View
      * Instance of the view used for the rendering
@@ -65,34 +56,29 @@ class Form
      * The adapter key matching the dbLayerAdapter instance we want to use on this Form
      */
     private $dbAdapterKey = null;
-    /**
-     * @var mixed
-     * The entity object the Form is working with. Depends on the DbLayerAdapter used
-     */
-    private $entity;
 
     /**
      * @var bool
      * Tells if the workflow for this Form must be stopped or not
      */
     private $openedWorkflow = true;
-    private $supportingEntities = null;
     /**
      * @var Db\Entity[] array
      */
     private $entities = array();
+    /**
+     * @var null|RequestManager
+     */
+    private $requestManager = null;
 
     /**
      * @param null|Config $config
-     * @param null|FieldManager $fieldManager
      * We can pass a Config object in order to customize this Form
      */
-    public function __construct($config = null, $fieldManager = null)
+    public function __construct($config = null)
     {
         // If no config was given, we instantiate a default one
         $this->config = (!is_null($config)) ? $config : new Config();
-        // The Form needs a fieldManager, we instantiate it by default
-        $this->fieldManager = (!is_null($fieldManager)) ? $fieldManager : new FieldManager();
     }
 
     /**
@@ -170,26 +156,6 @@ class Form
     }
 
     /**
-     * Sets the FieldManager that will be used to store the Fields for the Form
-     * @param FieldManager $fieldManager
-     * @return Form
-     */
-    public function setFieldManager($fieldManager)
-    {
-        $this->fieldManager = $fieldManager;
-        return $this;
-    }
-
-    /**
-     * Returns the FieldManager set on the Form
-     * @return FieldManager
-     */
-    public function getFieldManager()
-    {
-        return $this->fieldManager;
-    }
-
-    /**
      * Sets the Request object that has to be handled by the Form
      * It also instantiates a Response on the Form
      * Indeed, the Request and Response are really complementary
@@ -219,6 +185,15 @@ class Form
     }
 
     /**
+     * @param RequestManager $requestManager
+     * @return $this
+     */
+    public function setRequestManager($requestManager){
+        $this->requestManager = $requestManager;
+        return $this;
+    }
+
+    /**
      * Returns the Request object set on the Form
      * @return Request
      */
@@ -235,90 +210,6 @@ class Form
     public function getResponse()
     {
         return $this->response;
-    }
-
-    /**
-     * Validates the value set on each Field and sets a matching Response
-     * @return $this
-     */
-    public function validate()
-    {
-        // We initialize the response status to success
-        $this->getResponse()->setStatus(Response::STATUS_SUCCESS);
-
-        foreach ($this->entities as $entity) {
-            $entity->validate($this->getResponse(), $this->getErrorMessages());
-        }
-        return $this;
-    }
-
-    /**
-     * Filters each field and affects the filtered value in the Request
-     * @return $this
-     */
-    public function filter()
-    {
-        foreach ($this->entities as $entity) {
-            $entity->filter();
-        }
-        return $this;
-    }
-
-    /**
-     * Creates a row depending on the Request set on the Form
-     * @return $this
-     */
-    public function create()
-    {
-        // We instantiate a new Db that will handle the Db interaction
-        $db = new Db\Db();
-        // We set the DbAdapter configured on this Form
-        $db->setAdapter($this->getDbAdapter());
-        // We get the requested params (filtered if done, else the raw ones)
-        $data = $this->getRequest()->getParams();
-        // We ask the Db to create the row and get the result, it should return the inserted id
-        $lastInsertId = $db->createRow($this->entities, $data);
-        // We add this inserted id as a response param in order to inform the user
-        $this->getResponse()->addParam('created_id', $lastInsertId);
-        return $this;
-    }
-
-    /**
-     * Update the row depending on the Request set on the Form
-     * @return $this
-     */
-    public function update()
-    {
-        // We instantiate a new Db that will handle the Db interaction
-        $db = new Db\Db();
-        // We set the DbAdapter configured on this Form
-        $db->setAdapter($this->getDbAdapter());
-        // We get the requested params (filtered if done, else the raw ones)
-        $data = $this->getRequest()->getParams();
-        // We get the requested row id we want to update
-        $rowId = $this->getRequest()->getRowId();
-        // We ask the Db to update the row and get the result, it should return the number of affected rows
-        $affectedCount = $db->updateRow($this->entity, $rowId, $data);
-        // We add the number of affected rows as a response param in order to inform the user
-        $this->getResponse()->addParam('affected_count', $affectedCount);
-    }
-
-    /**
-     * Update the row depending on the Request set on the Form
-     * @return $this
-     */
-    public function delete()
-    {
-        // We instantiate a new Db that will handle the Db interaction
-        $db = new Db\Db();
-        // We set the DbAdapter configured on this Form
-        $db->setAdapter($this->getDbAdapter());
-        // We get the requested row id we want to update
-        $rowId = $this->getRequest()->getRowId();
-        // We ask the Db to delete the row and get the result, it should return the number of affected rows
-        $affectedCount = $db->deleteRow($this->entity, $rowId);
-        // We add the number of affected rows as a response param in order to inform the user
-        $this->getResponse()->addParam('affected_count', $affectedCount);
     }
 
     /**
@@ -388,28 +279,6 @@ class Form
     }
 
     /**
-     * Sets the entity the Form could work with on Db workflow,
-     * (e.g. When we work with pdo and mysql, the entity will be a table name)
-     * @param mixed $entity
-     * @return Form
-     */
-    public function setEntity($entity)
-    {
-        $this->entity = $entity;
-        return $this;
-    }
-
-    /**
-     * @param Db\Entity $entity
-     * @return $this
-     */
-    public function addSupportingEntity($entity)
-    {
-        $this->supportingEntities[$entity->getName()] = $entity;
-        return $this;
-    }
-
-    /**
      * Avoids the Workflow to continue
      * Useful when an error occurs
      */
@@ -425,20 +294,6 @@ class Form
     public function isWorkflowOpened()
     {
         return $this->openedWorkflow;
-    }
-
-    /**
-     * Affects the values from the Request to each matching Field
-     * This method is called before the validation of the filtering
-     * @return $this
-     */
-    public function affectValuesToFields()
-    {
-        // We get the values we want to affect
-        $values = $this->getRequest()->getParams();
-        // We ask the FieldManager to affect these values to their matching Field
-        $this->getFieldManager()->affectValues($values);
-        return $this;
     }
 
     /**
@@ -471,5 +326,13 @@ class Form
     public function getEntities()
     {
         return $this->entities;
+    }
+
+    /**
+     * @return RequestManager|null
+     */
+    public function getRequestManager()
+    {
+        return $this->requestManager;
     }
 }

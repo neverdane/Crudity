@@ -14,7 +14,6 @@ namespace Neverdane\Crudity\Form\Parser;
 use Neverdane\Crudity\Db\Entity;
 use Neverdane\Crudity\Field\FieldHandler;
 use Neverdane\Crudity\Field\FieldInterface;
-use Neverdane\Crudity\Form\View;
 
 /**
  * @package Neverdane\Crudity
@@ -25,16 +24,41 @@ class Parser
 
     const ADAPTER_DEFAULT = "PhpQueryAdapter";
 
+
+    const PREFIX_DEFAULT = "cr";
+
+    const FIELD_INPUT = "input";
+    const FIELD_SELECT = "select";
+    const FIELD_TEXTAREA = "textarea";
+
+    /**
+     * All the Form elements that Crudity can handle
+     * (Different from the handled fields which are more specific)
+     * @var array
+     */
+    public static $managedTagNames = array(
+        self::FIELD_INPUT,
+        self::FIELD_SELECT,
+        self::FIELD_TEXTAREA,
+    );
+
+    public static $prefix = self::PREFIX_DEFAULT;
+
     private $html = "";
     private $adapter = null;
 
     private $id = null;
-    private $fields = null;
     private $occurrences = null;
     private $formattedHtml = null;
     private $fieldHandler = null;
     private $entities = null;
     private $defaultEntityName = null;
+
+    public static function setPrefix($prefix = self::PREFIX_DEFAULT)
+    {
+        self::$prefix = $prefix;
+    }
+
 
     /**
      * @param string $html
@@ -86,7 +110,7 @@ class Parser
      * @param array $occurrences
      * @return array
      */
-    private function getEntitiesData($occurrences)
+    private function getEntitiesDataByOccurrences($occurrences)
     {
         $entities = array();
         foreach ($occurrences as $occurrence) {
@@ -152,7 +176,7 @@ class Parser
     public function getFieldsOccurrences()
     {
         if (is_null($this->occurrences)) {
-            $occurrences = $this->getAdapter()->getFieldsOccurrences(View::$managedTagNames);
+            $occurrences = $this->getAdapter()->getFieldsOccurrences(self::$managedTagNames);
             // We remove the non eligible fields occurrences
             $this->occurrences = $this->filterOccurrences($occurrences);
         }
@@ -189,7 +213,7 @@ class Parser
      * They are also stored in the instance
      * @return array
      */
-    public function getEntities()
+    public function getEntitiesData()
     {
         if (is_null($this->entities)) {
             // We ask our adapter to get back all the fields in an array
@@ -197,7 +221,7 @@ class Parser
             // which is the only one that can work with them
             $fieldsOccurrences = $this->getFieldsOccurrences();
             // It's time to convert this occurrence to Crudity fields instances, let's do it
-            $this->entities = $this->getEntitiesData($fieldsOccurrences);
+            $this->entities = $this->getEntitiesDataByOccurrences($fieldsOccurrences);
         }
         return $this->entities;
     }
@@ -240,8 +264,9 @@ class Parser
     {
         $parserAdapter = $this->getAdapter();
         // We remove the crudity  column attribute
-        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-column");
-        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-excluded");
+        $parserAdapter->removeAttribute($occurrence, self::$prefix . "-column");
+        $parserAdapter->removeAttribute($occurrence, self::$prefix . "-entity");
+        $parserAdapter->removeAttribute($occurrence, self::$prefix . "-excluded");
         return $this;
     }
 
@@ -276,19 +301,4 @@ class Parser
         return $this->defaultEntityName;
     }
 
-    private function distributeOccurrences($occurrences)
-    {
-        $entities = array();
-        foreach ($occurrences as $occurrence) {
-            $entityName = $this->getAdapter()->getAttribute($occurrence, 'cr-entity');
-            if (is_null($entityName)) {
-                $entityName = $this->defaultEntityName;
-            }
-            if (!isset($entities[$entityName])) {
-                $entities[$entityName] = array();
-            }
-            $entities[$entityName][] = $occurrence;
-        }
-
-    }
 }

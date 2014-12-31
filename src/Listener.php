@@ -3,6 +3,8 @@ namespace Neverdane\Crudity;
 
 use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Form\Request;
+use Neverdane\Crudity\Form\RequestManager;
+use Neverdane\Crudity\Form\Response;
 
 class Listener
 {
@@ -14,15 +16,15 @@ class Listener
         $registry = (!is_null($registry)) ? $registry : new Registry();
         // We get the submitted params if any
         $requestParams = self::getRequestParams();
-        // If we detect that a Crudity Form has been submitted (a Crudity Form Id has been launched)
+        // If we detect that a Crudity Form has been submitted (a crudity Form Id has been launched)
         if (self::wasCrudityFormSubmitted($requestParams)) {
             // We let the adapter search for the instance of the declared Form in config with the submitted id if any
             $submittedForm = $registry->getForm($requestParams["id"]);
             // If a Form has been founded
             if (!is_null($submittedForm)) {
                 /** @var Form $submittedForm */
-                $request = new Request($requestParams);
-                $submittedForm->setRequest($request);
+                $requestManager = new RequestManager(new Request($requestParams), new Response(), $submittedForm->getEntities(), $submittedForm->getDbAdapter());
+                $submittedForm->setRequestManager($requestManager);
                 $workflow = new Workflow($submittedForm);
                 $workflow->start();
             } else {

@@ -16,7 +16,6 @@ use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Form\Parser\Parser;
 use Neverdane\Crudity\Form\View;
-use Neverdane\Crudity\Field\FieldManager;
 
 /**
  * @package Neverdane\Crudity
@@ -61,7 +60,7 @@ class Crudity
         // We get the form attribute id
         $formId = $formParser->getId();
         // We get all the detected fields instances
-        $entitiesData = $formParser->getEntities();
+        $entitiesData = $formParser->getEntitiesData();
         $entities = array();
         foreach ($entitiesData as $entityName => $entityData) {
             $entity = new Entity($entityName);

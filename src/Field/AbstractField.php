@@ -169,22 +169,6 @@ abstract class AbstractField implements FieldInterface
      */
     public static function getParamsFromOccurrence($parser, $occurrence)
     {
-        // We extract the params from the occurrence
-        $params = static::extractParamsFromOccurrence($parser, $occurrence);
-        // Then we remove all the unneeded params from the occurrence
-        static::cleanUpOccurrence($parser, $occurrence, $params);
-        return $params;
-        // Finally we return an instance of the field
-        return new static($params);
-    }
-
-    /**
-     * @param Parser $parser
-     * @param mixed $occurrence
-     * @return array
-     */
-    public static function extractParamsFromOccurrence($parser, $occurrence)
-    {
         $parserAdapter = $parser->getAdapter();
         $required = $parserAdapter->getAttribute($occurrence, "required") === "true";
         $name = $parserAdapter->getAttribute($occurrence, "name");
@@ -206,19 +190,6 @@ abstract class AbstractField implements FieldInterface
             "entityName" => $entityName,
             "required" => $required
         );
-    }
-
-    /**
-     * @param Parser $parser
-     * @param mixed $occurrence
-     * @return array
-     */
-    public static function cleanUpOccurrence($parser, $occurrence, $params = null)
-    {
-        $parserAdapter = $parser->getAdapter();
-        // We remove the crudity name and column attributes
-        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-column");
-        $parserAdapter->removeAttribute($occurrence, View::$prefix . "-entity");
     }
 
     public function setName($name)
