@@ -1,53 +1,53 @@
 <?php
 namespace Neverdane\Crudity;
 
-use Neverdane\Crudity\Form\Form;
+use Neverdane\Crudity\Form\RequestManager;
 
 abstract class AbstractObserver
 {
-    public function preValidation(Form $form)
+    public function preValidation(RequestManager $rm)
     {
     }
-    public function postValidation(Form $form)
+    public function postValidation(RequestManager $rm)
     {
     }
-    public function preFilter(Form $form)
+    public function preFilter(RequestManager $rm)
     {
     }
-    public function postFilter(Form $form)
+    public function postFilter(RequestManager $rm)
     {
     }
-    public function preProcess(Form $form)
+    public function preProcess(RequestManager $rm)
     {
     }
-    public function postProcess(Form $form)
+    public function postProcess(RequestManager $rm)
     {
     }
-    public function preCreate(Form $form)
+    public function preCreate(RequestManager $rm)
     {
     }
-    public function postCreate(Form $form)
+    public function postCreate(RequestManager $rm)
     {
     }
-    public function preUpdate(Form $form)
+    public function preUpdate(RequestManager $rm)
     {
     }
-    public function postUpdate(Form $form)
+    public function postUpdate(RequestManager $rm)
     {
     }
-    public function preDelete(Form $form)
+    public function preDelete(RequestManager $rm)
     {
     }
-    public function postDelete(Form $form)
+    public function postDelete(RequestManager $rm)
     {
     }
-    public function preRead(Form $form)
+    public function preRead(RequestManager $rm)
     {
     }
-    public function postRead(Form $form)
+    public function postRead(RequestManager $rm)
     {
     }
-    public function preSend(Form $form)
+    public function preSend(RequestManager $rm)
     {
     }
 }
