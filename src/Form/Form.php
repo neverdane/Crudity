@@ -13,7 +13,6 @@ namespace Neverdane\Crudity\Form;
 
 use Neverdane\Crudity\AbstractObserver;
 use Neverdane\Crudity\Db;
-use Neverdane\Crudity\Field\FieldInterface;
 
 /**
  * @package Neverdane\Crudity
@@ -37,16 +36,6 @@ class Form
      */
     private $view = null;
     /**
-     * @var Request
-     * Instance of the request object keeping trace of the parameters given through the request
-     */
-    private $request = null;
-    /**
-     * @var Response
-     * Instance of the response object that contains everything we want to send to the client after the workflow process
-     */
-    private $response = null;
-    /**
      * @var array
      * An array of customized errors for some fields or validators on this Form
      */
@@ -56,20 +45,10 @@ class Form
      * The adapter key matching the dbLayerAdapter instance we want to use on this Form
      */
     private $dbAdapterKey = null;
-
-    /**
-     * @var bool
-     * Tells if the workflow for this Form must be stopped or not
-     */
-    private $openedWorkflow = true;
     /**
      * @var Db\Entity[] array
      */
     private $entities = array();
-    /**
-     * @var null|RequestManager
-     */
-    private $requestManager = null;
 
     /**
      * @param null|Config $config
@@ -156,65 +135,6 @@ class Form
     }
 
     /**
-     * Sets the Request object that has to be handled by the Form
-     * It also instantiates a Response on the Form
-     * Indeed, the Request and Response are really complementary
-     * @param Request $request
-     * @param Response $response
-     * @return $this
-     */
-    public function setRequest($request, $response = null)
-    {
-        $this->request = $request;
-        // We instantiate the Response that will store the result we want to share to the user
-        $this->response = (!is_null($response)) ? $response : new Response();
-        $params = $request->getParams();
-        /** @var Db\Entity $entity */
-        foreach ($this->entities as $entity) {
-            $fields = $entity->getFields();
-            /** @var FieldInterface $field */
-            foreach ($fields as $fieldName => $field) {
-                foreach ($params as $paramName => $value) {
-                    if ($fieldName === $paramName) {
-                        $field->setValue($value);
-                    }
-                }
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * @param RequestManager $requestManager
-     * @return $this
-     */
-    public function setRequestManager($requestManager){
-        $requestManager->setEntities($this->getEntities());
-        $requestManager->setDbAdapter($this->getDbAdapter());
-        $this->requestManager = $requestManager;
-        return $this;
-    }
-
-    /**
-     * Returns the Request object set on the Form
-     * @return Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * Returns the Response object set on the Form
-     * The Response object is instantiated when we set the Request
-     * @return Response
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
      * Sets an array of custom Error Messages overriding the default ones.
      * The array must be formatted as below :
      *
@@ -281,24 +201,6 @@ class Form
     }
 
     /**
-     * Avoids the Workflow to continue
-     * Useful when an error occurs
-     */
-    public function closeWorkflow()
-    {
-        $this->openedWorkflow = false;
-    }
-
-    /**
-     * Returns whether the Workflow can continue or not
-     * @return bool
-     */
-    public function isWorkflowOpened()
-    {
-        return $this->openedWorkflow;
-    }
-
-    /**
      * @param array $entities
      * @return $this
      */
@@ -323,18 +225,11 @@ class Form
     }
 
     /**
-     * @return array
+     * @return Db\Entity[]
      */
     public function getEntities()
     {
         return $this->entities;
     }
 
-    /**
-     * @return RequestManager|null
-     */
-    public function getRequestManager()
-    {
-        return $this->requestManager;
-    }
 }

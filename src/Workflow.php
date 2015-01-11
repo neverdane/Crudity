@@ -1,7 +1,6 @@
 <?php
 namespace Neverdane\Crudity;
 
-use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Form\Request;
 use Neverdane\Crudity\Form\RequestManager;
 use Neverdane\Crudity\Form\Response;
@@ -25,30 +24,26 @@ class Workflow
     const EVENT_SEND_BEFORE = "preSend";
 
     /**
-     * @var Form|null
-     */
-    private $form = null;
-    /**
      * @var null|RequestManager
      */
     private $requestManager;
 
     /**
-     * @param Form $form
+     * @param RequestManager $requestManager
      */
-    public function __construct($form)
+    public function __construct($requestManager)
     {
-        $this->form = $form;
+        $this->requestManager = $requestManager;
     }
 
     private function validate()
     {
-        if ($this->form->isWorkflowOpened()) {
+        if ($this->getRequestManager()->isWorkflowOpened()) {
             Error::initialize();
             $this->notify(self::EVENT_VALIDATION_BEFORE);
-            $this->form->getRequestManager()->validate();
-            if (Response::STATUS_ERROR === $this->form->getRequestManager()->getResponse()->getStatus()) {
-                $this->form->closeWorkflow();
+            $this->getRequestManager()->validate();
+            if (Response::STATUS_ERROR === $this->getRequestManager()->getResponse()->getStatus()) {
+                $this->getRequestManager()->closeWorkflow();
             }
             $this->notify(self::EVENT_VALIDATION_AFTER);
         }
@@ -56,16 +51,16 @@ class Workflow
 
     private function filter()
     {
-        if ($this->form->isWorkflowOpened()) {
+        if ($this->getRequestManager()->isWorkflowOpened()) {
             $this->notify(self::EVENT_FILTER_BEFORE);
-            $this->form->getRequestManager()->filter();
+            $this->getRequestManager()->filter();
             $this->notify(self::EVENT_FILTER_AFTER);
         }
     }
 
     private function process($type)
     {
-        if ($this->form->isWorkflowOpened()) {
+        if ($this->getRequestManager()->isWorkflowOpened()) {
             $this->notify(self::EVENT_PROCESS_BEFORE);
             switch ($type) {
                 case Request::ACTION_CREATE :
@@ -81,36 +76,36 @@ class Workflow
 
     private function create()
     {
-        if ($this->form->isWorkflowOpened()) {
+        if ($this->getRequestManager()->isWorkflowOpened()) {
             $this->notify(self::EVENT_CREATE_BEFORE);
-            $this->form->getRequestManager()->create();
+            $this->getRequestManager()->create();
             $this->notify(self::EVENT_CREATE_AFTER);
         }
     }
 
     private function update()
     {
-        if ($this->form->isWorkflowOpened()) {
+        if ($this->getRequestManager()->isWorkflowOpened()) {
             $this->notify(self::EVENT_UPDATE_BEFORE);
-            $this->form->update();
+            $this->getRequestManager()->update();
             $this->notify(self::EVENT_UPDATE_AFTER);
         }
     }
 
     private function delete()
     {
-        if ($this->form->isWorkflowOpened()) {
+        if ($this->getRequestManager()->isWorkflowOpened()) {
             $this->notify(self::EVENT_DELETE_BEFORE);
-            $this->form->delete();
+            $this->getRequestManager()->delete();
             $this->notify(self::EVENT_DELETE_AFTER);
         }
     }
 
     private function read()
     {
-        if ($this->form->isWorkflowOpened()) {
+        if ($this->getRequestManager()->isWorkflowOpened()) {
             $this->notify(self::EVENT_READ_BEFORE);
-            $this->form->read();
+            $this->getRequestManager()->read();
             $this->notify(self::EVENT_READ_AFTER);
         }
     }
@@ -118,24 +113,24 @@ class Workflow
     private function send()
     {
         $this->notify(self::EVENT_SEND_BEFORE);
-        $this->form->getRequestManager()->getResponse()->send();
+        $this->getRequestManager()->getResponse()->send();
     }
 
     private function notify($event)
     {
-        $observers = $this->form->getObservers();
+        $observers = $this->getRequestManager()->getForm()->getObservers();
         foreach ($observers as $observer) {
-            $observer->$event($this->form);
+            $observer->$event($this->getRequestManager());
         }
 
     }
 
     public function start()
     {
-        $action = $this->form->getRequestManager()->getRequest()->getAction();
+        $action = $this->getRequestManager()->getRequest()->getAction();
         switch ($action) {
             default:
-                $this->form->getRequestManager()->getRequest()->setAction(Request::ACTION_CUSTOM);
+                $this->getRequestManager()->getRequest()->setAction(Request::ACTION_CUSTOM);
             case Request::ACTION_CUSTOM :
                 $this->validate();
                 $this->filter();
@@ -155,6 +150,14 @@ class Workflow
         }
         $this->send();
         return $this;
+    }
+
+    /**
+     * @return RequestManager|null
+     */
+    public function getRequestManager()
+    {
+        return $this->requestManager;
     }
 
 }

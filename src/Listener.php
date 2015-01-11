@@ -1,10 +1,8 @@
 <?php
 namespace Neverdane\Crudity;
 
-use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Form\Request;
 use Neverdane\Crudity\Form\RequestManager;
-use Neverdane\Crudity\Form\Response;
 
 class Listener
 {
@@ -23,10 +21,8 @@ class Listener
             $submittedForm = $registry->getForm($requestParams["id"]);
             // If a Form has been founded
             if (!is_null($submittedForm)) {
-                /** @var Form $submittedForm */
-                $requestManager = new RequestManager(new Request($requestParams));
-                $submittedForm->setRequestManager($requestManager);
-                $workflow = new Workflow($submittedForm);
+                $requestManager = new RequestManager(new Request($requestParams), $submittedForm);
+                $workflow = new Workflow($requestManager);
                 $workflow->start();
             } else {
                 // If no declared Form has been found with this id
