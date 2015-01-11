@@ -27,19 +27,5 @@ abstract class AbstractValidator
         );
     }
 
-    public function validate($input)
-    {
-        $result = $this->check($input);
-        if (isset($result["success"])) {
-            return $result;
-        }
-        return $this->reject();
-    }
-
-    abstract protected function check($input);
-
-    protected function testRegex($regex, $input)
-    {
-        return preg_match($regex, $input) === 1;
-    }
+    abstract public function validate($input);
 }
