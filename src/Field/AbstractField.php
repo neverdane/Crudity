@@ -1,9 +1,8 @@
 <?php
 namespace Neverdane\Crudity\Field;
 
-use Neverdane\Crudity\Error;
 use Neverdane\Crudity\Form\Parser\Parser;
-use Neverdane\Crudity\Validator\ValidatorAbstract;
+use Neverdane\Crudity\Validator\AbstractValidator;
 
 abstract class AbstractField implements FieldInterface
 {
@@ -198,13 +197,16 @@ abstract class AbstractField implements FieldInterface
         return $this->values[$index];
     }
 
+    /**
+     * @return array|FieldValue[]
+     */
     public function getValues(){
         return $this->values;
     }
 
     public function validate()
     {
-        foreach ($this->values as $value) {
+        foreach ($this->getValues() as $value) {
             foreach ($this->validators as $validator) {
                 $value->validate($validator);
             }
@@ -214,7 +216,7 @@ abstract class AbstractField implements FieldInterface
 
     public function filter()
     {
-        foreach ($this->values as $value) {
+        foreach ($this->getValues() as $value) {
             foreach ($this->filters as $filter) {
                 $value->filter($filter);
             }
@@ -239,7 +241,7 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
-     * @return ValidatorAbstract[]
+     * @return AbstractValidator[]
      */
     public function getValidators()
     {
