@@ -11,8 +11,6 @@
 
 namespace Neverdane\Crudity\Form\Parser;
 
-use Neverdane\Crudity\Form\View;
-use phpQuery;
 
 /**
  * @package Neverdane\Crudity
@@ -38,11 +36,6 @@ class NullAdapter implements AdapterInterface
     public function getFieldsOccurrences($tagNames = array())
     {
         return array();
-    }
-
-    public function isFieldRelevant($occurrence)
-    {
-        return true;
     }
 
     public function getTagName($occurrence)

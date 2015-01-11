@@ -3,15 +3,10 @@ namespace Neverdane\Crudity\Field;
 
 use Neverdane\Crudity\Error;
 use Neverdane\Crudity\Form\Parser\Parser;
-use Neverdane\Crudity\Form\View;
+use Neverdane\Crudity\Validator\ValidatorAbstract;
 
 abstract class AbstractField implements FieldInterface
 {
-    const VALUE_REQUEST = "request";
-    const VALUE_FILTERED = "filtered";
-
-    const STATUS_SUCCESS = 1;
-    const STATUS_ERROR = 2;
 
     /**
      * Sets if the field is required or not
@@ -53,14 +48,7 @@ abstract class AbstractField implements FieldInterface
      */
     public $type = null;
 
-    private $value = array(
-        self::VALUE_REQUEST => null,
-        self::VALUE_FILTERED => null,
-    );
-
-    private $status = null;
-    private $errorCode = null;
-    private $errorValidatorName = null;
+    private $values = array();
     private $join = null;
 
     public function __construct($config)
@@ -77,6 +65,7 @@ abstract class AbstractField implements FieldInterface
         if (isset($config["join"])) {
             $this->join = $config["join"];
         }
+        $this->initializeValidators();
     }
 
     /**
@@ -155,7 +144,7 @@ abstract class AbstractField implements FieldInterface
         // The type attribute could be prefixed by the Crudity prefix so we firstly check that one
         // We then compare the given attribute with the occurrence one
         if ($key === "type") {
-            if ($parser->getAdapter()->getAttribute($o, View::$prefix . "-" . $key) === $value) {
+            if ($parser->getAdapter()->getAttribute($o, Parser::$prefix . "-" . $key) === $value) {
                 return true;
             }
         }
@@ -172,16 +161,12 @@ abstract class AbstractField implements FieldInterface
         $parserAdapter = $parser->getAdapter();
         $required = $parserAdapter->getAttribute($occurrence, "required") === "true";
         $name = $parserAdapter->getAttribute($occurrence, "name");
-        $column = $parserAdapter->getAttribute($occurrence, View::$prefix . "-column");
-        $entityName = $parserAdapter->getAttribute($occurrence, View::$prefix . "-entity");
-
+        $column = $parserAdapter->getAttribute($occurrence, Parser::$prefix . "-column");
+        $entityName = $parserAdapter->getAttribute($occurrence, Parser::$prefix . "-entity");
+        $name = explode('[', $name)[0];
         if (is_null($column)) {
             // We use the Crudity name attribute
             $column = $name;
-        }
-        if (is_null($entityName)) {
-            // We use the Crudity name attribute
-            $entityName = $parser->getDefaultEntityName();
         }
 
         return array(
@@ -203,39 +188,25 @@ abstract class AbstractField implements FieldInterface
         return $this->name;
     }
 
-    public function setValue($value, $type = self::VALUE_REQUEST)
+    public function setValue($value, $index = 0)
     {
-        $this->value[$type] = $value;
+        $this->values[$index] = $value;
     }
 
-    public function getValue($type = null)
+    public function getValue($index = 0)
     {
-        if (is_null($type)) {
-            if (!is_null($this->value[self::VALUE_FILTERED])) {
-                $type = self::VALUE_FILTERED;
-            } elseif (!is_null($this->value[self::VALUE_REQUEST])) {
-                $type = self::VALUE_REQUEST;
-            }
-        }
-        return $this->value[$type];
+        return $this->values[$index];
+    }
+
+    public function getValues(){
+        return $this->values;
     }
 
     public function validate()
     {
-        $this->setStatus(self::STATUS_SUCCESS);
-        $value = $this->getValue(self::VALUE_REQUEST);
-        if ($this->required === true) {
-            if (is_null($value) || $value === "") {
-                $this->setStatus(self::STATUS_ERROR, Error::REQUIRED);
-                return $this;
-            }
-        }
-        foreach ($this->validators as $validator) {
-            $result = $validator->validate($value);
-            $this->setStatus($result["status"]);
-            if ($this->getStatus() === self::STATUS_ERROR) {
-                $this->setError($result["code"], $validator->getName());
-                return $this;
+        foreach ($this->values as $value) {
+            foreach ($this->validators as $validator) {
+                $value->validate($validator);
             }
         }
         return $this;
@@ -243,41 +214,12 @@ abstract class AbstractField implements FieldInterface
 
     public function filter()
     {
-        $this->setValue($this->getValue(self::VALUE_REQUEST), self::VALUE_FILTERED);
-        foreach ($this->filters as $filter) {
-            $value = $this->getValue(self::VALUE_FILTERED);
-            $this->setValue($filter->filter($value), self::VALUE_FILTERED);
+        foreach ($this->values as $value) {
+            foreach ($this->filters as $filter) {
+                $value->filter($filter);
+            }
         }
         return $this;
-    }
-
-    private function setStatus($status, $error = null)
-    {
-        $this->status = $status;
-        $this->setError($error);
-        return $this;
-    }
-
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    public function setError($code = null, $validatorName = null)
-    {
-        $this->errorCode = $code;
-        $this->errorValidatorName = $validatorName;
-        return $this;
-    }
-
-    public function getErrorCode()
-    {
-        return $this->errorCode;
-    }
-
-    public function getErrorValidatorName()
-    {
-        return $this->errorValidatorName;
     }
 
     /**
@@ -286,5 +228,25 @@ abstract class AbstractField implements FieldInterface
     public function getJoin()
     {
         return $this->join;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isRequired()
+    {
+        return $this->required;
+    }
+
+    /**
+     * @return ValidatorAbstract[]
+     */
+    public function getValidators()
+    {
+        return $this->validators;
+    }
+
+    protected function initializeValidators()
+    {
     }
 }

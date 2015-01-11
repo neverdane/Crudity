@@ -9,6 +9,7 @@
 namespace Neverdane\Crudity\Form;
 
 use Neverdane\Crudity\Db;
+use Neverdane\Crudity\Field\FieldValue;
 
 class RequestManager
 {
@@ -16,6 +17,10 @@ class RequestManager
      * @var Response
      */
     private $response;
+    /**
+     * @var Request
+     */
+    private $request;
     /**
      * @var Db\Entity[]
      */
@@ -27,33 +32,32 @@ class RequestManager
 
     /**
      * @param Request $request
-     * @param Response $response
-     * @param Db\Entity[] $entities
-     * @param null|Db\Layer\AdapterInterface $dbAdapter
+     * @param null|Response $response
      */
-    public function __construct($request, $response, $entities, $dbAdapter = null)
+    public function __construct($request, $response = null)
     {
-        $this->dbAdapter = $dbAdapter;
-        $this->entities = $entities;
-        $this->response = $response;
-        $this->affectRequest($request);
+        $this->request = $request;
+        $this->response = (!is_null($response)) ? $response : new Response();
     }
 
     /**
-     * Sets the Request object that has to be handled by the Form
-     * @param Request $request
      * @return $this
      */
-    public function affectRequest($request)
+    public function affectRequest()
     {
         // We instantiate the Response that will store the result we want to share to the user
-        $params = $request->getParams();
+        $params = $this->getRequest()->getParams();
         foreach ($this->entities as $entity) {
             $fields = $entity->getFields();
             foreach ($fields as $fieldName => $field) {
-                foreach ($params as $paramName => $value) {
+                foreach ($params as $paramName => $values) {
                     if ($fieldName === $paramName) {
-                        $field->setValue($value);
+                        if (!is_array($values)) {
+                            $values = array($values);
+                        }
+                        foreach ($values as $index => $value) {
+                            $field->setValue(new FieldValue($value), $index);
+                        }
                     }
                 }
             }
@@ -106,8 +110,8 @@ class RequestManager
             foreach ($fields as $fieldName => $field) {
                 if (!is_null($field->getJoin())) {
                     $join = $field->getJoin();
-                    if (isset($entitiesIds[$join])) {
-                        $joinValue = $entitiesIds[$join];
+                    if (isset($entitiesIds[$join][0])) {
+                        $joinValue = $entitiesIds[$join][0];
                         $field->setValue($joinValue);
                     }
                 }
@@ -156,6 +160,31 @@ class RequestManager
     {
         $this->dbAdapter = $dbAdapter;
         return $this;
+    }
+
+    /**
+     * @return Response
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param Db\Entity[] $entities
+     */
+    public function setEntities($entities)
+    {
+        $this->entities = $entities;
+        $this->affectRequest();
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
 }

@@ -5,16 +5,14 @@ namespace Neverdane\Crudity\Db;
 use Neverdane\Crudity\Error;
 use Neverdane\Crudity\Field\AbstractField;
 use Neverdane\Crudity\Field\FieldInterface;
+use Neverdane\Crudity\Field\FieldValue;
 use Neverdane\Crudity\Form\Response;
 
 class Entity
 {
 
-    const DEFAULT_NAME = 'default';
-
     private $name;
     private $entity;
-    private $dependencies = null;
     private $fieldNames = null;
     private $defaultValues = array();
     private $fields = array();
@@ -36,19 +34,6 @@ class Entity
     public function setEntity($entity)
     {
         $this->entity = $entity;
-        return $this;
-    }
-
-    /**
-     * @param null|array $dependencies
-     * @return $this
-     */
-    public function setDependencies($dependencies = null)
-    {
-        $this->dependencies = $dependencies;
-        foreach ($dependencies as $dependency) {
-
-        }
         return $this;
     }
 
@@ -163,24 +148,27 @@ class Entity
         // We get all the fields we have to validate
         $fields = $this->getFields();
         foreach ($fields as $field) {
-            // We validate each field and we get its status
-            $fieldStatus = $field->validate()->getStatus();
-            if ($fieldStatus !== AbstractField::STATUS_SUCCESS) {
-                // If the validation fail, we set the response status to error
-                $response->setStatus(Response::STATUS_ERROR);
-                // We construct the error message that will be displayed to the user
-                $message = Error::getMessage(
-                    $field->getErrorCode(),
-                    $errorMessages,
-                    $field->getName(),
-                    $field->getErrorValidatorName(),
-                    $placeholders = array(
-                        "value" => $field->getValue(),
-                        "fieldName" => $field->getName()
-                    )
-                );
-                // Then we add the error message for this field to the response
-                $response->addError($field->getErrorCode(), $message, $field->getName());
+            $values = $field->getValues();
+            foreach ($values as $index => $value) {
+                // We validate each field and we get its status
+                $fieldStatus = $value->validate($field->isRequired(), $field->getValidators())->getStatus();
+                if ($fieldStatus !== FieldValue::STATUS_SUCCESS) {
+                    // If the validation fail, we set the response status to error
+                    $response->setStatus(Response::STATUS_ERROR);
+                    // We construct the error message that will be displayed to the user
+                    $message = Error::getMessage(
+                        $value->getErrorCode(),
+                        $errorMessages,
+                        $field->getName(),
+                        $value->getErrorValidatorName(),
+                        $placeholders = array(
+                            'value' => $value->getValue(),
+                            'fieldName' => $field->getName()
+                        )
+                    );
+                    // Then we add the error message for this field to the response
+                    $response->addError($value->getErrorCode(), $message, $field->getName(), $index);
+                }
             }
         }
         return $this;
@@ -200,23 +188,37 @@ class Entity
 
     /**
      * @param Db $db
+     * @return array
      */
     public function create($db)
     {
-        $values = $this->getValues();
-        $rowIds = $db->createRow($this, $values);
+        $rows = $this->getRowValues();
+        $rowIds = array();
+        foreach ($rows as $index => $rowValues) {
+            $rowIds[$index] = $db->createRow($this->getEntity(), $rowValues);
+        }
         return $rowIds;
     }
 
     /**
      * @return array
      */
-    private function getValues()
+    private function getRowValues()
     {
         $data = array();
         $fields = $this->getFields();
+        $rowCount = 0;
         foreach ($fields as $fieldName => $field) {
-            $data[$field->getName()] = $field->getValue();
+            $rowCount = count($field->getValues());
+            break;
+        }
+        for ($i = 0; $i < $rowCount; $i++) {
+            $data[$i] = array();
+            foreach ($fields as $fieldName => $field) {
+                $rowCount = count($field->getValues());
+                $value = $field->getValue($i);
+                $data[$i][$field->getName()] = $value->getValue();
+            }
         }
         return $data;
     }

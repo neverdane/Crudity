@@ -2,7 +2,7 @@
 namespace Neverdane\Crudity\Exception;
 
 
-class Exception extends \Exception
+class CrudityException extends \Exception
 {
     /**
      * @var null|\Exception
@@ -63,7 +63,7 @@ class Exception extends \Exception
     /**
      * Returns previous Exception
      *
-     * @return Exception|null
+     * @return \Exception|null
      */
     protected function _getPrevious()
     {

@@ -10,7 +10,6 @@ class Registry
     const NAMESPACE_FORM = "Forms";
 
     /**
-     * @param $id
      * @param Form $form
      */
     public function storeForm($form)

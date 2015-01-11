@@ -55,14 +55,14 @@ class Response
         exit();
     }
 
-    public function addError($code, $message, $fieldName = null)
+    public function addError($code, $message, $fieldName = null, $index = 0)
     {
         $error = array(
             'code' => $code,
             'message' => $message
         );
         if (!is_null($fieldName)) {
-            $this->errors['fields'][$fieldName] = $error;
+            $this->errors['fields'][$fieldName][$index] = $error;
         } else {
             $this->errors['global'] = $error;
         }

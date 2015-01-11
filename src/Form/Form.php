@@ -189,6 +189,8 @@ class Form
      * @return $this
      */
     public function setRequestManager($requestManager){
+        $requestManager->setEntities($this->getEntities());
+        $requestManager->setDbAdapter($this->getDbAdapter());
         $this->requestManager = $requestManager;
         return $this;
     }

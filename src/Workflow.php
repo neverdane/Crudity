@@ -24,7 +24,13 @@ class Workflow
     const EVENT_READ_AFTER = "postRead";
     const EVENT_SEND_BEFORE = "preSend";
 
+    /**
+     * @var Form|null
+     */
     private $form = null;
+    /**
+     * @var null|RequestManager
+     */
     private $requestManager;
 
     /**
@@ -40,8 +46,8 @@ class Workflow
         if ($this->form->isWorkflowOpened()) {
             Error::initialize();
             $this->notify(self::EVENT_VALIDATION_BEFORE);
-            $this->requestManager->validate();
-            if (Response::STATUS_ERROR === $this->form->getResponse()->getStatus()) {
+            $this->form->getRequestManager()->validate();
+            if (Response::STATUS_ERROR === $this->form->getRequestManager()->getResponse()->getStatus()) {
                 $this->form->closeWorkflow();
             }
             $this->notify(self::EVENT_VALIDATION_AFTER);
@@ -52,7 +58,7 @@ class Workflow
     {
         if ($this->form->isWorkflowOpened()) {
             $this->notify(self::EVENT_FILTER_BEFORE);
-            $this->requestManager->filter();
+            $this->form->getRequestManager()->filter();
             $this->notify(self::EVENT_FILTER_AFTER);
         }
     }
@@ -77,7 +83,7 @@ class Workflow
     {
         if ($this->form->isWorkflowOpened()) {
             $this->notify(self::EVENT_CREATE_BEFORE);
-            $this->requestManager->create();
+            $this->form->getRequestManager()->create();
             $this->notify(self::EVENT_CREATE_AFTER);
         }
     }
@@ -112,7 +118,7 @@ class Workflow
     private function send()
     {
         $this->notify(self::EVENT_SEND_BEFORE);
-        $this->form->getResponse()->send();
+        $this->form->getRequestManager()->getResponse()->send();
     }
 
     private function notify($event)
@@ -126,12 +132,10 @@ class Workflow
 
     public function start()
     {
-        $action = $this->form->getRequest()->getAction();
-        $this->requestManager = new RequestManager($this->form->getRequest(), $this->form->getResponse(), $this->form->getEntities(), $this->form->getDbAdapter());
-
+        $action = $this->form->getRequestManager()->getRequest()->getAction();
         switch ($action) {
             default:
-                $this->form->getRequest()->setAction(Request::ACTION_CUSTOM);
+                $this->form->getRequestManager()->getRequest()->setAction(Request::ACTION_CUSTOM);
             case Request::ACTION_CUSTOM :
                 $this->validate();
                 $this->filter();

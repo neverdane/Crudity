@@ -11,7 +11,7 @@
 
 namespace Neverdane\Crudity\Form\Parser;
 
-use Neverdane\Crudity\Db\Entity;
+use Neverdane\Crudity\Exception\Exception;
 use Neverdane\Crudity\Field\FieldHandler;
 use Neverdane\Crudity\Field\FieldInterface;
 
@@ -52,7 +52,6 @@ class Parser
     private $formattedHtml = null;
     private $fieldHandler = null;
     private $entities = null;
-    private $defaultEntityName = null;
 
     public static function setPrefix($prefix = self::PREFIX_DEFAULT)
     {
@@ -62,18 +61,13 @@ class Parser
 
     /**
      * @param string $html
-     * @param null|string $defaultEntityName
      * @param FieldHandler $fieldHandler
      */
-    public function __construct($html, $defaultEntityName = null, $fieldHandler = null)
+    public function __construct($html, $fieldHandler = null)
     {
         // The Field Handler only purpose is to set the fields that will be identified by the Form Parser
         $this->fieldHandler = (!is_null($fieldHandler)) ? $fieldHandler : new FieldHandler();
         $this->html = $html;
-        if (is_null($defaultEntityName)) {
-            $defaultEntityName = Entity::DEFAULT_NAME;
-        }
-        $this->defaultEntityName = $defaultEntityName;
     }
 
     /**
@@ -108,14 +102,23 @@ class Parser
     /**
      * Returns for each given fields occurrence its Field instance
      * @param array $occurrences
+     * @param null|string $defaultEntityName
+     * @throws Exception
      * @return array
      */
-    private function getEntitiesDataByOccurrences($occurrences)
+    private function getEntitiesDataByOccurrences($occurrences, $defaultEntityName = null)
     {
         $entities = array();
         foreach ($occurrences as $occurrence) {
             $fieldParams = $this->getFieldParams($occurrence);
             $entityName = $fieldParams['params']['entityName'];
+            unset($fieldParams['params']['entityName']);
+            if (is_null($entityName)) {
+                if (is_null($defaultEntityName)) {
+                    throw new Exception('The default Entity name must be given.');
+                }
+                $entityName = $defaultEntityName;
+            }
             if (!isset($entities[$entityName])) {
                 $entities[$entityName] = array('fields' => array());
             }
@@ -192,7 +195,7 @@ class Parser
     {
         $filteredOccurrences = array();
         foreach ($occurrences as $occurrence) {
-            if ($this->getAdapter()->isFieldRelevant($occurrence)) {
+            if ($this->isFieldRelevant($occurrence)) {
                 $filteredOccurrences[] = $occurrence;
             }
         }
@@ -211,9 +214,11 @@ class Parser
     /**
      * Returns the Fields instances extracted from the set html
      * They are also stored in the instance
+     * @param null|string $defaultEntityName
+     * @throws Exception
      * @return array
      */
-    public function getEntitiesData()
+    public function getEntitiesData($defaultEntityName = null)
     {
         if (is_null($this->entities)) {
             // We ask our adapter to get back all the fields in an array
@@ -221,7 +226,7 @@ class Parser
             // which is the only one that can work with them
             $fieldsOccurrences = $this->getFieldsOccurrences();
             // It's time to convert this occurrence to Crudity fields instances, let's do it
-            $this->entities = $this->getEntitiesDataByOccurrences($fieldsOccurrences);
+            $this->entities = $this->getEntitiesDataByOccurrences($fieldsOccurrences, $defaultEntityName);
         }
         return $this->entities;
     }
@@ -294,11 +299,16 @@ class Parser
     }
 
     /**
-     * @return null|string
+     * @param mixed $occurrence
+     * @return bool
      */
-    public function getDefaultEntityName()
+    private function isFieldRelevant($occurrence)
     {
-        return $this->defaultEntityName;
+        // We test if the current field analyzed is a Crudity functional field in the aim to not manage them
+        // We reject the submit buttons and the inputs that have cr-excluded attribute
+        return ($this->getAdapter()->getAttribute($occurrence, 'type') === "submit"
+            || !is_null($this->getAdapter()->getAttribute($occurrence, self::$prefix . "-excluded"))
+        );
     }
 
 }

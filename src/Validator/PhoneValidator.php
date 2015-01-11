@@ -1,10 +1,10 @@
 <?php
 namespace Neverdane\Crudity\Validator;
 
-class ValidatorPhone extends ValidatorAbstract
+class PhoneValidator extends AbstractValidator
 {
 
-    protected $regex = "([0-9]+[ .-+()])*[0-9]+";
+    protected $regex = '/^([0-9\(\)\/\+ \-]*)$/';
 
     protected function check($input)
     {

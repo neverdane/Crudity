@@ -65,16 +65,21 @@
 
                 function handleErrors(errors, params) {
                     // We handle the potential errors display
-                    $.each(errors.fields, function (idx, error) {
-                        var $guilt = $form.find("[name='" + idx + "']");
-                        if (params.errorHighlighted) {
-                            $guilt.addClass("cr-guilt--highlight");
-                        }
-                        if (params.errorGrouped === false) {
-                            $guilt.crDisplayError(error.message, "");
-                        } else {
-                            showGlobalError(error.message);
-                        }
+                    $.each(errors.fields, function (fieldName, rows) {
+                        $.each(rows, function (index, error) {
+                            var $guilt = $form.find("[name='" + fieldName + "']").eq(index);
+                            if($guilt.length === 0) {
+                                $guilt = $form.find("[name^='" + fieldName + "[']").eq(index);
+                            }
+                            if (params.errorHighlighted) {
+                                $guilt.addClass("cr-guilt--highlight");
+                            }
+                            if (params.errorGrouped === false) {
+                                $guilt.crDisplayError(error.message, "");
+                            } else {
+                                showGlobalError(error.message);
+                            }
+                        });
                     });
                 }
 

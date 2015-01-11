@@ -1,7 +1,7 @@
 <?php
 namespace Neverdane\Crudity\Validator;
 
-class ValidatorEmail extends ValidatorAbstract
+class EmailValidator extends AbstractValidator
 {
 
     protected function check($input)

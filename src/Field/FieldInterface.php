@@ -12,21 +12,23 @@ Interface FieldInterface
     public function getName();
 
     /**
-     * @return $this
+     * @param int $index
+     * @return FieldValue
      */
-    public function validate();
+    public function getValue($index = 0);
 
-    public function getStatus();
+    public function setValue($value, $index = 0);
 
-    public function getErrorCode();
-
-    public function getErrorValidatorName();
-
-    public function getValue();
-
-    public function setValue($value, $type = null);
+    /**
+     * @return FieldValue[]
+     */
+    public function getValues();
 
     public function filter();
 
     public function getJoin();
+
+    public function isRequired();
+
+    public function getValidators();
 }

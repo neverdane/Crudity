@@ -63,13 +63,13 @@ class Db
     }
 
     /**
-     * @param Entity $entity
+     * @param mixed $entity
      * @param array $data
      * @return mixed
      */
     public function createRow($entity, $data)
     {
-        return $this->getAdapter()->createRow($entity->getEntity(), $data);
+        return $this->getAdapter()->createRow($entity, $data);
     }
 
     public function updateRow($table, $id, $data)
@@ -82,55 +82,4 @@ class Db
         return $this->getAdapter()->deleteRow($table, $id);
     }
 
-    private function prioritizeEntities($entities)
-    {
-        $madeEntities = array();
-        $sortedEntities = array();
-        /** @var Entity $entity */
-        while (count($entities) > 0) {
-            foreach ($entities as $entityIndex => $entity) {
-                $dependencies = $entity->getDependencies();
-                $wait = false;
-                if (!is_null($dependencies)) {
-                    foreach ($dependencies as $dependency) {
-                        if (!in_array($dependency, $madeEntities)) {
-                            $wait = true;
-                            break;
-                        }
-                    }
-                }
-                if (false === $wait) {
-                    $madeEntities[] = $entity->getName();
-                    $sortedEntities[] = $entity;
-                    unset($entities[$entityIndex]);
-                }
-            }
-        }
-        return $sortedEntities;
-    }
-
-    /**
-     * @param array $data
-     * @param Entity $entity
-     * @param array $supportingEntities
-     */
-    public function distributeDataOverEntities($data, $entity, $supportingEntities = array())
-    {
-        $fieldsDistribution = array();
-        /** @var Entity $supportingEntity */
-        foreach ($supportingEntities as $supportingEntity) {
-            $entityName = $supportingEntity->getName();
-            $fieldsDistribution[$entityName] = array();
-            $fields = $supportingEntity->getFieldNames();
-            foreach ($fields as $field => $value) {
-                if (isset($data[$field])) {
-                    $fieldsDistribution[$entityName][$field] = $data[$field];
-                    unset($data[$field]);
-                } else {
-                    $fieldsDistribution[$entityName][$field] = $supportingEntity->getDefaultValue($field);
-                }
-            }
-        }
-        return $fieldsDistribution;
-    }
 }

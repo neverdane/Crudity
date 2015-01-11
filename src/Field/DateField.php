@@ -1,21 +1,22 @@
 <?php
 namespace Neverdane\Crudity\Field;
 
-use Neverdane\Crudity\Validator\EmailValidator;
+use Neverdane\Crudity\Validator\DateValidator;
 
-class EmailField extends AbstractField implements FieldInterface {
+class DateField extends AbstractField implements FieldInterface {
 
     protected function initializeValidators()
     {
         $this->validators = array(
-            new EmailValidator()
+            new DateValidator()
         );
     }
+
     public static function getIdentifiers() {
         return array(
             "tagName"       => "input",
             "attributes"    => array(
-                "type"  => "email"
+                "type"  => "date"
             )
         );
     }

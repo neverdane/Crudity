@@ -3,7 +3,7 @@ namespace Neverdane\Crudity\Validator;
 
 use Neverdane\Crudity\Error;
 
-abstract class ValidatorAbstract
+abstract class AbstractValidator
 {
 
     public function getName()
@@ -36,10 +36,7 @@ abstract class ValidatorAbstract
         return $this->reject();
     }
 
-    protected function check($input)
-    {
-        return $this->reject();
-    }
+    abstract protected function check($input);
 
     protected function testRegex($regex, $input)
     {

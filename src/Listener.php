@@ -12,23 +12,24 @@ class Listener
     /**
      * @param null|Registry $registry
      */
-    public static function listen($registry = null) {
+    public function listen($registry = null)
+    {
         $registry = (!is_null($registry)) ? $registry : new Registry();
         // We get the submitted params if any
-        $requestParams = self::getRequestParams();
+        $requestParams = $this->getRequestParams();
         // If we detect that a Crudity Form has been submitted (a crudity Form Id has been launched)
-        if (self::wasCrudityFormSubmitted($requestParams)) {
+        if ($this->wasCrudityFormSubmitted($requestParams)) {
             // We let the adapter search for the instance of the declared Form in config with the submitted id if any
             $submittedForm = $registry->getForm($requestParams["id"]);
             // If a Form has been founded
             if (!is_null($submittedForm)) {
                 /** @var Form $submittedForm */
-                $requestManager = new RequestManager(new Request($requestParams), new Response(), $submittedForm->getEntities(), $submittedForm->getDbAdapter());
+                $requestManager = new RequestManager(new Request($requestParams));
                 $submittedForm->setRequestManager($requestManager);
                 $workflow = new Workflow($submittedForm);
                 $workflow->start();
             } else {
-                // If no declared Form has been founded with this id
+                // If no declared Form has been found with this id
             }
         }
     }
@@ -40,7 +41,7 @@ class Listener
      *  ["row_id"]  => (string) The optional Row Id to affect or read if action is read, update or delete
      *  ["params"]  => (array)  All other params submitted
      */
-    private static function getRequestParams()
+    private function getRequestParams()
     {
         $userParams = $_POST;
         // We initialize the params
@@ -74,7 +75,7 @@ class Listener
      * @param array $requestParams
      * @return bool
      */
-    private static function wasCrudityFormSubmitted($requestParams)
+    private function wasCrudityFormSubmitted($requestParams)
     {
         return !is_null($requestParams["id"]);
     }

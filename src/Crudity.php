@@ -11,35 +11,42 @@
 
 namespace Neverdane\Crudity;
 
-use Neverdane\Crudity\Db\Entity;
-use Neverdane\Crudity\Field\FieldInterface;
+use Neverdane\Crudity\Db\EntityFactory;
+use Neverdane\Crudity\Field\FieldFactory;
 use Neverdane\Crudity\Form\Form;
 use Neverdane\Crudity\Form\Parser\Parser;
 use Neverdane\Crudity\Form\View;
 
 /**
+ * This class is a Facade that eases manipulation
  * @package Neverdane\Crudity
  * @author Alban Pommeret <alban@aocreation.com>
  */
 class Crudity
 {
-    public static function listen()
+    /**
+     * Triggers the listening of the Request
+     * @param null|Registry $registry
+     */
+    public static function listen($registry = null)
     {
-        Listener::listen();
+        $listener = new Listener();
+        $listener->listen($registry);
     }
 
     /**
      * Creates an instance of Form
-     * By parsing the file given and returns it
+     * By parsing the given file and returns it
      *
      * @param string $file
      *  The path to the file
      * @param null|string $defaultEntityName
+     *  The entity name that will be used when no entity was set on the Field
      * @return Form
      */
-    public static function createFromFile($file = null, $defaultEntityName = null)
+    public static function createFromFile($file, $defaultEntityName = null)
     {
-        //  we store the file content into a variable
+        // We store the file content into a variable
         $html = Helper::getFileAsVariable($file);
         return self::createForm($html, $defaultEntityName);
     }
@@ -55,34 +62,24 @@ class Crudity
      */
     public static function createForm($html, $defaultEntityName = null)
     {
+        $entityFactory = new EntityFactory();
+        $fieldFactory = new FieldFactory();
         // We instantiate a FormParser in order to extract required data to build the Crudity Form
-        $formParser = new Parser($html, $defaultEntityName);
-        // We get the form attribute id
+        $formParser = new Parser($html);
+
+        // We get the attribute id of the form
         $formId = $formParser->getId();
-        // We get all the detected fields instances
-        $entitiesData = $formParser->getEntitiesData();
-        $entities = array();
-        foreach ($entitiesData as $entityName => $entityData) {
-            $entity = new Entity($entityName);
-            $entity->setEntity($entityName);
-            $fields = array();
-            foreach ($entityData['fields'] as $fieldData) {
-                $fieldType = $fieldData['type'];
-                /** @var FieldInterface $field */
-                $field = new $fieldType($fieldData['params']);
-                $fields[$field->getName()] = $field;
-            }
-            $entity->setFields($fields);
-            $entities[$entity->getName()] = $entity;
-        }
+        // We get all the detected entities and their fields data
+        $entitiesData = $formParser->getEntitiesData($defaultEntityName);
         // We get the html which will be rendered
         $formattedHtml = $formParser->getFormattedHtml();
 
+        // We create the Entities and their Fields according to the parsed data
+        $entities = $entityFactory->createEntities($entitiesData, $fieldFactory);
         // We give the FormView its render
         $formView = new View($formattedHtml);
 
-        // We finally create the Crudity Form and give to it its id, the FieldManager and the FormView instances
-        // Then, we store the Crudity Form into session
+        // We finally create the Crudity Form and set its id, its Entities and its View instances
         $form = new Form();
         $form->setId($formId)
             ->setEntities($entities)

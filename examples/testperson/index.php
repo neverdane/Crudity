@@ -14,34 +14,23 @@ require "TestFormObserver.php";
 use Neverdane\Crudity\Crudity;
 use Neverdane\Crudity\Db;
 use Neverdane\Crudity\Field;
-$loader = new Twig_Loader_Array(array(
-    'index.html' => 'Hello {{ name }}!',
-));
-$twig = new Twig_Environment($loader);
 
 $registry = new \Neverdane\Crudity\Registry();
 $pdo = new PDO('mysql:host=localhost;dbname=crudity', 'root', '');
 Db\Db::registerAdapter('pdo', new Db\Layer\PdoAdapter($pdo));
 \Neverdane\Crudity\Listener::listen();
 
-$form = Crudity::createFromFile("form.php", 'user');
-$form->setErrorMessages(array(
-    "Fields" => array(
-        "first_name" => array(
-            \Neverdane\Crudity\Error::REQUIRED => "{{name}} ne semble pas être renseigné."
-        )
-    )
-));
-$form->addObserver(new TestFormObserver());
+$form = Crudity::createFromFile("form.php", 'person');
 
-$contactField = new Field\TextField(array('name' => 'contact_id', 'join' => 'contact'));
-$form->getEntity('user')->setField($contactField);
+$personField = new Field\TextField(array('name' => 'person_id', 'join' => 'person'));
+$form->getEntity('taste')->setField($personField);
 
 $registry->storeForm($form);
 
 ?>
 <html>
 <head>
+    <meta charset="UTF-8">
     <link rel="stylesheet" href="/public/crudity/css/crudity.css">
 </head>
 <body>

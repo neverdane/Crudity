@@ -69,25 +69,6 @@ class PhpQueryAdapter implements AdapterInterface
     }
 
     /**
-     * Returns if the given field occurrence can be handled by Crudity
-     * @param mixed $occurrence
-     * @return bool
-     */
-    public function isFieldRelevant($occurrence)
-    {
-        // We transform the element as a phpQuery object
-        $pqo = pq($occurrence);
-        // We test if the current field analyzed is a Crudity functional field in the aim to not manage them
-        // We reject the submit buttons and the inputs that have cr-excluded attribute
-        if ($pqo->attr("type") === "submit"
-            || !is_null($pqo->attr(Parser::$prefix . "-excluded"))
-        ) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Returns the tag name of the given occurrence
      * @param mixed $occurrence
      * @return null|string
