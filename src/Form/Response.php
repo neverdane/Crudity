@@ -45,14 +45,17 @@ class Response
 
     public function send()
     {
-        echo json_encode(
-            array(
-                'status' => $this->status,
-                'errors' => $this->errors,
-                'params' => $this->params
-            )
-        );
+        echo json_encode($this->getResponse());
         exit();
+    }
+
+    public function getResponse()
+    {
+        return array(
+            'status' => $this->status,
+            'errors' => $this->errors,
+            'params' => $this->params
+        );
     }
 
     public function addError($code, $message, $fieldName = null, $index = 0)

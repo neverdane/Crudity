@@ -20,4 +20,4 @@ $field->setValue(new FieldValue('neverdane@hotmail.com'), 1);
 $field->setValue(new FieldValue('neverdanevdhotmail.com'), 2);
 $response = new Response();
 $field->validate($response);
-$response->send();
+var_dump($response->getResponse());
