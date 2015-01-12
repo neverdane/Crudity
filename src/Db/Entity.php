@@ -3,7 +3,6 @@
 namespace Neverdane\Crudity\Db;
 
 use Neverdane\Crudity\Error;
-use Neverdane\Crudity\Field\AbstractField;
 use Neverdane\Crudity\Field\FieldInterface;
 use Neverdane\Crudity\Field\FieldValue;
 use Neverdane\Crudity\Form\Response;

@@ -22,7 +22,7 @@ $twig = new Twig_Environment($loader);
 $registry = new \Neverdane\Crudity\Registry();
 $pdo = new PDO('mysql:host=localhost;dbname=crudity', 'root', '');
 Db\Db::registerAdapter('pdo', new Db\Layer\PdoAdapter($pdo));
-\Neverdane\Crudity\Listener::listen();
+Crudity::listen();
 
 $form = Crudity::createFromFile("form.php", 'user');
 $form->setErrorMessages(array(

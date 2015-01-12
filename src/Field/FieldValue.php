@@ -2,7 +2,7 @@
 namespace Neverdane\Crudity\Field;
 
 use Neverdane\Crudity\Error;
-use Neverdane\Crudity\Validator\ValidatorAbstract;
+use Neverdane\Crudity\Validator\AbstractValidator;
 
 class FieldValue
 {
@@ -62,7 +62,7 @@ class FieldValue
                 return $this;
             }
         }
-        /** @var ValidatorAbstract $validator */
+        /** @var AbstractValidator $validator */
         foreach ($validators as $validator) {
             $result = $validator->validate($value);
             if(false === $result['success']) {
