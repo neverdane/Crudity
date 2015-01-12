@@ -23,16 +23,13 @@ class Request
     const ACTION_UPDATE = "update";
     const ACTION_DELETE = "delete";
 
-    const PARAMS_REQUEST = "request";
-    const PARAMS_FILTERED = "filtered";
-
     private $action = null;
     private $rowId = null;
-    private $params = array(
-        self::PARAMS_REQUEST => null,
-        self::PARAMS_FILTERED => null
-    );
+    private $params = array();
 
+    /**
+     * @param null|array $requestParams
+     */
     public function __construct($requestParams = null)
     {
         if (isset($requestParams["action"])) {
@@ -46,44 +43,70 @@ class Request
         }
     }
 
+    /**
+     * Sets the action requested
+     *
+     * @param string $action
+     * @return $this
+     */
     public function setAction($action)
     {
         $this->action = $action;
         return $this;
     }
 
+    /**
+     * Sets the rowId requested if any
+     *
+     * @param int $rowId
+     * @return $this
+     */
     public function setRowId($rowId)
     {
         $this->rowId = $rowId;
         return $this;
     }
 
-    public function setParams($params, $type = self::PARAMS_REQUEST)
+    /**
+     * Sets the sent params
+     *
+     * @param array $params
+     * @return $this
+     */
+    public function setParams($params)
     {
-        $this->params[$type] = $params;
+        $this->params = $params;
         return $this;
     }
 
+    /**
+     * Returns the action requested
+     *
+     * @return null|string
+     */
     public function getAction()
     {
         return $this->action;
     }
 
+    /**
+     * Returns the row id if any
+     *
+     * @return null|string
+     */
     public function getRowId()
     {
         return $this->rowId;
     }
 
-    public function getParams($type = null)
+    /**
+     * Returns the sent params
+     *
+     * @return array
+     */
+    public function getParams()
     {
-        if (is_null($type)) {
-            if (!is_null($this->params[self::PARAMS_FILTERED])) {
-                $type = self::PARAMS_FILTERED;
-            } elseif (!is_null($this->params[self::PARAMS_REQUEST])) {
-                $type = self::PARAMS_REQUEST;
-            }
-        }
-        return $this->params[$type];
+        return $this->params;
     }
 
 }
