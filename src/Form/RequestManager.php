@@ -81,7 +81,7 @@ class RequestManager
     }
 
     /**
-     * Validates the value set on each Field and sets a matching Response
+     * Validates the value set on each Field of each Entity and affects the Response
      * @param array $errorMessages
      * @return $this
      */

@@ -138,6 +138,8 @@ class Entity
     }
 
     /**
+     * Validates the value set on each Field and affects the Response
+     *
      * @param Response $response
      * @param array $errorMessages
      * @return $this

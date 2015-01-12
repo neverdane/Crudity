@@ -207,6 +207,8 @@ abstract class AbstractField implements FieldInterface
     }
 
     /**
+     * Validates the value set and affects the Response
+     *
      * @param Response $response
      * @param array $errorMessages
      * @return $this
