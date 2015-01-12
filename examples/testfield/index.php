@@ -21,3 +21,9 @@ $field->setValue(new FieldValue('neverdanevdhotmail.com'), 2);
 $response = new Response();
 $field->validate($response);
 var_dump($response->getResponse());
+
+$value = new FieldValue('neverdane@hotmail.com');
+$value->validate(false, array(
+    new \Neverdane\Crudity\Validator\EmailValidator()
+));
+var_dump($value->getStatus());
