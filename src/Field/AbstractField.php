@@ -218,8 +218,8 @@ abstract class AbstractField implements FieldInterface
         $values = $this->getValues();
         foreach ($values as $index => $value) {
             // We validate each field and we get its status
-            $fieldStatus = $value->validate($this->isRequired(), $this->getValidators())->getStatus();
-            if ($fieldStatus !== FieldValue::STATUS_SUCCESS) {
+            $valueStatus = $value->validate($this->isRequired(), $this->getValidators())->getStatus();
+            if ($valueStatus !== FieldValue::STATUS_SUCCESS) {
                 // If the validation fails, we set the response status to error
                 $response->setStatus(Response::STATUS_ERROR);
                 // We construct the error message that will be displayed to the user
