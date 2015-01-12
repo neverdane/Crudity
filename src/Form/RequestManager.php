@@ -42,6 +42,7 @@ class RequestManager
         $this->request = $request;
         $this->form = $form;
         $this->response = (!is_null($response)) ? $response : new Response();
+        $this->affectRequest();
     }
 
     /**
