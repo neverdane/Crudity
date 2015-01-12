@@ -1,7 +1,9 @@
 <?php
 namespace Neverdane\Crudity\Field;
 
+use Neverdane\Crudity\Error;
 use Neverdane\Crudity\Form\Parser\Parser;
+use Neverdane\Crudity\Form\Response;
 use Neverdane\Crudity\Validator\AbstractValidator;
 
 abstract class AbstractField implements FieldInterface
@@ -204,11 +206,33 @@ abstract class AbstractField implements FieldInterface
         return $this->values;
     }
 
-    public function validate()
+    /**
+     * @param Response $response
+     * @param array $errorMessages
+     * @return $this
+     */
+    public function validate($response, $errorMessages = array())
     {
-        foreach ($this->getValues() as $value) {
-            foreach ($this->validators as $validator) {
-                $value->validate($validator);
+        $values = $this->getValues();
+        foreach ($values as $index => $value) {
+            // We validate each field and we get its status
+            $fieldStatus = $value->validate($this->isRequired(), $this->getValidators())->getStatus();
+            if ($fieldStatus !== FieldValue::STATUS_SUCCESS) {
+                // If the validation fails, we set the response status to error
+                $response->setStatus(Response::STATUS_ERROR);
+                // We construct the error message that will be displayed to the user
+                $message = Error::getMessage(
+                    $value->getErrorCode(),
+                    $errorMessages,
+                    $this->getName(),
+                    $value->getErrorValidatorName(),
+                    $placeholders = array(
+                        'value' => $value->getValue(),
+                        'fieldName' => $this->getName()
+                    )
+                );
+                // Then we add the error message for this field to the response
+                $response->addError($value->getErrorCode(), $message, $this->getName(), $index);
             }
         }
         return $this;

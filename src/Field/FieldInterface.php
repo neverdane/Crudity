@@ -31,4 +31,6 @@ Interface FieldInterface
     public function isRequired();
 
     public function getValidators();
+
+    public function validate($response, $errorMessages = array());
 }

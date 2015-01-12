@@ -147,28 +147,7 @@ class Entity
         // We get all the fields we have to validate
         $fields = $this->getFields();
         foreach ($fields as $field) {
-            $values = $field->getValues();
-            foreach ($values as $index => $value) {
-                // We validate each field and we get its status
-                $fieldStatus = $value->validate($field->isRequired(), $field->getValidators())->getStatus();
-                if ($fieldStatus !== FieldValue::STATUS_SUCCESS) {
-                    // If the validation fail, we set the response status to error
-                    $response->setStatus(Response::STATUS_ERROR);
-                    // We construct the error message that will be displayed to the user
-                    $message = Error::getMessage(
-                        $value->getErrorCode(),
-                        $errorMessages,
-                        $field->getName(),
-                        $value->getErrorValidatorName(),
-                        $placeholders = array(
-                            'value' => $value->getValue(),
-                            'fieldName' => $field->getName()
-                        )
-                    );
-                    // Then we add the error message for this field to the response
-                    $response->addError($value->getErrorCode(), $message, $field->getName(), $index);
-                }
-            }
+            $field->validate($response, $errorMessages);
         }
         return $this;
     }
@@ -177,7 +156,8 @@ class Entity
      * @return $this
      */
     public function filter()
-    {   // We get all the fields we have to validate
+    {
+        // We get all the fields we have to filter
         $fields = $this->getFields();
         foreach ($fields as $field) {
             $field->filter();

@@ -49,20 +49,28 @@ class RequestManager
     }
 
     /**
+     * Affects the sent values of the set request on each matching field of the set Form
+     *
      * @return $this
      */
     public function affectRequest()
     {
         $params = $this->getRequest()->getParams();
+        // We get all the entities of the Form
         foreach ($this->getForm()->getEntities() as $entity) {
+            // And all their Fields
             $fields = $entity->getFields();
             foreach ($fields as $fieldName => $field) {
                 foreach ($params as $paramName => $values) {
+                    // We check if a sent param matches this field
                     if ($fieldName === $paramName) {
+                        // We uniform the sent values,
+                        // we process the data as a full row so a field can embed multiple value foreach row
                         if (!is_array($values)) {
                             $values = array($values);
                         }
                         foreach ($values as $index => $value) {
+                            // We set the value on the Field and send its index
                             $field->setValue(new FieldValue($value), $index);
                         }
                     }
