@@ -25,6 +25,7 @@ class RequestManager
     private $response = null;
     /**
      * @var Form
+     * Instance of the Form we work with
      */
     private $form;
     /**
@@ -32,6 +33,7 @@ class RequestManager
      * Tells if the workflow for this RequestManager must be stopped or not
      */
     private $openedWorkflow = true;
+
     /**
      * @param Request $request
      * @param Form $form
@@ -42,6 +44,7 @@ class RequestManager
         $this->request = $request;
         $this->form = $form;
         $this->response = (!is_null($response)) ? $response : new Response();
+        // We affect the request values to the Form fields
         $this->affectRequest();
     }
 
@@ -50,7 +53,6 @@ class RequestManager
      */
     public function affectRequest()
     {
-        // We instantiate the Response that will store the result we want to share to the user
         $params = $this->getRequest()->getParams();
         foreach ($this->getForm()->getEntities() as $entity) {
             $fields = $entity->getFields();
