@@ -30,7 +30,7 @@ class Request
     private $rowId = null;
     private $params = array(
         self::PARAMS_REQUEST => null,
-        self::PARAMS_FILTERED => null,
+        self::PARAMS_FILTERED => null
     );
 
     public function __construct($requestParams = null)
