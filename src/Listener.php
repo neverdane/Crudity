@@ -8,7 +8,10 @@ class Listener
 {
 
     /**
+     * Listens to the potential Crudity data sent and triggers the requested action if any
+     *
      * @param null|Registry $registry
+     * @return $this
      */
     public function listen($registry = null)
     {
@@ -19,7 +22,7 @@ class Listener
         if ($this->wasCrudityFormSubmitted($requestParams)) {
             // We let the adapter search for the instance of the declared Form in config with the submitted id if any
             $submittedForm = $registry->getForm($requestParams["id"]);
-            // If a Form has been founded
+            // If a Form was found
             if (!is_null($submittedForm)) {
                 $requestManager = new RequestManager(new Request($requestParams), $submittedForm);
                 $workflow = new Workflow($requestManager);
@@ -28,18 +31,23 @@ class Listener
                 // If no declared Form has been found with this id
             }
         }
+        return $this;
     }
 
     /**
-     * We get the potentially submitted params and organize and store them in the $requestParams array :
+     * Extracts the Crudity data from the given request
+     *
+     * We get the potentially submitted params and organize and return them as an array :
      *  ["id"]      => (string) The Crudity Form Id
      *  ["action"]  => (string) The action to perform with submitted params
      *  ["row_id"]  => (string) The optional Row Id to affect or read if action is read, update or delete
      *  ["params"]  => (array)  All other params submitted
+     * @param null|array $request
+     * @return array
      */
-    private function getRequestParams()
+    private function getRequestParams($request = null)
     {
-        $userParams = $_POST;
+        $userParams = (!is_null($request)) ? $request : $_POST;
         // We initialize the params
         $requestParams = array(
             "id" => null,
