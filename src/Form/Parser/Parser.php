@@ -11,7 +11,7 @@
 
 namespace Neverdane\Crudity\Form\Parser;
 
-use Neverdane\Crudity\Exception\Exception;
+use Neverdane\Crudity\Exception\CrudityException;
 use Neverdane\Crudity\Field\FieldHandler;
 use Neverdane\Crudity\Field\FieldInterface;
 
@@ -103,7 +103,7 @@ class Parser
      * Returns for each given fields occurrence its Field instance
      * @param array $occurrences
      * @param null|string $defaultEntityName
-     * @throws Exception
+     * @throws CrudityException
      * @return array
      */
     private function getEntitiesDataByOccurrences($occurrences, $defaultEntityName = null)
@@ -115,7 +115,7 @@ class Parser
             unset($fieldParams['params']['entityName']);
             if (is_null($entityName)) {
                 if (is_null($defaultEntityName)) {
-                    throw new Exception('The default Entity name must be given.');
+                    throw new CrudityException('The default Entity name must be given.');
                 }
                 $entityName = $defaultEntityName;
             }
@@ -215,7 +215,7 @@ class Parser
      * Returns the Fields instances extracted from the set html
      * They are also stored in the instance
      * @param null|string $defaultEntityName
-     * @throws Exception
+     * @throws CrudityException
      * @return array
      */
     public function getEntitiesData($defaultEntityName = null)
