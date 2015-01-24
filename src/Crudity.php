@@ -66,7 +66,6 @@ class Crudity
     public static function createForm($html, $defaultEntityName = null)
     {
         $entityFactory = new EntityFactory();
-        $fieldFactory = new FieldFactory();
         // We instantiate a FormParser in order to extract required data to build the Crudity Form
         $formParser = new Parser($html);
 
@@ -78,7 +77,7 @@ class Crudity
         $formattedHtml = $formParser->getFormattedHtml();
 
         // We create the Entities and their Fields according to the parsed data
-        $entities = $entityFactory->createEntities($entitiesData, $fieldFactory);
+        $entities = $entityFactory->createEntities($entitiesData);
         // We give the FormView its render
         $formView = new View($formattedHtml);
 
