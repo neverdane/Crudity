@@ -18,7 +18,7 @@ use Neverdane\Crudity\Form\Parser\Parser;
 use Neverdane\Crudity\Form\View;
 
 /**
- * This class is a Facade that eases manipulation
+ * This class is a Facade that eases Crudity manipulation
  * @package Neverdane\Crudity
  * @author Alban Pommeret <alban@aocreation.com>
  */
@@ -26,7 +26,9 @@ class Crudity
 {
     /**
      * Triggers the listening of the Request
+     *
      * @param null|Registry $registry
+     *  The registry instance which embeds the Form instances
      */
     public static function listen($registry = null)
     {
@@ -39,9 +41,9 @@ class Crudity
      * By parsing the given file and returns it
      *
      * @param string $file
-     *  The path to the file
+     *  The path to the HTML file
      * @param null|string $defaultEntityName
-     *  The entity name that will be used when no entity was set on the Field
+     *  The entity name that will be used when no entity was set on a Field
      * @return Form
      */
     public static function createFromFile($file, $defaultEntityName = null)
@@ -56,8 +58,9 @@ class Crudity
      * By parsing the given html and returns it
      *
      * @param string $html
-     *  The HTML to parse.
+     *  The HTML to parse
      * @param null|string $defaultEntityName
+     *  The entity name that will be used when no entity was set on a Field
      * @return Form
      */
     public static function createForm($html, $defaultEntityName = null)
@@ -67,7 +70,7 @@ class Crudity
         // We instantiate a FormParser in order to extract required data to build the Crudity Form
         $formParser = new Parser($html);
 
-        // We get the attribute id of the form
+        // We get the id attribute of the form
         $formId = $formParser->getId();
         // We get all the detected entities and their fields data
         $entitiesData = $formParser->getEntitiesData($defaultEntityName);
@@ -79,7 +82,7 @@ class Crudity
         // We give the FormView its render
         $formView = new View($formattedHtml);
 
-        // We finally create the Crudity Form and set its id, its Entities and its View instances
+        // We finally create the Crudity Form and set its id, its Entities and its View instance
         $form = new Form();
         $form->setId($formId)
             ->setEntities($entities)
