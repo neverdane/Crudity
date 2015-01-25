@@ -173,7 +173,7 @@
         });
     };
 
-    Crudity.prototype.setDelete = function (id, text) {
+    Crudity.prototype.setActionToDelete = function (id, text) {
         this.$el.find(".cr__fieldset--delete").show();
         this.$el.find(".cr__fieldset--edit").hide();
         this.$el.find(".cr__placeholder--name").html(text);
@@ -225,7 +225,7 @@
         }, "json");
     };
 
-    Crudity.prototype.setCreate = function () {
+    Crudity.prototype.setActionToCreate = function () {
         this.action = 'create';
     };
 
@@ -271,13 +271,13 @@
 
         switch(action) {
             case 'create':
-                crudity.setCreate();
+                crudity.setActionToCreate();
                 break;
             case 'update':
-                crudity.setUpdate();
+                crudity.setActionToUpdate();
                 break;
             case 'delete':
-                crudity.setDelete();
+                crudity.setActionToDelete();
                 break;
             default:
                 break;
