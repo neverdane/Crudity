@@ -1,11 +1,13 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 // We get the Composer autoloader
 require '../../vendor/autoload.php';
 // We create a namespace alias to Crudity
 use Neverdane\Crudity;
 
 // We store our database connection to Crudity Db. This connection will be used on database manipulation.
-$pdo = new PDO('mysql:host=localhost;dbname=crudity', 'root', '');
+$pdo = new PDO('mysql:host=192.168.1.21;dbname=crudity', 'root', '');
 // We register this connection as 'pdo' in order to pass the wanted connection to our Forms
 Crudity\Db\Db::registerAdapter('pdo', new Crudity\Db\Layer\PdoAdapter($pdo));
 
