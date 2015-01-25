@@ -20,7 +20,9 @@
 
     var pluginName = 'crudity',
         defaults = {
-            action: 'create'
+            action: 'create',
+            errorHighlighted: true,
+            errorGrouped: false
         };
 
     function Crudity(el, options) {
@@ -41,8 +43,8 @@
     Crudity.prototype.init = function () {
         var self = this;
         // On form submission
-        this.onSubmit = function () {
-            self.handleSubmit();
+        this.onSubmit = function (e) {
+            self.handleSubmit(e);
         };
         this.$el.on("submit", this.onSubmit);
 
@@ -71,7 +73,6 @@
         this.hideAllErrors();
         this.disableSubmitButton();
         // We get the potential configuration we set for this form
-        var params = {};
         var sData = this.getDataToSend();
         var url = this.$el.attr("action") || window.location.href;
         var method = this.$el.attr("method") || "post";
@@ -84,12 +85,12 @@
                 if (response.status === 1) {
                     self.$el.trigger("cruditySuccess");
                 } else {
-                    self.handleErrors(response.errors, params);
+                    self.handleErrors(response.errors);
                 }
             },
             error: function () {
                 self.enableSubmitButton();
-                self.showGlobalError(params.messages.fail);
+                self.showGlobalError(this.options.messages.fail);
             }
         });
     };
@@ -151,7 +152,7 @@
         $("<div>" + content + "</div>").appendTo(this.$el).hide().slideDown();
     };
 
-    Crudity.prototype.handleErrors = function (errors, params) {
+    Crudity.prototype.handleErrors = function (errors) {
         var self = this;
         // We handle the potential errors display
         $.each(errors.fields, function (fieldName, rows) {
@@ -160,10 +161,10 @@
                 if ($guilt.length === 0) {
                     $guilt = self.$el.find("[name^='" + fieldName + "[']").eq(index);
                 }
-                if (params.errorHighlighted) {
+                if (self.options.errorHighlighted) {
                     $guilt.addClass("cr-guilt--highlight");
                 }
-                if (params.errorGrouped === false) {
+                if (self.options.errorGrouped === false) {
                     self.displayError($guilt, error.message, "");
                 } else {
                     self.showGlobalError(error.message);
