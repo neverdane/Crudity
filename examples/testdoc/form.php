@@ -1,4 +1,4 @@
-<form id="userForm">
+<form id="userForm" novalidate>
     <label>Name</label><input type="text" required="true" name="name"><br/>
     <label>Birthdate</label><input type="date" required="true" name="birthdate"><br/>
     <label>Biography</label><textarea name="biography"></textarea><br/>
