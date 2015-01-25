@@ -19,7 +19,9 @@
     "use strict";
 
     var pluginName = 'crudity',
-        defaults = {};
+        defaults = {
+            action: 'create'
+        };
 
     function Crudity(el, options) {
 
@@ -30,6 +32,7 @@
         this.id = this.$el.attr("id");
 
         this.options = $.extend({}, defaults, options);
+        this.action = this.options.action;
 
         this.init();
         return this;

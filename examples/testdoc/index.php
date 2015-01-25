@@ -38,7 +38,7 @@ $registry->storeForm($form);
         <script>
             $().ready(function () {
                 <?php // We trigger Crudity on our form and set its action to creation ?>
-                $('#userForm').crudity().crSetCreate();
+                $('#userForm').crudity({action: 'create'});
             });
         </script>
     </body>
