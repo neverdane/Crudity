@@ -31,9 +31,14 @@
 
         this.el = el;
         this.$el = $(el);
-        this.id = this.$el.attr("id");
+
+        var nativeOptions = this.$el.data('config');
+        $.extend(defaults, nativeOptions);
+        this.$el.removeAttr('data-config');
 
         this.options = $.extend({}, defaults, options);
+
+        this.id = this.$el.attr("id");
         this.action = this.options.action;
 
         this.init();
@@ -42,6 +47,7 @@
 
     Crudity.prototype.init = function () {
         var self = this;
+
         // On form submission
         this.onSubmit = function (e) {
             self.handleSubmit(e);
