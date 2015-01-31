@@ -285,7 +285,6 @@
     // TODO Create Crudity API
     $.crudity.setAction = function ($obj, action, params) {
         var crudity = $obj.data('plugin_' + pluginName);
-
         if (typeof crudity === 'undefined')
             return;
 
@@ -303,5 +302,12 @@
                 break;
         }
     };
+
+    $.crudity.fetch = function($obj) {
+        var crudity = $obj.data('plugin_' + pluginName);
+        if (typeof crudity === 'undefined')
+            return;
+        crudity.fetch();
+    }
 
 })(jQuery, window, document);

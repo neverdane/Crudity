@@ -22,6 +22,7 @@ class Request
     const ACTION_READ = "read";
     const ACTION_UPDATE = "update";
     const ACTION_DELETE = "delete";
+    const ACTION_FETCH = "fetch";
 
     private $action = null;
     private $rowId = null;

@@ -138,6 +138,25 @@ class RequestManager
         return $this;
     }
 
+    public function fetch()
+    {
+        // We instantiate a new Db that will handle the Db interaction
+        $db = new Db\Db();
+        // We set the DbAdapter configured on this Form
+        $db->setAdapter($this->getForm()->getDbAdapter());
+
+        $entitiesValues = array();
+        foreach ($this->getForm()->getEntities() as $entity) {
+            $fields = $entity->getFields();
+            foreach ($fields as $field) {
+                $entitiesValues[$field->getName()] = null;
+            }
+        }
+        // We add this inserted id as a response param in order to inform the user
+        $this->getResponse()->addParam('entities', $entitiesValues);
+        return $this;
+    }
+
     /**
      * @return Db\Entity[]
      */

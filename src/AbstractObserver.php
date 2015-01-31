@@ -47,6 +47,12 @@ abstract class AbstractObserver
     public function postRead(RequestManager $rm)
     {
     }
+    public function preFetch(RequestManager $rm)
+    {
+    }
+    public function postFetch(RequestManager $rm)
+    {
+    }
     public function preSend(RequestManager $rm)
     {
     }

@@ -21,6 +21,8 @@ class Workflow
     const EVENT_DELETE_AFTER = "postDelete";
     const EVENT_READ_BEFORE = "preRead";
     const EVENT_READ_AFTER = "postRead";
+    const EVENT_FETCH_BEFORE = "preFetch";
+    const EVENT_FETCH_AFTER = "postFetch";
     const EVENT_SEND_BEFORE = "preSend";
 
     /**
@@ -110,6 +112,15 @@ class Workflow
         }
     }
 
+    private function fetch()
+    {
+        if ($this->getRequestManager()->isWorkflowOpened()) {
+            $this->notify(self::EVENT_READ_BEFORE);
+            $this->getRequestManager()->fetch();
+            $this->notify(self::EVENT_READ_AFTER);
+        }
+    }
+
     private function send()
     {
         $this->notify(self::EVENT_SEND_BEFORE);
@@ -146,6 +157,9 @@ class Workflow
                 break;
             case Request::ACTION_READ :
                 $this->read();
+                break;
+            case Request::ACTION_FETCH :
+                $this->fetch();
                 break;
         }
         $this->send();
