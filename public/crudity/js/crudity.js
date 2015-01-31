@@ -179,11 +179,11 @@
         });
     };
 
-    Crudity.prototype.setActionToDelete = function (id, text) {
+    Crudity.prototype.setActionToDelete = function (params) {
         this.$el.find(".cr__fieldset--delete").show();
         this.$el.find(".cr__fieldset--edit").hide();
-        this.$el.find(".cr__placeholder--name").html(text);
-        this.rowId = id;
+        this.$el.find(".cr__placeholder--name").html(params.text);
+        this.rowId = params.id;
         this.action = "delete";
     };
 
@@ -269,7 +269,7 @@
 
     $.crudity = {};
     // TODO Create Crudity API
-    $.crudity.setAction = function ($obj, action) {
+    $.crudity.setAction = function ($obj, action, params) {
         var crudity = $obj.data('plugin_' + pluginName);
 
         if (typeof crudity === 'undefined')
@@ -280,10 +280,10 @@
                 crudity.setActionToCreate();
                 break;
             case 'update':
-                crudity.setActionToUpdate();
+                crudity.setActionToUpdate(params);
                 break;
             case 'delete':
-                crudity.setActionToDelete();
+                crudity.setActionToDelete(params);
                 break;
             default:
                 break;
