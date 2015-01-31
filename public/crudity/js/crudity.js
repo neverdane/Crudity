@@ -265,11 +265,22 @@
     };
 
     Crudity.prototype.fetch = function () {
+        var self = this;
         var sData = {
-            crudity_form_id : this.id,
+            crudity_form_id: this.id,
             crudity_form_action: 'fetch'
         };
-        this.doRequest(sData);
+        this.doRequest(sData, function (response) {
+            $.each(response.params.fields, function (fieldName, fieldValues) {
+                $.each(fieldValues, function (index, value) {
+                    var $el = self.$el;
+                    var $field = $($el.find('[name="' + fieldName + '[' + index + ']"]')[0]
+                    || $el.find('[name="' + fieldName + '[]"]').eq(index)[0]
+                    || $el.find('[name="' + fieldName + '"]')[0]);
+                    $field.val(value);
+                });
+            });
+        });
     };
 
     $.fn[pluginName] = function (options) {
@@ -303,7 +314,7 @@
         }
     };
 
-    $.crudity.fetch = function($obj) {
+    $.crudity.fetch = function ($obj) {
         var crudity = $obj.data('plugin_' + pluginName);
         if (typeof crudity === 'undefined')
             return;

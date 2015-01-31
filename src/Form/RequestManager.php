@@ -145,15 +145,18 @@ class RequestManager
         // We set the DbAdapter configured on this Form
         $db->setAdapter($this->getForm()->getDbAdapter());
 
-        $entitiesValues = array();
+        $values = array();
         foreach ($this->getForm()->getEntities() as $entity) {
             $fields = $entity->getFields();
             foreach ($fields as $field) {
-                $entitiesValues[$field->getName()] = $field->getDefaultValue();
+                if(!isset($values[$field->getName()])) {
+                    $values[$field->getName()] = array();
+                }
+                $values[$field->getName()][] = $field->getDefaultValue();
             }
         }
         // We add this inserted id as a response param in order to inform the user
-        $this->getResponse()->addParam('entities', $entitiesValues);
+        $this->getResponse()->addParam('fields', $values);
         return $this;
     }
 
