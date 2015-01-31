@@ -33,4 +33,8 @@ Interface FieldInterface
     public function getValidators();
 
     public function validate($response, $errorMessages = array());
+
+    public function setDefaultValue($value);
+
+    public function getDefaultValue();
 }

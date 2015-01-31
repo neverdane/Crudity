@@ -48,6 +48,7 @@ abstract class AbstractField implements FieldInterface
      * @var null|string
      */
     public $type = null;
+    protected $defaultValue = null;
 
     private $values = array();
     private $join = null;
@@ -202,7 +203,8 @@ abstract class AbstractField implements FieldInterface
     /**
      * @return array|FieldValue[]
      */
-    public function getValues(){
+    public function getValues()
+    {
         return $this->values;
     }
 
@@ -276,5 +278,23 @@ abstract class AbstractField implements FieldInterface
 
     protected function initializeValidators()
     {
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setDefaultValue($value)
+    {
+        $this->defaultValue = $value;
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getDefaultValue()
+    {
+        return $this->defaultValue;
     }
 }
