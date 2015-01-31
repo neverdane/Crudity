@@ -80,13 +80,7 @@
         this.disableSubmitButton();
         // We get the potential configuration we set for this form
         var sData = this.getDataToSend();
-        var url = this.$el.attr("action") || window.location.href;
-        var method = this.$el.attr("method") || "post";
-        $.ajax(url, {
-            data: sData,
-            dataType: "json",
-            type: method,
-            success: function (response) {
+        this.doRequest(sData, function (response) {
                 self.enableSubmitButton();
                 if (response.status === 1) {
                     self.$el.trigger("cruditySuccess");
@@ -94,10 +88,22 @@
                     self.handleErrors(response.errors);
                 }
             },
-            error: function () {
+            function () {
                 self.enableSubmitButton();
-                self.showGlobalError(this.options.messages.fail);
+                self.showGlobalError(self.options.messages.fail);
             }
+        );
+    };
+
+    Crudity.prototype.doRequest = function (sData, onSuccess, onError) {
+        var url = this.$el.attr("action") || window.location.href;
+        var method = this.$el.attr("method") || "post";
+        $.ajax(url, {
+            data: sData,
+            dataType: "json",
+            type: method,
+            success: onSuccess,
+            error: onError
         });
     };
 
@@ -258,6 +264,14 @@
         });
     };
 
+    Crudity.prototype.fetch = function () {
+        var sData = {
+            crudity_form_id : this.id,
+            crudity_form_action: 'fetch'
+        };
+        this.doRequest(sData);
+    };
+
     $.fn[pluginName] = function (options) {
         return this.each(function () {
             if (!$.data(this, 'plugin_' + pluginName)) {
@@ -275,7 +289,7 @@
         if (typeof crudity === 'undefined')
             return;
 
-        switch(action) {
+        switch (action) {
             case 'create':
                 crudity.setActionToCreate();
                 break;
