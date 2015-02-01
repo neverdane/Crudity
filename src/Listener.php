@@ -42,7 +42,7 @@ class Listener
      *  ["action"]  => (string) The action to perform with submitted params
      *  ["row_id"]  => (string) The optional Row Id to affect or read if action is read, update or delete
      *  ["params"]  => (array)  All other params submitted
-     *  ["rows"]    => (array) The rows to fetch or affect
+     *  ["row_ids"] => (array) The row ids to fetch or affect
      * @param null|array $request
      * @return array
      */
@@ -55,7 +55,7 @@ class Listener
             'action' => null,
             'row_id' => null,
             'params' => array(),
-            'rows'   => array()
+            'row_ids'   => array()
         );
         foreach ($userParams as $paramName => $paramValue) {
             switch ($paramName) {
@@ -68,8 +68,8 @@ class Listener
                 case 'crudity_form_id':
                     $requestParams['id'] = $paramValue;
                     continue;
-                case 'crudity_form_rows':
-                    $requestParams['rows'] = $paramValue;
+                case 'crudity_form_row_ids':
+                    $requestParams['row_ids'] = $paramValue;
                     continue;
                 default:
                     $requestParams['params'][$paramName] = $paramValue;
