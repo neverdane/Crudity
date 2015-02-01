@@ -149,10 +149,11 @@ class RequestManager
         foreach ($this->getForm()->getEntities() as $entity) {
             $fields = $entity->getFields();
             foreach ($fields as $field) {
-                if(!isset($values[$field->getName()])) {
-                    $values[$field->getName()] = array();
+                $fieldName = $field->getName();
+                if(!isset($values[$fieldName])) {
+                    $values[$fieldName] = array();
                 }
-                $values[$field->getName()][] = $field->getDefaultValue();
+                $values[$fieldName][] = $field->getDefaultValue();
             }
         }
         // We add this inserted id as a response param in order to inform the user
