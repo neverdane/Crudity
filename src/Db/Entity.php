@@ -182,6 +182,16 @@ class Entity
     }
 
     /**
+     * @param Db $db
+     * @param int $id
+     * @return array
+     */
+    public function fetch($db, $id)
+    {
+        return $db->selectRow($this->getEntity(), $id);
+    }
+
+    /**
      * @return array
      */
     private function getRowValues()
