@@ -42,6 +42,7 @@ class Listener
      *  ["action"]  => (string) The action to perform with submitted params
      *  ["row_id"]  => (string) The optional Row Id to affect or read if action is read, update or delete
      *  ["params"]  => (array)  All other params submitted
+     *  ["rows"]    => (array) The rows to fetch or affect
      * @param null|array $request
      * @return array
      */
