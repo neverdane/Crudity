@@ -53,7 +53,8 @@ class Listener
             'id' => null,
             'action' => null,
             'row_id' => null,
-            'params' => array()
+            'params' => array(),
+            'rows'   => array()
         );
         foreach ($userParams as $paramName => $paramValue) {
             switch ($paramName) {
@@ -65,6 +66,9 @@ class Listener
                     continue;
                 case 'crudity_form_id':
                     $requestParams['id'] = $paramValue;
+                    continue;
+                case 'crudity_form_rows':
+                    $requestParams['rows'] = $paramValue;
                     continue;
                 default:
                     $requestParams['params'][$paramName] = $paramValue;
