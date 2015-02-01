@@ -146,19 +146,15 @@ class RequestManager
         $db->setAdapter($this->getForm()->getDbAdapter());
 
         $requestedRowIds = $this->getRequest()->getRowIds();
-        $values = array();
-        foreach ($this->getForm()->getEntities() as $entity) {
-            $fields = $entity->getFields();
-            foreach ($fields as $field) {
-                $fieldName = $field->getName();
-                if(!isset($values[$fieldName])) {
-                    $values[$fieldName] = array();
-                }
-                $values[$fieldName][] = $field->getDefaultValue();
+        $rows = array();
+        foreach ($requestedRowIds as $entityName => $rowIds) {
+            $entity = $this->getForm()->getEntity($entityName);
+            $rows[$entityName] = array();
+            foreach ($rowIds as $rowId) {
+                $rows[$entityName][$rowId] = $entity->fetch($db, $rowId);
             }
         }
-        // We add this inserted id as a response param in order to inform the user
-        $this->getResponse()->addParam('fields', $values);
+        $this->getResponse()->addParam('rows', $rows);
         return $this;
     }
 
