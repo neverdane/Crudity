@@ -27,4 +27,6 @@ interface AdapterInterface
     public function updateRow($entity, $id, $data);
 
     public function deleteRow($entity, $id);
+
+    public function selectRow($table, $id);
 }

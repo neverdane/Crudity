@@ -72,6 +72,15 @@ class PdoAdapter extends AbstractAdapter implements AdapterInterface
         return $result;
     }
 
+    public function selectRow($table, $id)
+    {
+        $connection = $this->getConnection();
+        $connection->beginTransaction();
+        $idColumn = $this->getPrimaryKey($table);
+        $result = $connection->query("SELECT * FROM $table WHERE $idColumn=$id");
+        return $result->fetch(\PDO::FETCH_ASSOC);
+    }
+
     private function getColumnsSlug($data)
     {
         return join(', ', array_keys($data));
