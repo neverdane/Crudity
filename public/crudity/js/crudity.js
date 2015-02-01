@@ -264,11 +264,12 @@
         });
     };
 
-    Crudity.prototype.fetch = function () {
+    Crudity.prototype.fetch = function (rowIds) {
         var self = this;
         var sData = {
             crudity_form_id: this.id,
-            crudity_form_action: 'fetch'
+            crudity_form_action: 'fetch',
+            crudity_form_row_ids: rowIds
         };
         this.doRequest(sData, function (response) {
             $.each(response.params.fields, function (fieldName, fieldValues) {
@@ -314,11 +315,11 @@
         }
     };
 
-    $.crudity.fetch = function ($obj) {
+    $.crudity.fetch = function ($obj, rowIds) {
         var crudity = $obj.data('plugin_' + pluginName);
         if (typeof crudity === 'undefined')
             return;
-        crudity.fetch();
+        crudity.fetch(rowIds);
     }
 
 })(jQuery, window, document);
