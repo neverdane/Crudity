@@ -50,24 +50,24 @@ class Listener
         $userParams = (!is_null($request)) ? $request : $_POST;
         // We initialize the params
         $requestParams = array(
-            "id" => null,
-            "action" => null,
-            "row_id" => null,
-            "params" => array()
+            'id' => null,
+            'action' => null,
+            'row_id' => null,
+            'params' => array()
         );
         foreach ($userParams as $paramName => $paramValue) {
             switch ($paramName) {
-                case "crudity_form_action":
-                    $requestParams["action"] = $paramValue;
+                case 'crudity_form_action':
+                    $requestParams['action'] = $paramValue;
                     continue;
-                case "crudity_form_row_id":
-                    $requestParams["row_id"] = $paramValue;
+                case 'crudity_form_row_id':
+                    $requestParams['row_id'] = $paramValue;
                     continue;
-                case "crudity_form_id":
-                    $requestParams["id"] = $paramValue;
+                case 'crudity_form_id':
+                    $requestParams['id'] = $paramValue;
                     continue;
                 default:
-                    $requestParams["params"][$paramName] = $paramValue;
+                    $requestParams['params'][$paramName] = $paramValue;
                     break;
             }
         }
