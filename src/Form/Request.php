@@ -27,6 +27,7 @@ class Request
     private $action = null;
     private $rowId = null;
     private $params = array();
+    private $rowIds = array();
 
     /**
      * @param null|array $requestParams
@@ -41,6 +42,9 @@ class Request
         }
         if (isset($requestParams["params"])) {
             $this->setParams($requestParams["params"]);
+        }
+        if (isset($requestParams["row_ids"])) {
+            $this->setRowIds($requestParams["row_ids"]);
         }
     }
 
@@ -108,6 +112,21 @@ class Request
     public function getParams()
     {
         return $this->params;
+    }
+
+    public function getRowIds()
+    {
+        return $this->rowIds;
+    }
+
+    /**
+     * @param array $rowIds
+     * @return $this
+     */
+    public function setRowIds($rowIds)
+    {
+        $this->rowIds = $rowIds;
+        return $this;
     }
 
 }

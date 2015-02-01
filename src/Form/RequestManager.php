@@ -145,6 +145,7 @@ class RequestManager
         // We set the DbAdapter configured on this Form
         $db->setAdapter($this->getForm()->getDbAdapter());
 
+        $requestedRowIds = $this->getRequest()->getRowIds();
         $values = array();
         foreach ($this->getForm()->getEntities() as $entity) {
             $fields = $entity->getFields();
