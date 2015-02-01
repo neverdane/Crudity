@@ -306,8 +306,8 @@ class Parser
     {
         // We test if the current field analyzed is a Crudity functional field in the aim to not manage them
         // We reject the submit buttons and the inputs that have cr-excluded attribute
-        return ($this->getAdapter()->getAttribute($occurrence, 'type') === "submit"
-            || is_null($this->getAdapter()->getAttribute($occurrence, self::$prefix . "-excluded"))
+        return !($this->getAdapter()->getAttribute($occurrence, 'type') === "submit"
+            || !is_null($this->getAdapter()->getAttribute($occurrence, self::$prefix . "-excluded"))
         );
     }
 
