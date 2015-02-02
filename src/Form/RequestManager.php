@@ -146,19 +146,24 @@ class RequestManager
         $db->setAdapter($this->getForm()->getDbAdapter());
 
         $requestedRowIds = $this->getRequest()->getRowIds();
-        $rows = array();
+        $fields = array();
         foreach ($requestedRowIds as $entityName => $rowIds) {
             $entity = $this->getForm()->getEntity($entityName);
-            $rows[$entityName] = array();
             $columns = array();
             foreach ($entity->getFields() as $field) {
                 $columns[] = $field->getName();
             }
             foreach ($rowIds as $rowId) {
-                $rows[$entityName][$rowId] = $entity->fetch($db, $rowId, $columns);
+                $rows = $entity->fetch($db, $rowId, $columns);
+                foreach ($rows as $fieldName => $value) {
+                    if (!isset($fields[$fieldName])) {
+                        $fields[$fieldName] = array();
+                    }
+                    $fields[$fieldName][$rowId] = $value;
+                }
             }
         }
-        $this->getResponse()->addParam('rows', $rows);
+        $this->getResponse()->addParam('fields', $fields);
         return $this;
     }
 
