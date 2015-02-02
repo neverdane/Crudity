@@ -82,9 +82,9 @@ class Db
         return $this->getAdapter()->deleteRow($table, $id);
     }
 
-    public function selectRow($table, $id)
+    public function selectRow($table, $id, $columns = array())
     {
-        return $this->getAdapter()->selectRow($table, $id);
+        return $this->getAdapter()->selectRow($table, $id, $columns);
     }
 
 }

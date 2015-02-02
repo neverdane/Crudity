@@ -150,8 +150,12 @@ class RequestManager
         foreach ($requestedRowIds as $entityName => $rowIds) {
             $entity = $this->getForm()->getEntity($entityName);
             $rows[$entityName] = array();
+            $columns = array();
+            foreach ($entity->getFields() as $field) {
+                $columns[] = $field->getName();
+            }
             foreach ($rowIds as $rowId) {
-                $rows[$entityName][$rowId] = $entity->fetch($db, $rowId);
+                $rows[$entityName][$rowId] = $entity->fetch($db, $rowId, $columns);
             }
         }
         $this->getResponse()->addParam('rows', $rows);

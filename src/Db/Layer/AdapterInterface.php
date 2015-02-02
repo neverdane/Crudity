@@ -28,5 +28,5 @@ interface AdapterInterface
 
     public function deleteRow($entity, $id);
 
-    public function selectRow($table, $id);
+    public function selectRow($table, $id, $columns = array());
 }
