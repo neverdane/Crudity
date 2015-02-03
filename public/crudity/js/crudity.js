@@ -25,6 +25,12 @@
             errorGrouped: false
         };
 
+    function Entity(entityName) {
+        this.name = entityName;
+        this.rows = [];
+        return this;
+    }
+
     function Crudity(el, options) {
 
         this.name = pluginName;
