@@ -31,6 +31,12 @@
         return this;
     }
 
+    function Row(id, fields) {
+        this.id = id || null;
+        this.$wrapper = null;
+        this.fields = {};
+    }
+
     function Crudity(el, options) {
 
         this.name = pluginName;
