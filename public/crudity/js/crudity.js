@@ -57,6 +57,10 @@
         return this;
     }
 
+    function getRowName(name) {
+        return name.slice(0, name.indexOf("["));
+    }
+
     Crudity.prototype.init = function () {
         var self = this;
 
@@ -70,6 +74,37 @@
             self.handleGuiltyChange(this)
         };
         this.$el.on("change", ".cr-guilt--highlight", this.onGuiltyChange);
+
+        this.analyzeEntities();
+    };
+
+    Crudity.prototype.analyzeEntities = function() {
+        var entities = {};
+        var rows = {};
+        var rowsOccurrences = {};
+        $.each('[data-cr-entity]', function(index, entityName) {
+            if(!entities[entityName]) {
+                entities[entityName] = new Entity(entityName);
+                rows[entityName] = {};
+            }
+            var rowName = getRowName($(this).attr("name"));
+            if(!rows[entityName][rowName]) {
+                rowsOccurrences[entityName][rowName] = 0;
+            }
+            var rowIndex = rowsOccurrences[entityName][rowName]++;
+            if(!rows[entityName][rowIndex]) {
+                rowsOccurrences[entityName][rowIndex] = {};
+            }
+            rows[entityName][rowName].push($(this));
+        });
+
+        $.each(rows, function(entityName, rows) {
+            $.each(rows, function(rowIndex, fields) {
+                var row = new Row(rowIndex, fields);
+                entities[entityName].push(row);
+            });
+        });
+        this.entities = entities;
     };
 
     Crudity.prototype.addParams = function (addedParams) {
