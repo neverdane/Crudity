@@ -21,7 +21,7 @@ class EntityFactory
 
     public function createEntityFromData($entityName, $entityData, $fieldFactory = null)
     {
-        $fieldFactory = (!is_null($fieldFactory)) ? $fieldFactory : new FieldFactory();
+        $fieldFactory = $fieldFactory ?: new FieldFactory();
         $entity = $this->createEntity($entityName, $entityData['entity']);
         $fields = array();
         foreach ($entityData['fields'] as $fieldData) {

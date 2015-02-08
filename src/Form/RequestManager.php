@@ -43,7 +43,7 @@ class RequestManager
     {
         $this->request = $request;
         $this->form = $form;
-        $this->response = (!is_null($response)) ? $response : new Response();
+        $this->response = $response ?: new Response();
         // We affect the request values to the Form fields
         $this->affectRequest();
     }

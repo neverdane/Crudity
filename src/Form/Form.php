@@ -57,7 +57,7 @@ class Form
     public function __construct($config = null)
     {
         // If no config was given, we instantiate a default one
-        $this->config = (!is_null($config)) ? $config : new Config();
+        $this->config = $config ?: new Config();
     }
 
     /**

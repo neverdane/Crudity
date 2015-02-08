@@ -15,7 +15,7 @@ class Listener
      */
     public function listen($registry = null)
     {
-        $registry = (!is_null($registry)) ? $registry : new Registry();
+        $registry = $registry ?: new Registry();
         // We get the submitted params if any
         $requestParams = $this->getRequestParams();
         // If we detect that a Crudity Form has been submitted (a crudity Form Id has been launched)
